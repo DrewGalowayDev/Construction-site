@@ -1,0 +1,741 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Construction Material & Cost Estimator</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item"><a class="text-white" href="/materials">Materials</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Material Calculator</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-xxl py-4">
+    <div class="container">
+        <!-- Introduction Banner -->
+        <div class="card border-0 shadow-sm bg-white p-4 mb-4">
+            <div class="row align-items-center g-3">
+                <div class="col-lg-8">
+                    <span class="badge bg-primary text-uppercase px-3 py-2 mb-2"><i class="fa fa-calculator me-1"></i>Kenyan Site Standard Rates</span>
+                    <h3 class="fw-bold text-dark mb-2">Estimate Quantities & Budget for Your Site Build</h3>
+                    <p class="text-muted mb-0">
+                        Calculate exact bags of cement, sand lorries, ballast, machine-cut stones, and roofing sheets based on your architectural dimensions. Prices are dynamically calibrated to active hardware and quarry catalog rates across Kenya.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <div class="p-3 bg-light rounded text-start d-inline-block w-100">
+                        <small class="text-muted d-block fw-bold mb-1"><i class="fa fa-map-marker-alt text-primary me-1"></i>Project Site County</small>
+                        <select id="estimatorCounty" class="form-select form-select-sm" onchange="updateCountyContext(this.value)">
+                            <% counties.forEach(c => { %>
+                                <option value="<%= c %>" <%= c === preselectedCounty ? 'selected' : '' %>><%= c %> County</option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column: Interactive Estimation Modules -->
+            <div class="col-lg-8">
+                <!-- Module Navigation Tabs -->
+                <ul class="nav nav-pills nav-fill bg-light p-2 rounded shadow-sm mb-4 gap-2" id="calcTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active fw-bold py-2" id="concrete-tab" data-bs-toggle="pill" data-bs-target="#tab-concrete" type="button">
+                            <i class="fa fa-layer-group me-1"></i>1. Concrete & Slabs
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold py-2" id="walling-tab" data-bs-toggle="pill" data-bs-target="#tab-walling" type="button">
+                            <i class="fa fa-th me-1"></i>2. Stone Walling
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold py-2" id="plaster-tab" data-bs-toggle="pill" data-bs-target="#tab-plaster" type="button">
+                            <i class="fa fa-paint-roller me-1"></i>3. Plaster & Screed
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold py-2" id="roofing-tab" data-bs-toggle="pill" data-bs-target="#tab-roofing" type="button">
+                            <i class="fa fa-home me-1"></i>4. Roofing Sheets
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="calcTabsContent">
+                    <!-- MODULE 1: CONCRETE & SLABS -->
+                    <div class="tab-pane fade show active" id="tab-concrete">
+                        <div class="card border-0 shadow-sm bg-white p-4 mb-4">
+                            <div class="border-start border-4 border-primary ps-3 mb-4">
+                                <h4 class="fw-bold text-dark mb-1">Concrete Volume & Mix Calculator</h4>
+                                <small class="text-muted">Calculates cement bags, river sand, and 3/4" crushed ballast for foundations, beams, columns, and slabs.</small>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Length (Meters) *</label>
+                                    <input type="number" id="conc_len" class="form-control" value="10" min="0.1" step="0.1" oninput="calculateConcrete()">
+                                    <small class="text-muted">e.g. 10m slab length</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Width (Meters) *</label>
+                                    <input type="number" id="conc_wid" class="form-control" value="8" min="0.1" step="0.1" oninput="calculateConcrete()">
+                                    <small class="text-muted">e.g. 8m slab width</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Thickness (Meters) *</label>
+                                    <select id="conc_thick" class="form-select" onchange="calculateConcrete()">
+                                        <option value="0.10">100 mm (Light Walkway / Patio)</option>
+                                        <option value="0.15" selected>150 mm (Standard Ground Slab)</option>
+                                        <option value="0.20">200 mm (Suspended Slab / Footing)</option>
+                                        <option value="0.25">250 mm (Heavy Raft Foundation)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Mix Ratio (Strength)</label>
+                                    <select id="conc_mix" class="form-select" onchange="calculateConcrete()">
+                                        <option value="1:2:4" selected>1 : 2 : 4 (Standard Structural Class 20/25 - Slabs & Beams)</option>
+                                        <option value="1:1.5:3">1 : 1.5 : 3 (High Strength Class 25/30 - Columns & Basements)</option>
+                                        <option value="1:3:6">1 : 3 : 6 (Mass Concrete / Blinding Footings)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Wastage & Compaction Margin</label>
+                                    <select id="conc_waste" class="form-select" onchange="calculateConcrete()">
+                                        <option value="1.05" selected>5% Allowance (Standard)</option>
+                                        <option value="1.10">10% Allowance (Rough Ground)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Concrete Output Strip -->
+                            <div class="p-3 bg-light rounded border">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fa fa-cubes text-primary me-2"></i>Estimated Concrete Materials:</h6>
+                                <div class="row g-3 text-center">
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Total Volume</small>
+                                            <span class="fs-5 fw-bold text-dark" id="conc_vol_res">12.6 m³</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Cement (50kg)</small>
+                                            <span class="fs-5 fw-bold text-primary" id="conc_cement_res">88 Bags</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">River Sand</small>
+                                            <span class="fs-5 fw-bold text-dark" id="conc_sand_res">7.5 Tonnes</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Crushed Ballast</small>
+                                            <span class="fs-5 fw-bold text-dark" id="conc_ballast_res">15.1 Tonnes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                    <small class="text-muted">Estimated Concrete Material Cost:</small>
+                                    <strong class="fs-5 text-primary" id="conc_cost_res">Ksh 126,500</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MODULE 2: STONE WALLING -->
+                    <div class="tab-pane fade" id="tab-walling">
+                        <div class="card border-0 shadow-sm bg-white p-4 mb-4">
+                            <div class="border-start border-4 border-primary ps-3 mb-4">
+                                <h4 class="fw-bold text-dark mb-1">Masonry Walling Calculator</h4>
+                                <small class="text-muted">Calculates machine-cut stones, cement, and sand for boundary walls, residential perimeters, and partitions.</small>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Total Wall Length (Meters) *</label>
+                                    <input type="number" id="wall_len" class="form-control" value="25" min="1" step="0.5" oninput="calculateWalling()">
+                                    <small class="text-muted">e.g. 25m boundary stretch</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Wall Height (Meters) *</label>
+                                    <input type="number" id="wall_hgt" class="form-control" value="2.6" min="0.5" step="0.1" oninput="calculateWalling()">
+                                    <small class="text-muted">e.g. 2.6m storey height</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Stone Size & Type *</label>
+                                    <select id="wall_stone_type" class="form-select" onchange="calculateWalling()">
+                                        <option value="9_inch" selected>9" Machine-Cut Quarry Stone (External / Foundation)</option>
+                                        <option value="6_inch">6" Machine-Cut Partition Stone (Internal)</option>
+                                        <option value="block_9">9" Hollow Concrete Block</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Doors & Windows Deduction (m²)</label>
+                                    <input type="number" id="wall_deduct" class="form-control" value="5" min="0" step="0.5" oninput="calculateWalling()">
+                                    <small class="text-muted">Subtract openings (approx 2m² per door, 1.5m² per window)</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Mortar Joint Thickness</label>
+                                    <select id="wall_mortar" class="form-select" onchange="calculateWalling()">
+                                        <option value="standard" selected>15mm Standard Joint (1:4 Cement:Sand)</option>
+                                        <option value="thick">20mm Rough Joint</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Walling Output Strip -->
+                            <div class="p-3 bg-light rounded border">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fa fa-th text-primary me-2"></i>Estimated Walling Materials:</h6>
+                                <div class="row g-3 text-center">
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Net Wall Area</small>
+                                            <span class="fs-5 fw-bold text-dark" id="wall_area_res">60 m²</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Building Stones</small>
+                                            <span class="fs-5 fw-bold text-primary" id="wall_stones_res">780 Pcs</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Mortar Cement</small>
+                                            <span class="fs-5 fw-bold text-dark" id="wall_cement_res">16 Bags</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Mortar Sand</small>
+                                            <span class="fs-5 fw-bold text-dark" id="wall_sand_res">3.2 Tonnes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                    <small class="text-muted">Estimated Walling Material Cost:</small>
+                                    <strong class="fs-5 text-primary" id="wall_cost_res">Ksh 59,480</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MODULE 3: PLASTER & FLOOR SCREED -->
+                    <div class="tab-pane fade" id="tab-plaster">
+                        <div class="card border-0 shadow-sm bg-white p-4 mb-4">
+                            <div class="border-start border-4 border-primary ps-3 mb-4">
+                                <h4 class="fw-bold text-dark mb-1">Wall Plaster & Floor Screed Calculator</h4>
+                                <small class="text-muted">Estimates fine plaster sand and cement bags for internal wall finishing and smooth floor screeds.</small>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Plaster Surface Area (m²) *</label>
+                                    <input type="number" id="plas_area" class="form-control" value="120" min="1" step="1" oninput="calculatePlaster()">
+                                    <small class="text-muted">Both sides of walls or floor square meters</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Application Type & Thickness</label>
+                                    <select id="plas_type" class="form-select" onchange="calculatePlaster()">
+                                        <option value="internal_12" selected>Internal Wall Plaster (12mm, 1:4 Mix)</option>
+                                        <option value="external_18">External Weather Plaster (18mm, 1:3 Mix + Waterproof)</option>
+                                        <option value="screed_25">Floor Screed (25mm, 1:3 Mix)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Plaster Output Strip -->
+                            <div class="p-3 bg-light rounded border">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fa fa-paint-roller text-primary me-2"></i>Estimated Plaster Materials:</h6>
+                                <div class="row g-3 text-center">
+                                    <div class="col-6 col-md-4">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Surface Area</small>
+                                            <span class="fs-5 fw-bold text-dark" id="plas_area_res">120 m²</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Finishing Cement</small>
+                                            <span class="fs-5 fw-bold text-primary" id="plas_cement_res">19 Bags</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Fine Plaster Sand</small>
+                                            <span class="fs-5 fw-bold text-dark" id="plas_sand_res">2.9 Tonnes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                    <small class="text-muted">Estimated Plaster Material Cost:</small>
+                                    <strong class="fs-5 text-primary" id="plas_cost_res">Ksh 22,160</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MODULE 4: ROOFING SHEETS (MABATI) -->
+                    <div class="tab-pane fade" id="tab-roofing">
+                        <div class="card border-0 shadow-sm bg-white p-4 mb-4">
+                            <div class="border-start border-4 border-primary ps-3 mb-4">
+                                <h4 class="fw-bold text-dark mb-1">Mabati & Roofing Materials Calculator</h4>
+                                <small class="text-muted">Calculates box profile corrugated sheets, ridge caps, and roofing nails for residential and site sheds.</small>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Ridge Length (Meters) *</label>
+                                    <input type="number" id="roof_ridge" class="form-control" value="12" min="1" step="0.5" oninput="calculateRoofing()">
+                                    <small class="text-muted">Length along roof crest</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Slope / Rafter Length (Meters) *</label>
+                                    <input type="number" id="roof_slope" class="form-control" value="5.5" min="1" step="0.5" oninput="calculateRoofing()">
+                                    <small class="text-muted">From ridge crest to fascia board</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-dark">Roof Style</label>
+                                    <select id="roof_style" class="form-select" onchange="calculateRoofing()">
+                                        <option value="gable" selected>Double Pitch / Gable (2 Slopes)</option>
+                                        <option value="mono">Single Pitch / Mono-Pitch (1 Slope)</option>
+                                        <option value="hip">Hip Roof (4 Slopes + 20% allowance)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Sheet Profile & Gauge</label>
+                                    <select id="roof_gauge" class="form-select" onchange="calculateRoofing()">
+                                        <option value="box_30" selected>Box Profile 30-Gauge (Popular Residential)</option>
+                                        <option value="box_28">Box Profile 28-Gauge (Heavy Commercial)</option>
+                                        <option value="corrugated_30">Normal Corrugated 30-Gauge (Economical)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Sheet Standard Length (Meters)</label>
+                                    <select id="roof_sheet_len" class="form-select" onchange="calculateRoofing()">
+                                        <option value="2.5">2.5 Meter Sheets</option>
+                                        <option value="3.0" selected>3.0 Meter Sheets</option>
+                                        <option value="custom">Custom Full-Slope Length</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Roofing Output Strip -->
+                            <div class="p-3 bg-light rounded border">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fa fa-home text-primary me-2"></i>Estimated Roofing Materials:</h6>
+                                <div class="row g-3 text-center">
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Roof Area</small>
+                                            <span class="fs-5 fw-bold text-dark" id="roof_area_res">132 m²</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Mabati Total Meters</small>
+                                            <span class="fs-5 fw-bold text-primary" id="roof_meters_res">155 M</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Ridge Caps</small>
+                                            <span class="fs-5 fw-bold text-dark" id="roof_ridge_res">7 Pcs</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="bg-white p-2 rounded shadow-sm">
+                                            <small class="text-muted d-block">Roofing Nails</small>
+                                            <span class="fs-5 fw-bold text-dark" id="roof_nails_res">8 Packets</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                    <small class="text-muted">Estimated Roofing Material Cost:</small>
+                                    <strong class="fs-5 text-primary" id="roof_cost_res">Ksh 146,850</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guidance & Practical Tips Note -->
+                <div class="alert alert-light border shadow-sm p-4 d-flex align-items-start gap-3">
+                    <i class="fa fa-info-circle fa-2x text-primary mt-1"></i>
+                    <div>
+                        <strong class="text-dark d-block mb-1">Standard Kenyan Site Practices & Conversions:</strong>
+                        <ul class="mb-0 small text-muted ps-3">
+                            <li>1 Lorry (Tipper) of sand/ballast is generally 10 to 12 Tonnes (approx. 7 m³).</li>
+                            <li>Standard machine-cut quarry stones from Juja/Ndunyu Sabuk measure 9"x9"x18" (0.23m x 0.23m x 0.45m).</li>
+                            <li>Water-cement ratio: Use approx 25-28 Litres of clean water per 50kg bag of cement.</li>
+                            <li>TopLineHub verifies local prices across Kenya to help you avoid broker overcharges.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Consolidated Bill of Quantities (BOQ) & 1-Click Order -->
+            <div class="col-lg-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-dark mb-0"><i class="fa fa-receipt text-primary me-2"></i>Consolidated BOQ</h5>
+                        <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openProformaInvoice()" title="Generate Official Proforma Invoice">
+                                <i class="fa fa-file-invoice me-1"></i>Proforma
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-dark" onclick="window.print()" title="Print BOQ">
+                                <i class="fa fa-print"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="small text-muted mb-3">
+                        Live accumulated materials for your site build in <strong class="text-dark" id="boqCountyLabel"><%= preselectedCounty %> County</strong>.
+                    </p>
+
+                    <!-- BOQ Items List -->
+                    <div class="bg-light p-3 rounded mb-4" style="max-height: 380px; overflow-y: auto;">
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <strong class="text-dark d-block small">Bamburi Tembo Cement (50kg)</strong>
+                                <small class="text-muted">@ Ksh <%= rates.cementBag.toLocaleString() %>/bag</small>
+                            </div>
+                            <span class="fw-bold text-primary" id="boq_cement_qty">123 Bags</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <strong class="text-dark d-block small">Clean River Sand (Aggregates)</strong>
+                                <small class="text-muted">@ Ksh <%= rates.sandTonne.toLocaleString() %>/tonne</small>
+                            </div>
+                            <span class="fw-bold text-dark" id="boq_sand_qty">13.6 Tonnes</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <strong class="text-dark d-block small">Machine Crushed Ballast (3/4")</strong>
+                                <small class="text-muted">@ Ksh <%= rates.ballastTonne.toLocaleString() %>/tonne</small>
+                            </div>
+                            <span class="fw-bold text-dark" id="boq_ballast_qty">15.1 Tonnes</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <strong class="text-dark d-block small">Machine-Cut Quarry Stones</strong>
+                                <small class="text-muted">@ Ksh <%= rates.stone9Inch.toLocaleString() %>/stone</small>
+                            </div>
+                            <span class="fw-bold text-primary" id="boq_stones_qty">780 Pcs</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <strong class="text-dark d-block small">Mabati Box Profile (30-Gauge)</strong>
+                                <small class="text-muted">@ Ksh <%= rates.mabatiMeter.toLocaleString() %>/meter</small>
+                            </div>
+                            <span class="fw-bold text-dark" id="boq_mabati_qty">155 Meters</span>
+                        </div>
+                    </div>
+
+                    <!-- Total Estimated Budget -->
+                    <div class="p-3 bg-light rounded text-center mb-4">
+                        <small class="text-muted d-block text-uppercase fw-bold">Combined Material Estimate</small>
+                        <div class="display-6 fw-bold text-primary" id="boq_total_cost">Ksh 354,990</div>
+                        <small class="text-muted">Excludes site transport & labor wages</small>
+                    </div>
+
+                    <!-- Direct Order Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary py-3 text-white fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#quoteModal">
+                            <i class="fa fa-shopping-cart me-2"></i>Order / Request Verified Quotes
+                        </button>
+                        <button type="button" class="btn btn-whatsapp py-3 fw-bold" onclick="sendBoqWhatsApp()">
+                            <i class="fab fa-whatsapp me-2"></i>Send BOQ on WhatsApp
+                        </button>
+                        <a href="/materials" class="btn btn-outline-dark btn-sm py-2">
+                            <i class="fa fa-search me-1"></i>Browse Verified Supplies Catalog
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Supplier Quote Modal -->
+<div class="modal fade" id="quoteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title text-white"><i class="fa fa-paper-plane text-primary me-2"></i>Request Supplier Quote</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/calculator/quote" method="POST">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="estimated_total" id="modal_total_cost" value="354990">
+                    <input type="hidden" name="boq_summary" id="modal_boq_summary" value="">
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Your Name *</label>
+                        <input type="text" name="client_name" class="form-control" value="<%= user ? user.name : '' %>" placeholder="Site Owner / Developer" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Phone / WhatsApp *</label>
+                        <input type="tel" name="client_phone" class="form-control" value="<%= user ? user.phone : '' %>" placeholder="0711000000" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Site Delivery County *</label>
+                        <select name="location_county" id="modal_county" class="form-select" required>
+                            <% counties.forEach(c => { %>
+                                <option value="<%= c %>" <%= c === preselectedCounty ? 'selected' : '' %>><%= c %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Project Type</label>
+                        <input type="text" name="project_type" class="form-control" value="Residential Building / Site Construction">
+                    </div>
+                    <div class="alert alert-light border small text-muted mb-0">
+                        <i class="fa fa-shield-alt text-success me-1"></i>
+                        TopLineHub sends this BOQ to top verified hardware yards and tipper owners in your county to provide competitive delivered pricing.
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm text-white fw-bold"><i class="fa fa-check me-1"></i>Send Quote Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Rate Constants calibrated from platform catalog
+const RATES = {
+    cementBag: <%= rates.cementBag %>,
+    sandTonne: <%= rates.sandTonne %>,
+    sandLorry10T: <%= rates.sandLorry10T %>,
+    ballastTonne: <%= rates.ballastTonne %>,
+    stone9Inch: <%= rates.stone9Inch %>,
+    stone6Inch: <%= rates.stone6Inch %>,
+    block9Inch: <%= rates.block9Inch %>,
+    mabatiMeter: <%= rates.mabatiMeter %>,
+    steelD12: <%= rates.steelD12 %>
+};
+
+let currentBOQ = {
+    concrete: { cement: 88, sand: 7.5, ballast: 15.1, cost: 126500 },
+    walling: { stones: 780, cement: 16, sand: 3.2, cost: 59480 },
+    plaster: { cement: 19, sand: 2.9, cost: 22160 },
+    roofing: { meters: 155, cost: 146850 }
+};
+
+function calculateConcrete() {
+    const len = parseFloat(document.getElementById('conc_len').value) || 0;
+    const wid = parseFloat(document.getElementById('conc_wid').value) || 0;
+    const thick = parseFloat(document.getElementById('conc_thick').value) || 0.15;
+    const waste = parseFloat(document.getElementById('conc_waste').value) || 1.05;
+    const mix = document.getElementById('conc_mix').value;
+
+    const netVol = len * wid * thick;
+    const grossVol = netVol * waste;
+
+    // Mix Factors for 1m³ wet concrete:
+    // 1:2:4 -> ~7.0 bags cement (350kg), 0.45m³ sand (0.60t), 0.85m³ ballast (1.20t)
+    // 1:1.5:3 -> ~8.0 bags cement (400kg), 0.42m³ sand (0.56t), 0.82m³ ballast (1.15t)
+    // 1:3:6 -> ~4.5 bags cement (225kg), 0.50m³ sand (0.68t), 0.90m³ ballast (1.26t)
+    let cementPerM3 = 7.0;
+    let sandPerM3 = 0.60;
+    let ballastPerM3 = 1.20;
+
+    if (mix === '1:1.5:3') {
+        cementPerM3 = 8.0;
+        sandPerM3 = 0.56;
+        ballastPerM3 = 1.15;
+    } else if (mix === '1:3:6') {
+        cementPerM3 = 4.5;
+        sandPerM3 = 0.68;
+        ballastPerM3 = 1.26;
+    }
+
+    const cementBags = Math.ceil(grossVol * cementPerM3);
+    const sandTonnes = parseFloat((grossVol * sandPerM3).toFixed(1));
+    const ballastTonnes = parseFloat((grossVol * ballastPerM3).toFixed(1));
+
+    const totalCost = (cementBags * RATES.cementBag) + (sandTonnes * RATES.sandTonne) + (ballastTonnes * RATES.ballastTonne);
+
+    document.getElementById('conc_vol_res').innerText = grossVol.toFixed(1) + ' m³';
+    document.getElementById('conc_cement_res').innerText = cementBags + ' Bags';
+    document.getElementById('conc_sand_res').innerText = sandTonnes + ' Tonnes';
+    document.getElementById('conc_ballast_res').innerText = ballastTonnes + ' Tonnes';
+    document.getElementById('conc_cost_res').innerText = 'Ksh ' + Math.round(totalCost).toLocaleString();
+
+    currentBOQ.concrete = { cement: cementBags, sand: sandTonnes, ballast: ballastTonnes, cost: totalCost };
+    updateConsolidatedBOQ();
+}
+
+function calculateWalling() {
+    const len = parseFloat(document.getElementById('wall_len').value) || 0;
+    const hgt = parseFloat(document.getElementById('wall_hgt').value) || 0;
+    const deduct = parseFloat(document.getElementById('wall_deduct').value) || 0;
+    const stoneType = document.getElementById('wall_stone_type').value;
+
+    const grossArea = len * hgt;
+    const netArea = Math.max(0, grossArea - deduct);
+
+    // Standard stone face: 0.23m x 0.45m + 15mm joint = approx 13 stones per m² (including 5% breakage)
+    const stones = Math.ceil(netArea * 13);
+    const cementBags = Math.ceil(netArea * 0.26); // Mortar joints
+    const sandTonnes = parseFloat((netArea * 0.053).toFixed(1));
+
+    let stoneUnitRate = RATES.stone9Inch;
+    if (stoneType === '6_inch') stoneUnitRate = RATES.stone6Inch;
+    if (stoneType === 'block_9') stoneUnitRate = RATES.block9Inch;
+
+    const totalCost = (stones * stoneUnitRate) + (cementBags * RATES.cementBag) + (sandTonnes * RATES.sandTonne);
+
+    document.getElementById('wall_area_res').innerText = netArea.toFixed(1) + ' m²';
+    document.getElementById('wall_stones_res').innerText = stones + ' Pcs';
+    document.getElementById('wall_cement_res').innerText = cementBags + ' Bags';
+    document.getElementById('wall_sand_res').innerText = sandTonnes + ' Tonnes';
+    document.getElementById('wall_cost_res').innerText = 'Ksh ' + Math.round(totalCost).toLocaleString();
+
+    currentBOQ.walling = { stones, cement: cementBags, sand: sandTonnes, cost: totalCost };
+    updateConsolidatedBOQ();
+}
+
+function calculatePlaster() {
+    const area = parseFloat(document.getElementById('plas_area').value) || 0;
+    const type = document.getElementById('plas_type').value;
+
+    let cementFactor = 0.16; // Bags per m²
+    let sandFactor = 0.024;  // Tonnes per m²
+
+    if (type === 'external_18') {
+        cementFactor = 0.24;
+        sandFactor = 0.035;
+    } else if (type === 'screed_25') {
+        cementFactor = 0.30;
+        sandFactor = 0.045;
+    }
+
+    const cementBags = Math.ceil(area * cementFactor);
+    const sandTonnes = parseFloat((area * sandFactor).toFixed(1));
+    const totalCost = (cementBags * RATES.cementBag) + (sandTonnes * RATES.sandTonne);
+
+    document.getElementById('plas_area_res').innerText = area + ' m²';
+    document.getElementById('plas_cement_res').innerText = cementBags + ' Bags';
+    document.getElementById('plas_sand_res').innerText = sandTonnes + ' Tonnes';
+    document.getElementById('plas_cost_res').innerText = 'Ksh ' + Math.round(totalCost).toLocaleString();
+
+    currentBOQ.plaster = { cement: cementBags, sand: sandTonnes, cost: totalCost };
+    updateConsolidatedBOQ();
+}
+
+function calculateRoofing() {
+    const ridge = parseFloat(document.getElementById('roof_ridge').value) || 0;
+    const slope = parseFloat(document.getElementById('roof_slope').value) || 0;
+    const style = document.getElementById('roof_style').value;
+    const gauge = document.getElementById('roof_gauge').value;
+
+    let slopeMultiplier = 2; // Gable has 2 slopes
+    if (style === 'mono') slopeMultiplier = 1;
+    if (style === 'hip') slopeMultiplier = 2.4; // Hip roof 20% waste
+
+    const totalRoofArea = ridge * slope * slopeMultiplier;
+    // Effective cover width of box profile sheet is 0.85m
+    const numberOfRuns = Math.ceil(ridge / 0.85) * (style === 'mono' ? 1 : 2);
+    const totalMeters = Math.ceil(numberOfRuns * slope * (style === 'hip' ? 1.15 : 1.05));
+    const ridgeCaps = Math.ceil(ridge / 1.8);
+    const nailsPkts = Math.ceil(totalMeters / 20);
+
+    const sheetRate = gauge === 'box_28' ? RATES.mabatiMeter * 1.15 : RATES.mabatiMeter;
+    const totalCost = (totalMeters * sheetRate) + (ridgeCaps * 750) + (nailsPkts * 450);
+
+    document.getElementById('roof_area_res').innerText = Math.round(totalRoofArea) + ' m²';
+    document.getElementById('roof_meters_res').innerText = totalMeters + ' M';
+    document.getElementById('roof_ridge_res').innerText = ridgeCaps + ' Pcs';
+    document.getElementById('roof_nails_res').innerText = nailsPkts + ' Pkts';
+    document.getElementById('roof_cost_res').innerText = 'Ksh ' + Math.round(totalCost).toLocaleString();
+
+    currentBOQ.roofing = { meters: totalMeters, cost: totalCost };
+    updateConsolidatedBOQ();
+}
+
+function updateConsolidatedBOQ() {
+    const totalCement = currentBOQ.concrete.cement + currentBOQ.walling.cement + currentBOQ.plaster.cement;
+    const totalSand = parseFloat((currentBOQ.concrete.sand + currentBOQ.walling.sand + currentBOQ.plaster.sand).toFixed(1));
+    const totalBallast = currentBOQ.concrete.ballast;
+    const totalStones = currentBOQ.walling.stones;
+    const totalMabati = currentBOQ.roofing.meters;
+
+    const totalBudget = Math.round(currentBOQ.concrete.cost + currentBOQ.walling.cost + currentBOQ.plaster.cost + currentBOQ.roofing.cost);
+
+    document.getElementById('boq_cement_qty').innerText = totalCement + ' Bags';
+    document.getElementById('boq_sand_qty').innerText = totalSand + ' Tonnes';
+    document.getElementById('boq_ballast_qty').innerText = totalBallast + ' Tonnes';
+    document.getElementById('boq_stones_qty').innerText = totalStones + ' Pcs';
+    document.getElementById('boq_mabati_qty').innerText = totalMabati + ' Meters';
+
+    document.getElementById('boq_total_cost').innerText = 'Ksh ' + totalBudget.toLocaleString();
+    document.getElementById('modal_total_cost').value = totalBudget;
+
+    const boqText = 
+        `- Cement (50kg bags): ${totalCement} Bags\n` +
+        `- River Sand: ${totalSand} Tonnes\n` +
+        `- Crushed Ballast: ${totalBallast} Tonnes\n` +
+        `- Machine-cut Stones: ${totalStones} Pieces\n` +
+        `- Box Profile Mabati: ${totalMabati} Meters\n` +
+        `Total Estimated Budget: Ksh ${totalBudget.toLocaleString()}`;
+    document.getElementById('modal_boq_summary').value = boqText;
+}
+
+function updateCountyContext(county) {
+    document.getElementById('boqCountyLabel').innerText = county + ' County';
+    const modalCounty = document.getElementById('modal_county');
+    if (modalCounty) modalCounty.value = county;
+}
+
+function sendBoqWhatsApp() {
+    const county = document.getElementById('estimatorCounty').value || 'Nairobi';
+    const totalCost = document.getElementById('boq_total_cost').innerText;
+    const cement = document.getElementById('boq_cement_qty').innerText;
+    const sand = document.getElementById('boq_sand_qty').innerText;
+    const ballast = document.getElementById('boq_ballast_qty').innerText;
+    const stones = document.getElementById('boq_stones_qty').innerText;
+    const mabati = document.getElementById('boq_mabati_qty').innerText;
+
+    const msg = encodeURIComponent(
+        `*Construction BOQ Estimate - TopLineHub Kenya*\n` +
+        `Site County: ${county}\n` +
+        `Total Estimated Budget: ${totalCost}\n\n` +
+        `*Items Needed:*\n` +
+        `• Cement (50kg): ${cement}\n` +
+        `• River Sand: ${sand}\n` +
+        `• Crushed Ballast: ${ballast}\n` +
+        `• Building Stones: ${stones}\n` +
+        `• Roofing Mabati: ${mabati}\n\n` +
+        `Please send available supplier quotes and transport delivery rates.`
+    );
+    window.open('https://wa.me/254711000000?text=' + msg, '_blank');
+}
+
+function openProformaInvoice() {
+    const county = document.getElementById('estimatorCounty').value || 'Nairobi';
+    const cement = parseInt(document.getElementById('boq_cement_qty').innerText) || 123;
+    const sand = parseFloat(document.getElementById('boq_sand_qty').innerText) || 13.6;
+    const ballast = parseFloat(document.getElementById('boq_ballast_qty').innerText) || 15.1;
+    const stones = parseInt(document.getElementById('boq_stones_qty').innerText) || 780;
+    const mabati = parseInt(document.getElementById('boq_mabati_qty').innerText) || 155;
+
+    const url = `/calculator/invoice?county=${encodeURIComponent(county)}&cement=${cement}&sand=${sand}&ballast=${ballast}&stones=${stones}&mabati=${mabati}`;
+    window.location.href = url;
+}
+
+// Initial calculation on load
+document.addEventListener('DOMContentLoaded', () => {
+    calculateConcrete();
+    calculateWalling();
+    calculatePlaster();
+    calculateRoofing();
+});
+</script>

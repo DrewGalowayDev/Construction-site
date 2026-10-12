@@ -1,0 +1,92 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Contact TopLineHub Support</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Contact</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Contact Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="border-start border-5 border-primary ps-4 mb-5">
+                    <h6 class="text-body text-uppercase mb-2">Customer Desk</h6>
+                    <h1 class="display-6 mb-0">Need Site Support or Supplier Registration?</h1>
+                </div>
+                <p class="mb-4">Whether you are sourcing bulk cement/steel for a high-rise, needing emergency equipment hire, or seeking to onboard as an accredited supplier, our customer relations team is ready.</p>
+                <div class="row g-4 mb-4">
+                    <div class="col-sm-6">
+                        <div class="card card-custom p-3 bg-light">
+                            <h6 class="fw-bold"><i class="fa fa-phone-alt text-primary me-2"></i>Call Directly</h6>
+                            <p class="mb-0 text-muted">+254 711 000 000</p>
+                            <p class="mb-0 text-muted">+254 722 112 233</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card card-custom p-3 bg-light">
+                            <h6 class="fw-bold"><i class="fab fa-whatsapp text-success me-2"></i>WhatsApp Desk</h6>
+                            <p class="mb-0 text-muted">+254 711 000 000</p>
+                            <small class="text-success fw-bold">Live Support 7AM - 8PM</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-custom p-3 bg-dark text-white">
+                    <h6><i class="fa fa-map-marker-alt text-primary me-2"></i>Headquarters / Logistics Depot</h6>
+                    <p class="mb-0 text-secondary">Enterprise Road, Industrial Area, Nairobi, Kenya</p>
+                </div>
+            </div>
+
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
+                <div class="bg-light p-5 rounded card-custom">
+                    <h3 class="mb-4 text-dark fw-bold">Send Message / Inquiry</h3>
+                    <form action="/contact" method="POST">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="name" class="form-control" id="c_name" placeholder="Your Name" value="<%= user ? user.name : '' %>" required>
+                                    <label for="c_name">Your Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="email" name="email" class="form-control" id="c_email" placeholder="Your Email" value="<%= user ? user.email : '' %>" required>
+                                    <label for="c_email">Your Email</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="tel" name="phone" class="form-control" id="c_phone" placeholder="Phone Number" value="<%= user ? user.phone : '' %>" required>
+                                    <label for="c_phone">Phone / WhatsApp</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" name="subject" class="form-control" id="c_subject" placeholder="Subject" required>
+                                    <label for="c_subject">Subject (e.g. Bulk Quarry Order / Equipment Hire)</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea name="message" class="form-control" placeholder="Leave a message here" id="c_msg" style="height: 120px" required></textarea>
+                                    <label for="c_msg">Your Message / Site Details</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3 text-white fw-bold" type="submit">Send Message</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Contact End -->

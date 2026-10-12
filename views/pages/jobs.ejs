@@ -1,0 +1,159 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Construction Project & Job Board</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Job Board</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-xxl py-4">
+    <div class="container">
+        <!-- Top Call To Action -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <div class="border-start border-5 border-primary ps-4">
+                    <h6 class="text-body text-uppercase mb-1">Open Tenders & Subcontracts</h6>
+                    <h1 class="display-6 mb-0">Active Building Projects in Kenya</h1>
+                </div>
+            </div>
+            <div>
+                <a href="/jobs/post" class="btn btn-primary py-3 px-4 text-white fw-bold shadow-sm">
+                    <i class="fa fa-plus-circle me-2"></i>Post A Construction Job
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-light p-4 rounded shadow-sm mb-4">
+            <form action="/jobs" method="GET">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4 col-lg-3">
+                        <label class="form-label small fw-bold text-dark">Keyword Search</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa fa-search text-muted"></i></span>
+                            <input type="text" name="q" class="form-control" placeholder="e.g. Masonry, Plumbing, Roofing" value="<%= typeof query !== 'undefined' ? query.q || '' : '' %>">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-3">
+                        <label class="form-label small fw-bold text-dark">Trade / Skill</label>
+                        <select name="trade" class="form-select">
+                            <option value="">All Trades & Skills</option>
+                            <% trades.forEach(t => { %>
+                                <option value="<%= t %>" <%= (typeof query !== 'undefined' && query.trade === t) ? 'selected' : '' %>><%= t %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="col-md-4 col-lg-2">
+                        <label class="form-label small fw-bold text-dark">County</label>
+                        <select name="county" class="form-select">
+                            <option value="">All Counties</option>
+                            <% counties.forEach(c => { %>
+                                <option value="<%= c %>" <%= (typeof query !== 'undefined' && query.county === c) ? 'selected' : '' %>><%= c %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <label class="form-label small fw-bold text-dark">Max Budget (Ksh)</label>
+                        <input type="number" name="max_budget" class="form-control" placeholder="Any" value="<%= typeof query !== 'undefined' ? query.max_budget || '' : '' %>">
+                    </div>
+                    <div class="col-md-6 col-lg-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary text-white fw-bold flex-grow-1"><i class="fa fa-filter me-1"></i>Filter</button>
+                        <a href="/jobs" class="btn btn-outline-secondary" title="Reset Filters"><i class="fa fa-undo"></i></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Result Status -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted small">Showing <strong><%= jobs.length %></strong> open construction opportunities</span>
+            <% if (typeof query !== 'undefined' && (query.q || query.trade || query.county || query.max_budget)) { %>
+                <span class="badge bg-warning text-dark"><i class="fa fa-filter me-1"></i>Filters Active</span>
+            <% } %>
+        </div>
+
+        <!-- Jobs Listing -->
+        <% if (jobs.length === 0) { %>
+            <div class="card p-5 text-center bg-white shadow-sm border-0 my-4">
+                <i class="fa fa-search fa-3x text-secondary mb-3"></i>
+                <h4 class="text-dark">No Construction Gigs Found</h4>
+                <p class="text-muted">No open projects currently match your trade or county filters. Try clearing your filters or check back shortly.</p>
+                <div>
+                    <a href="/jobs" class="btn btn-primary text-white me-2">Reset Filters</a>
+                    <a href="/jobs/post" class="btn btn-outline-primary">Post a Project</a>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="row g-4">
+                <% jobs.forEach(job => { %>
+                    <div class="col-12">
+                        <div class="card card-custom bg-white p-4 border-0 shadow-sm">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                        <span class="badge bg-success text-uppercase">Status: <%= job.status %></span>
+                                        <span class="badge bg-primary text-uppercase"><%= job.trade_required %></span>
+                                        <span class="text-muted small"><i class="fa fa-clock text-primary me-1"></i>Duration: <%= job.duration %></span>
+                                    </div>
+                                    <h4 class="fw-bold text-dark mb-2"><%= job.title %></h4>
+                                    <p class="text-muted mb-3"><%= job.description %></p>
+                                    <div class="d-flex flex-wrap gap-3 text-secondary small">
+                                        <span><i class="fa fa-map-marker-alt text-primary me-1"></i><%= job.location_town %>, <%= job.location_county %></span>
+                                        <span><i class="fa fa-user text-primary me-1"></i>Client: <%= job.client ? job.client.name : 'Verified Site Owner' %></span>
+                                        <span><i class="fa fa-calendar-alt text-primary me-1"></i>Posted: <%= new Date(job.created_at).toLocaleDateString() %></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0 border-start ps-lg-4">
+                                    <small class="text-muted d-block">Estimated Budget</small>
+                                    <h3 class="text-primary fw-bold mb-3">Ksh <%= Number(job.budget_estimate).toLocaleString() %></h3>
+                                    <button type="button" class="btn btn-primary text-white px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#bidModal<%= job.id %>">
+                                        <i class="fa fa-paper-plane me-1"></i>Submit Bid / Pitch
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bid Modal -->
+                        <div class="modal fade" id="bidModal<%= job.id %>" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content border-0 shadow">
+                                    <form action="/jobs/<%= job.id %>/apply" method="POST">
+                                        <div class="modal-header bg-dark text-white">
+                                            <h5 class="modal-title text-white">Bid on: <%= job.title.substring(0, 32) %>...</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="alert alert-info py-2 px-3 small mb-3">
+                                                <i class="fa fa-info-circle me-1"></i>Client budget estimate is <strong>Ksh <%= Number(job.budget_estimate).toLocaleString() %></strong>.
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold small text-dark">Your Proposed Bid Amount (Ksh) *</label>
+                                                <input type="number" name="bid_amount" class="form-control bg-light" placeholder="e.g. <%= job.budget_estimate %>" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold small text-dark">Your Pitch & Experience Summary *</label>
+                                                <textarea name="pitch_message" rows="4" class="form-control bg-light" placeholder="Describe your relevant experience, team capacity, tools, and commencement date..." required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-light">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary btn-sm text-white fw-bold">
+                                                <i class="fa fa-paper-plane me-1"></i>Submit Proposal to Client
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+</div>

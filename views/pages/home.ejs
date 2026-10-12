@@ -1,0 +1,396 @@
+<!-- Carousel & Search Start -->
+<div class="container-fluid p-0 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img class="w-100" src="/img/banner-african-engineers.jpg" alt="Kenyan Construction Engineers & Materials">
+                <div class="carousel-caption">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-lg-10">
+                                <h5 class="text-light text-uppercase mb-2 animated slideInDown">Kenya's #1 Construction Hub</h5>
+                                <h1 class="display-3 text-light mb-4 animated slideInDown fw-bold">Build Smarter. Source Faster. Hire Better.</h1>
+                                
+                                <!-- Hero Search Box -->
+                                <div class="hero-search-box text-start mt-4">
+                                    <form action="/materials" method="GET" class="row g-2 align-items-center">
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-0"><i class="fa fa-search text-muted"></i></span>
+                                                <input type="text" name="q" class="form-control border-0 py-3" placeholder="Search cement, steel, mabati, mixers...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <select name="category" class="form-select border-0 py-3">
+                                                <option value="">All Categories & Equipment</option>
+                                                <% categories.forEach(cat => { %>
+                                                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button type="submit" class="btn btn-primary w-100 py-3 text-white fw-bold">
+                                                <i class="fa fa-arrow-right me-1"></i> Find Materials
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <div class="mt-3 d-flex flex-wrap gap-2">
+                                        <span class="text-light small me-2 align-self-center">Popular:</span>
+                                        <a href="/materials?category=1" class="badge bg-light text-dark text-decoration-none">Bamburi Cement</a>
+                                        <a href="/materials?category=2" class="badge bg-light text-dark text-decoration-none">D12 Steel</a>
+                                        <a href="/rentals" class="badge bg-primary text-white text-decoration-none">Mixer Hire</a>
+                                        <a href="/fundis?trade=Mason" class="badge bg-light text-dark text-decoration-none">Fundi Masons</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="w-100" src="/img/banner-african-machinery.jpg" alt="Construction Equipment & Artisans">
+                <div class="carousel-caption">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-lg-10">
+                                <h5 class="text-light text-uppercase mb-2 animated slideInDown">Machinery & Professional Trades</h5>
+                                <h1 class="display-3 text-light mb-4 animated slideInDown fw-bold">Verified Artisans & Construction Plant Hire</h1>
+                                <p class="fs-5 text-light mb-4">Rent concrete mixers, compactors, and scaffolding. Connect with certified fundis for masonry, electrical, and plumbing projects.</p>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <a href="/rentals" class="btn btn-primary py-3 px-5 text-white fw-bold">Rent Equipment</a>
+                                    <a href="/fundis" class="btn btn-outline-light py-3 px-5 fw-bold">Hire Verified Fundis</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+<!-- Carousel End -->
+
+
+<!-- Top Categories Grid -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5 align-items-end mb-4">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="border-start border-5 border-primary ps-4">
+                    <h6 class="text-body text-uppercase mb-2">Platform Categories</h6>
+                    <h1 class="display-6 mb-0">Browse By Construction Category</h1>
+                </div>
+            </div>
+            <div class="col-lg-6 text-lg-end wow fadeInUp" data-wow-delay="0.3s">
+                <a class="btn btn-outline-primary py-2 px-4" href="/materials">All Materials & Hire</a>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <% categories.forEach((cat, idx) => { %>
+                <div class="col-lg-3 col-md-4 col-sm-6 wow fadeInUp" data-wow-delay="<%= 0.1 * (idx % 4) %>s">
+                    <a href="/materials?category=<%= cat.id %>" class="text-decoration-none">
+                        <div class="card-custom bg-light p-4 text-center h-100 border">
+                            <div class="btn-square bg-white rounded-circle mx-auto mb-3 text-primary shadow-sm" style="width: 60px; height: 60px;">
+                                <i class="fa <%= cat.icon %> fa-2x"></i>
+                            </div>
+                            <h5 class="text-dark mb-1"><%= cat.name %></h5>
+                            <small class="text-muted"><%= cat.description %></small>
+                        </div>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+
+
+<!-- Featured Materials Section (Reusing Service Item Hover Style) -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5 align-items-end mb-5">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="border-start border-5 border-primary ps-4">
+                    <h6 class="text-body text-uppercase mb-2">Verified Materials</h6>
+                    <h1 class="display-6 mb-0">Building Materials & Direct Supplies</h1>
+                </div>
+            </div>
+            <div class="col-lg-6 text-lg-end wow fadeInUp" data-wow-delay="0.3s">
+                <a class="btn btn-primary py-3 px-5 text-white" href="/materials">View All Materials</a>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <% featuredProducts.forEach((item, index) => { %>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="<%= 0.1 * (index + 1) %>s">
+                    <div class="service-item bg-light overflow-hidden h-100 card-custom">
+                        <div style="height: 220px; overflow: hidden;" class="position-relative">
+                            <img class="img-fluid w-100 h-100" style="object-fit: cover;" src="<%= item.image_url %>" alt="<%= item.title %>">
+                            <span class="position-absolute top-0 end-0 m-3 badge bg-dark"><%= item.location_county %></span>
+                        </div>
+                        <div class="service-text position-relative text-center h-100 p-4">
+                            <h5 class="mb-2">
+                                <a href="/materials/<%= item.id %>" class="text-dark text-decoration-none"><%= item.title %></a>
+                            </h5>
+                            <p class="text-muted small mb-3"><%= item.description.substring(0, 95) %>...</p>
+                            <div class="product-price mb-3">
+                                Ksh <%= Number(item.price).toLocaleString() %> <span>/ <%= item.unit %></span>
+                            </div>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a class="btn btn-sm btn-outline-primary" href="/materials/<%= item.id %>">Details</a>
+                                <a class="btn btn-sm btn-primary text-white" href="/orders/request/<%= item.id %>">Order / Quote</a>
+                                <a class="btn btn-sm btn-whatsapp" href="https://wa.me/254711000000?text=Hello%20TopLineHub,%20I%20am%20inquiring%20about%20<%= encodeURIComponent(item.title) %>" target="_blank">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+
+
+<!-- Equipment Rental Highlight Section -->
+<div class="container-xxl py-5 bg-light my-5">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-5 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="border-start border-5 border-primary ps-4 mb-4">
+                    <h6 class="text-body text-uppercase mb-2">Plant & Machinery</h6>
+                    <h1 class="display-6 mb-0">Construction Machinery & Equipment Hire</h1>
+                </div>
+                <p class="mb-4">Why buy expensive plant when you can rent certified equipment on daily or weekly terms? We deliver concrete mixers, poker vibrators, scaffolding systems, and rollers directly to your site.</p>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2"><i class="fa fa-check text-primary me-2"></i> On-site delivery and trained machine operators available</li>
+                    <li class="mb-2"><i class="fa fa-check text-primary me-2"></i> Well-maintained diesel and petrol power units</li>
+                    <li class="mb-2"><i class="fa fa-check text-primary me-2"></i> Flexible daily, weekly, or monthly site contracts</li>
+                </ul>
+                <a href="/rentals" class="btn btn-primary py-3 px-5 text-white">Browse Rental Fleet</a>
+            </div>
+            <div class="col-lg-7 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="row g-3">
+                    <% rentalItems.forEach(rental => { %>
+                        <div class="col-md-6">
+                            <div class="card card-custom h-100 bg-white p-3">
+                                <a href="/materials/<%= rental.id %>">
+                                    <img src="<%= rental.image_url %>" class="card-img-top rounded mb-3" style="height: 160px; object-fit: cover;" alt="<%= rental.title %>">
+                                </a>
+                                <h6 class="fw-bold mb-1">
+                                    <a href="/materials/<%= rental.id %>" class="text-dark text-decoration-none"><%= rental.title %></a>
+                                </h6>
+                                <p class="text-primary fw-bold mb-2">Ksh <%= Number(rental.price).toLocaleString() %> <small class="text-muted">/ <%= rental.unit %></small></p>
+                                <div class="d-flex gap-2 mt-auto">
+                                    <a href="/materials/<%= rental.id %>" class="btn btn-sm btn-outline-primary flex-grow-1">Details</a>
+                                    <a href="/orders/request/<%= rental.id %>" class="btn btn-sm btn-dark flex-grow-1">Book Hire</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Verified Artisans / Fundis Section (Reusing Team Cards) -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5 align-items-end mb-5">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="border-start border-5 border-primary ps-4">
+                    <h6 class="text-body text-uppercase mb-2">Verified Professionals</h6>
+                    <h1 class="display-6 mb-0">Hire Verified Artisans & Fundis</h1>
+                </div>
+            </div>
+            <div class="col-lg-6 text-lg-end wow fadeInUp" data-wow-delay="0.3s">
+                <a class="btn btn-outline-primary py-2 px-4" href="/fundis">View All Artisans</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <% featuredArtisans.forEach((artisan, i) => { %>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="<%= 0.1 * (i + 1) %>s">
+                    <div class="team-item position-relative rounded overflow-hidden card-custom bg-white">
+                        <div class="overflow-hidden" style="height: 280px;">
+                            <a href="/fundis/<%= artisan.id %>">
+                                <img class="img-fluid w-100 h-100" style="object-fit: cover;" src="<%= artisan.user.avatar || '/img/team-1.jpg' %>" alt="<%= artisan.user.name %>">
+                            </a>
+                        </div>
+                        <div class="p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge-trade"><%= artisan.trade %></span>
+                                <span class="badge-verified"><i class="fa fa-check-circle me-1"></i>Verified</span>
+                            </div>
+                            <h5 class="mb-1 fw-bold">
+                                <a href="/fundis/<%= artisan.id %>" class="text-dark text-decoration-none"><%= artisan.user.name %></a>
+                            </h5>
+                            <p class="text-muted small mb-2"><i class="fa fa-map-marker-alt me-1 text-primary"></i><%= artisan.user.town %>, <%= artisan.user.county %></p>
+                            <p class="small text-secondary mb-3"><%= artisan.bio.substring(0, 110) %>...</p>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                <div>
+                                    <small class="text-muted">Rate:</small>
+                                    <strong class="text-dark">Ksh <%= Number(artisan.daily_rate).toLocaleString() %>/day</strong>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <a href="/fundis/<%= artisan.id %>" class="btn btn-sm btn-outline-primary">Profile</a>
+                                    <a href="https://wa.me/<%= artisan.user.phone.replace(/[^0-9]/g, '') %>?text=Hello%20<%= encodeURIComponent(artisan.user.name) %>,%20I%20found%20your%20profile%20on%20TopLineHub" class="btn btn-sm btn-whatsapp" target="_blank">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+
+
+<!-- Post A Project / Tender Banner (Reusing Appointment Banner) -->
+<div class="container-fluid appointment my-5 py-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 wow fadeIn" data-wow-delay="0.3s">
+                <h1 class="display-5 text-white mb-4">Have A Construction Project or Site Need?</h1>
+                <p class="text-light fs-5 mb-4">Post your project scope and budget. Receive competitive proposals from vetted local fundis, masons, plumbers, and contractors in your county.</p>
+                <div class="d-flex gap-3">
+                    <a href="/jobs/post" class="btn btn-primary py-3 px-5 text-white fw-bold">Post Your Job Now</a>
+                    <a href="/jobs" class="btn btn-outline-light py-3 px-5 fw-bold">View Open Gigs</a>
+                </div>
+            </div>
+            <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+                <div class="bg-white p-4 p-sm-5 rounded shadow">
+                    <h3 class="mb-4 text-dark fw-bold"><i class="fa fa-clipboard-list text-primary me-2"></i>Quick Site Quote</h3>
+                    <form action="/orders/quick-inquiry" method="POST">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="text" name="full_name" class="form-control bg-light border-0" id="client_name" placeholder="Full Name" required>
+                                    <label for="client_name">Your Name</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="tel" name="phone" class="form-control bg-light border-0" id="client_phone" placeholder="0712345678" required>
+                                    <label for="client_phone">Phone / WhatsApp</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <select name="inquiry_type" class="form-select bg-light border-0" id="inquiry_type">
+                                        <option value="materials">Building Materials Quote</option>
+                                        <option value="rental">Plant / Machine Hire</option>
+                                        <option value="artisan">Hire Fundi / Contractor</option>
+                                    </select>
+                                    <label for="inquiry_type">I need:</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="text" name="location" class="form-control bg-light border-0" id="site_location" list="kenyaCountiesList" placeholder="e.g. Ruiru, Kiambu" required>
+                                    <label for="site_location">Site Location / County</label>
+                                    <datalist id="kenyaCountiesList">
+                                        <% counties.forEach(c => { %>
+                                            <option value="<%= c %>"></option>
+                                        <% }) %>
+                                    </datalist>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea name="description" class="form-control bg-light border-0" placeholder="List items needed or project scope" id="quick_desc" style="height: 100px" required></textarea>
+                                    <label for="quick_desc">Project Scope / Material Quantities</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3 text-white fw-bold" type="submit">Submit Request</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Facts / Counter Section -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6 wow fadeIn" data-wow-delay="0.1s">
+                <div class="border rounded p-4 text-center bg-light">
+                    <h1 class="display-5 text-primary fw-bold mb-2">250+</h1>
+                    <h6 class="text-dark mb-0">Hardware Stores & Suppliers</h6>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeIn" data-wow-delay="0.3s">
+                <div class="border rounded p-4 text-center bg-light">
+                    <h1 class="display-5 text-primary fw-bold mb-2">1,500+</h1>
+                    <h6 class="text-dark mb-0">Verified Fundis & Specialists</h6>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeIn" data-wow-delay="0.5s">
+                <div class="border rounded p-4 text-center bg-light">
+                    <h1 class="display-5 text-primary fw-bold mb-2">3,800+</h1>
+                    <h6 class="text-dark mb-0">Successful Site Deliveries</h6>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeIn" data-wow-delay="0.7s">
+                <div class="border rounded p-4 text-center bg-light">
+                    <h1 class="display-5 text-primary fw-bold mb-2">47</h1>
+                    <h6 class="text-dark mb-0">Counties Covered in Kenya</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Testimonials Carousel -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5 align-items-end mb-5">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="border-start border-5 border-primary ps-4">
+                    <h6 class="text-body text-uppercase mb-2">Client Testimonials</h6>
+                    <h1 class="display-6 mb-0">What Site Owners & Developers Say</h1>
+                </div>
+            </div>
+        </div>
+        <div class="owl-carousel testimonial-carousel wow fadeInUp" data-wow-delay="0.1s">
+            <div class="testimonial-item bg-light rounded p-4">
+                <div class="d-flex align-items-center mb-4">
+                    <img class="flex-shrink-0 rounded-circle border p-1" src="/img/testimonial-1.jpg" alt="">
+                    <div class="ms-4">
+                        <h5 class="mb-1">David Kamau</h5>
+                        <span>Property Developer, Kiambu</span>
+                    </div>
+                </div>
+                <p class="mb-0">"Sourcing steel and cement directly through TopLineHub saved our construction project nearly 14% compared to standard middleman rates. Deliveries arrived directly to our site in Ruiru right on schedule."</p>
+            </div>
+            <div class="testimonial-item bg-light rounded p-4">
+                <div class="d-flex align-items-center mb-4">
+                    <img class="flex-shrink-0 rounded-circle border p-1" src="/img/testimonial-2.jpg" alt="">
+                    <div class="ms-4">
+                        <h5 class="mb-1">Sarah Otieno</h5>
+                        <span>Homeowner, Syokimau</span>
+                    </div>
+                </div>
+                <p class="mb-0">"We posted our perimeter wall project on the job board and connected with John Mwangi within 2 hours. His masonry team was professional, timely, and NCA compliant. Truly impressive platform!"</p>
+            </div>
+        </div>
+    </div>
+</div>

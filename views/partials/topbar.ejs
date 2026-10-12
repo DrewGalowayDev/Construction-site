@@ -1,0 +1,35 @@
+<!-- Topbar Start -->
+<div class="container-fluid bg-light p-0">
+    <div class="row gx-0 d-none d-lg-flex">
+        <div class="col-lg-7 px-5 text-start">
+            <div class="h-100 d-inline-flex align-items-center border-start border-end px-3">
+                <small class="fa fa-phone-alt text-primary me-2"></small>
+                <small>+254 711 000 000</small>
+            </div>
+            <div class="h-100 d-inline-flex align-items-center border-end px-3">
+                <small class="far fa-envelope-open text-primary me-2"></small>
+                <small>info@toplinehub.co.ke</small>
+            </div>
+            <div class="h-100 d-inline-flex align-items-center border-end px-3">
+                <small class="fas fa-map-marker-alt text-primary me-2"></small>
+                <small>Nairobi, Kenya</small>
+            </div>
+        </div>
+        <div class="col-lg-5 px-5 text-end">
+            <div class="h-100 d-inline-flex align-items-center">
+                <% if (user) { %>
+                    <a class="btn btn-sm btn-primary me-3 text-white" href="/dashboard"><i class="fa fa-tachometer-alt me-1"></i>My Dashboard</a>
+                    <span class="me-3 small text-muted">Welcome, <strong><%= user.name %></strong> (<span class="badge bg-primary text-uppercase"><%= user.role %></span>)</span>
+                    <a class="btn btn-sm btn-outline-danger me-2" href="/auth/logout"><i class="fa fa-sign-out-alt me-1"></i>Logout</a>
+                <% } else { %>
+                    <a class="btn btn-sm btn-outline-primary me-2" href="/auth/login"><i class="fa fa-user me-1"></i>Login</a>
+                    <a class="btn btn-sm btn-primary me-2 text-white" href="/auth/register"><i class="fa fa-user-plus me-1"></i>Register</a>
+                <% } %>
+                <a class="btn btn-square border-end border-start" href="#"><i class="fab fa-facebook-f"></i></a>
+                <a class="btn btn-square border-end" href="#"><i class="fab fa-twitter"></i></a>
+                <a class="btn btn-square border-end" href="#"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Topbar End -->

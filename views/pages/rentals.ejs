@@ -1,0 +1,134 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Construction Plant & Equipment Hire</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Equipment Rental</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-xxl py-4">
+    <div class="container">
+        <!-- Top Banner -->
+        <div class="row g-4 align-items-center mb-4">
+            <div class="col-lg-6">
+                <div class="border-start border-5 border-primary ps-4">
+                    <h6 class="text-body text-uppercase mb-2">Heavy Machinery Fleets</h6>
+                    <h1 class="display-6 mb-0">Site Plant Available Across Kenya</h1>
+                </div>
+            </div>
+            <div class="col-lg-6 text-lg-end">
+                <a href="/materials/post?type=rental" class="btn btn-primary text-white me-2 fw-bold shadow-sm">
+                    <i class="fa fa-plus-circle me-1"></i>List Machinery for Hire
+                </a>
+                <a href="/contact" class="btn btn-outline-primary">Call Plant Manager</a>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-light p-4 rounded shadow-sm mb-4">
+            <form action="/rentals" method="GET">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4 col-lg-3">
+                        <label class="form-label small fw-bold text-dark">Search Equipment</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa fa-search text-muted"></i></span>
+                            <input type="text" name="q" class="form-control" placeholder="e.g. Mixer, Excavator, Scaffold" value="<%= typeof query !== 'undefined' ? query.q || '' : '' %>">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-3">
+                        <label class="form-label small fw-bold text-dark">Machinery Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            <% if (typeof categories !== 'undefined') { %>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat.id %>" <%= (typeof query !== 'undefined' && query.category == cat.id) ? 'selected' : '' %>><%= cat.name %></option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div class="col-md-4 col-lg-2">
+                        <label class="form-label small fw-bold text-dark">County</label>
+                        <select name="county" class="form-select">
+                            <option value="">All 47 Counties</option>
+                            <% counties.forEach(c => { %>
+                                <option value="<%= c %>" <%= (typeof query !== 'undefined' && query.county === c) ? 'selected' : '' %>><%= c %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <label class="form-label small fw-bold text-dark">Max Rate (Ksh/Day)</label>
+                        <input type="number" name="max_rate" class="form-control" placeholder="Any" value="<%= typeof query !== 'undefined' ? query.max_rate || '' : '' %>">
+                    </div>
+                    <div class="col-md-6 col-lg-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary text-white fw-bold flex-grow-1"><i class="fa fa-filter me-1"></i>Filter</button>
+                        <a href="/rentals" class="btn btn-outline-secondary" title="Reset Filters"><i class="fa fa-undo"></i></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Result Info -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted small">Showing <strong><%= rentals.length %></strong> equipment units available for site hire</span>
+            <% if (typeof query !== 'undefined' && (query.q || query.county || query.category || query.max_rate)) { %>
+                <span class="badge bg-warning text-dark"><i class="fa fa-filter me-1"></i>Filters Applied</span>
+            <% } %>
+        </div>
+
+        <!-- Equipment Grid -->
+        <% if (rentals.length === 0) { %>
+            <div class="card p-5 text-center bg-white shadow-sm border-0 my-4">
+                <i class="fa fa-tools fa-3x text-secondary mb-3"></i>
+                <h4 class="text-dark">No Equipment Available Matching Your Filters</h4>
+                <p class="text-muted">Try resetting your rate or county filters, or submit a custom plant request.</p>
+                <div>
+                    <a href="/rentals" class="btn btn-primary text-white me-2">Reset Filters</a>
+                    <a href="/materials/post?type=rental" class="btn btn-outline-primary">List Your Equipment</a>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="row g-4">
+                <% rentals.forEach(rental => { %>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card card-custom h-100 bg-white border-0 shadow-sm">
+                            <div style="height: 220px; overflow: hidden;" class="position-relative">
+                                <a href="/materials/<%= rental.id %>">
+                                    <img src="<%= rental.image_url %>" class="card-img-top w-100 h-100" style="object-fit: cover;" alt="<%= rental.title %>">
+                                </a>
+                                <span class="badge bg-primary position-absolute top-0 start-0 m-3">Hire Plant</span>
+                                <span class="badge bg-dark position-absolute top-0 end-0 m-3"><%= rental.location_county %></span>
+                            </div>
+                            <div class="card-body d-flex flex-column p-4">
+                                <div class="small text-primary fw-bold text-uppercase mb-1"><%= rental.category ? rental.category.name : 'Heavy Plant' %></div>
+                                <h5 class="card-title fw-bold text-dark mb-2">
+                                    <a href="/materials/<%= rental.id %>" class="text-dark text-decoration-none"><%= rental.title %></a>
+                                </h5>
+                                <p class="text-muted small mb-3"><%= rental.description %></p>
+                                <div class="product-price mb-3 mt-auto">
+                                    Ksh <%= Number(rental.price).toLocaleString() %> <span class="small">/ <%= rental.unit %></span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="/materials/<%= rental.id %>" class="btn btn-outline-primary btn-sm fw-bold">Details</a>
+                                    <a href="/orders/request/<%= rental.id %>" class="btn btn-primary text-white flex-grow-1 fw-bold btn-sm">Book Hire</a>
+                                    <% 
+                                        const vendorPhone = rental.seller ? rental.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                        const waRentUrl = 'https://wa.me/' + (vendorPhone.startsWith('0') ? '254' + vendorPhone.slice(1) : vendorPhone) + '?text=' + encodeURIComponent('Hi, inquiring about hiring ' + rental.title + ' at Ksh ' + Number(rental.price).toLocaleString() + '/' + rental.unit + ' on TopLineHub.');
+                                    %>
+                                    <a href="<%= waRentUrl %>" class="btn btn-whatsapp btn-sm" target="_blank" title="WhatsApp Machinery Owner">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+</div>

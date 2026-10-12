@@ -1,0 +1,111 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Post A Construction Project</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Post Project</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Post Project Section Start -->
+<div class="container-fluid appointment my-5 py-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-lg-5 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="border-start border-5 border-primary ps-4 mb-5">
+                    <h6 class="text-body text-uppercase mb-2 text-white">Client Portal</h6>
+                    <h1 class="display-6 mb-0 text-white">Reach Qualified Contractors & Artisans Across Kenya</h1>
+                </div>
+                <p class="text-light mb-4">Post your building project whether it's structural masonry, foundation works, roofing, plumbing, electrical installations, or site painting.</p>
+                <div class="bg-dark p-4 rounded text-white border border-secondary mb-4">
+                    <h5 class="text-primary mb-3"><i class="fa fa-shield-alt me-2"></i>How It Works:</h5>
+                    <ol class="ps-3 mb-0 text-secondary">
+                        <li class="mb-2"><strong class="text-white">Post Your Details:</strong> Specify trade, location, and budget.</li>
+                        <li class="mb-2"><strong class="text-white">Receive Bids:</strong> Local vetted fundis review and bid.</li>
+                        <li class="mb-0"><strong class="text-white">Select & Build:</strong> Chat on WhatsApp/Call and award the job.</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="col-lg-7 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                <div class="bg-white p-5 rounded shadow">
+                    <h3 class="mb-4 text-dark fw-bold">Project Details</h3>
+                    <form action="/jobs/post" method="POST">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" name="title" class="form-control bg-light border-0" id="job_title" placeholder="e.g. Masonry for 3-Bedroom Foundation" required>
+                                    <label for="job_title">Project Title</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <select name="trade_required" class="form-select bg-light border-0" id="trade_select" required>
+                                        <option value="Mason / Bricklayer">Mason / Bricklayer</option>
+                                        <option value="Certified Electrician">Certified Electrician</option>
+                                        <option value="Plumber">Plumber</option>
+                                        <option value="Painter">Painter & Finisher</option>
+                                        <option value="Carpenter / Roofer">Carpenter / Roofer</option>
+                                        <option value="Welder & Fabricator">Welder & Fabricator</option>
+                                        <option value="Tiler">Tiler</option>
+                                        <option value="General Contractor">General Contractor</option>
+                                    </select>
+                                    <label for="trade_select">Trade / Skill Required</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="number" name="budget_estimate" class="form-control bg-light border-0" id="budget_val" placeholder="50000" required>
+                                    <label for="budget_val">Estimated Budget (Ksh)</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <select name="location_county" class="form-select bg-light border-0" id="county_input" required>
+                                        <% counties.forEach(c => { %>
+                                            <option value="<%= c %>" <%= (user && user.county === c) || c === 'Nairobi' ? 'selected' : '' %>><%= c %></option>
+                                        <% }) %>
+                                    </select>
+                                    <label for="county_input">Site County *</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="text" name="location_town" class="form-control bg-light border-0" id="town_input" placeholder="Ruiru" required>
+                                    <label for="town_input">Town / Specific Area (e.g. Ruiru)</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="text" name="duration" class="form-control bg-light border-0" id="duration_val" placeholder="2 weeks" value="2 weeks" required>
+                                    <label for="duration_val">Expected Duration</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="tel" name="contact_phone" class="form-control bg-light border-0" id="phone_val" placeholder="0712345678" value="<%= user ? user.phone : '' %>" required>
+                                    <label for="phone_val">Contact Phone / WhatsApp</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea name="description" class="form-control bg-light border-0" placeholder="Scope description" id="desc_val" style="height: 120px" required></textarea>
+                                    <label for="desc_val">Detailed Project Scope & Requirements</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3 text-white fw-bold" type="submit">Publish Construction Project</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Post Project Section End -->

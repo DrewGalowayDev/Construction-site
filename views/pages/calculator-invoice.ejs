@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title><%= title %></title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+            color: #2b303a;
+        }
+        .invoice-card {
+            max-width: 900px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 45px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .invoice-header-logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            color: #182333;
+        }
+        .invoice-header-logo span {
+            color: #FDA12B;
+        }
+        .badge-boq {
+            background-color: rgba(253, 161, 43, 0.15);
+            color: #d87e09;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                padding: 0 !important;
+            }
+            .invoice-card {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 20px !important;
+                max-width: 100% !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Print & Navigation Actions -->
+    <div class="container text-center pt-4 no-print">
+        <div class="d-inline-flex flex-wrap gap-2 justify-content-center">
+            <button onclick="window.print()" class="btn btn-primary text-white fw-bold px-4">
+                <i class="fa fa-print me-2"></i>Print / Save BOQ PDF
+            </button>
+            <a href="https://wa.me/254711000000?text=<%= encodeURIComponent('Hello TopLineHub, I have generated an Official Material BOQ Proforma Invoice ' + invoiceNo + ' for ' + county + ' County (Total Ksh ' + Math.round(grandTotal).toLocaleString() + '). Please connect me with verified suppliers.') %>" target="_blank" class="btn btn-success text-white px-3" style="background-color: #25D366; border: none;">
+                <i class="fab fa-whatsapp me-2"></i>Send to Procurement Desk
+            </a>
+            <a href="/calculator?county=<%= encodeURIComponent(county) %>" class="btn btn-outline-dark px-3">
+                <i class="fa fa-calculator me-1"></i>Edit Dimensions
+            </a>
+            <a href="/" class="btn btn-outline-secondary px-3">
+                <i class="fa fa-home me-1"></i>Home
+            </a>
+        </div>
+    </div>
+
+    <div class="invoice-card">
+        <!-- Header: Company & Quotation Details -->
+        <div class="row align-items-start border-bottom pb-4 mb-4">
+            <div class="col-sm-7">
+                <div class="invoice-header-logo mb-2">
+                    <i class="fa fa-hard-hat text-warning me-2"></i>TOPLINE<span>HUB</span>
+                </div>
+                <div class="small text-muted">
+                    <strong>TopLineHub Construction Ltd — Materials Estimator Desk</strong><br>
+                    Delta Corner Tower B, Westlands, Nairobi, Kenya<br>
+                    P.O. Box 45291 - 00100 Nairobi • Tel: +254 711 000 000<br>
+                    Email: estimates@toplinehub.co.ke • Web: www.toplinehub.co.ke<br>
+                    <strong>KRA PIN: P051938291X • NCA Verified Supply Network</strong>
+                </div>
+            </div>
+            <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+                <div class="badge-boq mb-2">OFFICIAL PROFORMA INVOICE</div>
+                <h4 class="fw-bold text-dark text-uppercase mb-1">Bill of Quantities</h4>
+                <div class="text-muted small"><strong>Ref No:</strong> <%= invoiceNo %></div>
+                <div class="text-muted small"><strong>Date:</strong> <%= new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %></div>
+                <div class="text-muted small"><strong>Validity:</strong> 14 Days from issuance</div>
+                <div class="text-muted small"><strong>Project County:</strong> <span class="badge bg-dark"><%= county %> County</span></div>
+            </div>
+        </div>
+
+        <!-- Project & Destination Context -->
+        <div class="p-3 bg-light rounded mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <small class="text-uppercase text-muted fw-bold d-block">Site Destination:</small>
+                <strong class="text-dark"><%= county %> County Construction Site (Kenya)</strong>
+            </div>
+            <div class="text-sm-end">
+                <small class="text-uppercase text-muted fw-bold d-block">Scope:</small>
+                <span class="text-muted small">Foundation, Masonry Walling, Plaster & Roofing</span>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 45px;">#</th>
+                        <th>Material Item & Kenyan Standard Specifications</th>
+                        <th class="text-center" style="width: 120px;">Est. Quantity</th>
+                        <th class="text-end" style="width: 130px;">Rate (Ksh)</th>
+                        <th class="text-end" style="width: 150px;">Total (Ksh)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% lineItems.forEach(item => { %>
+                        <tr>
+                            <td><%= item.no %></td>
+                            <td>
+                                <strong class="text-dark d-block"><%= item.description %></strong>
+                                <small class="text-muted"><%= item.category %></small>
+                            </td>
+                            <td class="text-center fw-bold text-dark"><%= item.qty %></td>
+                            <td class="text-end">Ksh <%= Number(item.unitRate).toLocaleString() %></td>
+                            <td class="text-end fw-bold">Ksh <%= Math.round(item.total).toLocaleString() %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Calculation Totals Block -->
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="p-3 bg-light rounded small h-100">
+                    <strong class="text-dark d-block mb-2"><i class="fa fa-info-circle text-primary me-1"></i>Procurement & Supply Notes:</strong>
+                    <ul class="mb-0 ps-3 text-muted">
+                        <li>Quantities include Kenyan site standard 5% compaction & cut allowance.</li>
+                        <li>Rates benchmarked to active vetted hardware stores and quarries in <%= county %> County.</li>
+                        <li>Payment verified via Safaricom Lipa na M-Pesa or RTGS bank transfer.</li>
+                        <li>Site offloading crew is available upon request with the delivery tipper.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                <div class="d-flex justify-content-between py-1 border-bottom small">
+                    <span class="text-muted">Net Materials Subtotal:</span>
+                    <strong class="text-dark">Ksh <%= Math.round(subtotal).toLocaleString() %></strong>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom small">
+                    <span class="text-muted">Value Added Tax (16% VAT):</span>
+                    <span class="text-dark">Ksh <%= Math.round(vat).toLocaleString() %></span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom small">
+                    <span class="text-muted">Estimated County Haulage (<%= county %>):</span>
+                    <span class="text-dark">Ksh <%= transportEstimate.toLocaleString() %></span>
+                </div>
+                <div class="d-flex justify-content-between py-3 mb-2 border-bottom">
+                    <span class="fw-bold text-dark fs-5">Estimated Budget:</span>
+                    <strong class="text-primary fs-4">Ksh <%= Math.round(grandTotal).toLocaleString() %></strong>
+                </div>
+                <div class="small text-muted">
+                    Lipa na M-Pesa Paybill: <strong>522522</strong> • Acc: <strong><%= invoiceNo %></strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Signoff -->
+        <div class="border-top pt-4 mt-5 d-flex justify-content-between align-items-center flex-wrap gap-3 small text-muted">
+            <div>
+                <strong>Generated via TopLineHub Estimator Engine</strong><br>
+                Kenya's #1 Construction Marketplace & Procurement Network
+            </div>
+            <div class="text-end">
+                <div class="border-top border-dark pt-1 d-inline-block" style="min-width: 180px;">
+                    Authorized Signature / Stamp
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

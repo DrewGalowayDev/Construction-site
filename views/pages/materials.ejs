@@ -1,0 +1,113 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Building Materials Catalog</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Materials</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-xxl py-4">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Filter Sidebar -->
+            <div class="col-lg-3">
+                <div class="bg-light p-4 rounded card-custom mb-4">
+                    <h5 class="fw-bold mb-3"><i class="fa fa-filter text-primary me-2"></i>Filter Materials</h5>
+                    <form action="/materials" method="GET">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Search</label>
+                            <input type="text" name="q" class="form-control" placeholder="Search product..." value="<%= typeof query !== 'undefined' ? query.q || '' : '' %>">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat.id %>" <%= (typeof query !== 'undefined' && query.category == cat.id) ? 'selected' : '' %>><%= cat.name %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">County / Location</label>
+                            <select name="county" class="form-select">
+                                <option value="">All 47 Counties</option>
+                                <% counties.forEach(c => { %>
+                                    <option value="<%= c %>" <%= (typeof query !== 'undefined' && query.county === c) ? 'selected' : '' %>><%= c %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 text-white fw-bold mb-2">Apply Filters</button>
+                        <a href="/materials" class="btn btn-outline-secondary w-100 btn-sm">Reset</a>
+                    </form>
+                </div>
+
+                <div class="bg-dark text-white p-4 rounded text-center">
+                    <i class="fa fa-truck-loading fa-3x text-primary mb-3"></i>
+                    <h5 class="text-white">Need Bulk Site Supply?</h5>
+                    <p class="small text-secondary mb-3">Get direct quarry tippers, whole-bundle steel rebars, or factory-direct cement with site delivery.</p>
+                    <a href="/contact" class="btn btn-sm btn-outline-light">Request Bulk Quote</a>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <p class="mb-0 text-muted">Showing <strong><%= products.length %></strong> verified building materials</p>
+                    <div class="d-flex gap-2">
+                        <a href="/materials/post" class="btn btn-sm btn-primary text-white fw-bold"><i class="fa fa-plus-circle me-1"></i>List Materials</a>
+                        <a href="/jobs/post" class="btn btn-sm btn-outline-primary"><i class="fa fa-tools me-1"></i>Post Job</a>
+                    </div>
+                </div>
+
+                <% if (products.length === 0) { %>
+                    <div class="alert alert-info text-center py-5">
+                        <i class="fa fa-search fa-3x mb-3 text-secondary"></i>
+                        <h4>No materials match your criteria</h4>
+                        <p class="text-muted">Try clearing your filters or search keywords.</p>
+                        <a href="/materials" class="btn btn-primary text-white">Reset Filters</a>
+                    </div>
+                <% } else { %>
+                    <div class="row g-4">
+                        <% products.forEach(product => { %>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card card-custom h-100 bg-white">
+                                    <div style="height: 190px; overflow: hidden;" class="position-relative">
+                                        <a href="/materials/<%= product.id %>">
+                                            <img src="<%= product.image_url %>" class="card-img-top w-100 h-100" style="object-fit: cover;" alt="<%= product.title %>">
+                                        </a>
+                                        <span class="badge bg-dark position-absolute top-0 end-0 m-2"><%= product.location_county %></span>
+                                    </div>
+                                    <div class="card-body d-flex flex-column p-3">
+                                        <div class="small text-primary fw-bold text-uppercase mb-1"><%= product.category ? product.category.name : 'Material' %></div>
+                                        <h6 class="card-title fw-bold text-dark mb-2">
+                                            <a href="/materials/<%= product.id %>" class="text-dark text-decoration-none"><%= product.title %></a>
+                                        </h6>
+                                        <p class="text-muted small mb-3"><%= product.description.substring(0, 80) %>...</p>
+                                        <div class="product-price mb-3 mt-auto">
+                                            Ksh <%= Number(product.price).toLocaleString() %> <span class="small">/ <%= product.unit %></span>
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                            <div class="d-flex gap-2">
+                                                <a href="/materials/<%= product.id %>" class="btn btn-outline-primary btn-sm fw-bold flex-grow-1">Details</a>
+                                                <a href="/orders/request/<%= product.id %>" class="btn btn-primary text-white btn-sm fw-bold flex-grow-1">Order / Quote</a>
+                                            </div>
+                                            <a href="https://wa.me/254711000000?text=Hi,%20inquiring%20about%20<%= encodeURIComponent(product.title) %>" class="btn btn-whatsapp btn-sm" target="_blank">
+                                                <i class="fab fa-whatsapp me-1"></i>WhatsApp Vendor
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>

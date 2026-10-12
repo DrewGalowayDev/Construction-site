@@ -1,0 +1,48 @@
+<!-- Navbar Start -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top px-3 px-xl-4 py-lg-0">
+    <a href="/" class="navbar-brand d-flex align-items-center me-2 me-xl-3">
+        <h1 class="m-0 fs-4 fw-bold text-dark text-nowrap">
+            <i class="fa fa-hard-hat text-primary me-2"></i>TOPLINE<span class="text-primary">HUB</span>
+        </h1>
+    </a>
+    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto py-3 py-lg-0">
+            <a href="/" class="nav-item nav-link <%= currentPath === '/' ? 'active' : '' %>">Home</a>
+            <a href="/materials" class="nav-item nav-link <%= currentPath.startsWith('/materials') ? 'active' : '' %>">Materials</a>
+            <a href="/rentals" class="nav-item nav-link <%= currentPath.startsWith('/rentals') ? 'active' : '' %>">Equipment Hire</a>
+            <a href="/fundis" class="nav-item nav-link <%= currentPath.startsWith('/fundis') ? 'active' : '' %>">Hire Fundi</a>
+            <a href="/jobs" class="nav-item nav-link <%= currentPath.startsWith('/jobs') ? 'active' : '' %>">Job Board</a>
+            <a href="/calculator" class="nav-item nav-link <%= currentPath === '/calculator' ? 'active' : '' %>"><i class="fa fa-calculator me-1 text-primary"></i>Estimator</a>
+            <% if (user) { %>
+                <a href="/dashboard" class="nav-item nav-link <%= currentPath === '/dashboard' ? 'active' : '' %>"><i class="fa fa-tachometer-alt me-1 text-primary"></i>Dashboard</a>
+            <% } %>
+            
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">More</a>
+                <div class="dropdown-menu bg-light m-0">
+                    <a href="/about" class="dropdown-item">About Platform</a>
+                    <a href="/calculator" class="dropdown-item fw-bold text-dark"><i class="fa fa-calculator me-2 text-primary"></i>Material Estimator</a>
+                    <a href="/materials/post" class="dropdown-item fw-bold text-dark"><i class="fa fa-cubes me-2 text-primary"></i>Post Material / Plant</a>
+                    <a href="/jobs/post" class="dropdown-item fw-bold text-primary"><i class="fa fa-plus-circle me-2"></i>Post a Job</a>
+                    <% if (user) { %>
+                        <a href="/dashboard" class="dropdown-item fw-bold text-dark"><i class="fa fa-tachometer-alt me-2 text-primary"></i>My Dashboard</a>
+                    <% } %>
+                    <a href="/contact" class="dropdown-item">Help & Support</a>
+                </div>
+            </div>
+            <a href="/contact" class="nav-item nav-link <%= currentPath === '/contact' ? 'active' : '' %>">Contact</a>
+        </div>
+        <div class="d-none d-lg-flex ms-2 ms-xl-3 gap-2 align-items-center flex-nowrap">
+            <a href="/materials/post" class="btn btn-outline-primary py-2 px-2 px-xl-3 fw-medium text-nowrap" style="font-size: 0.82rem;">
+                <i class="fa fa-plus-circle me-1"></i>List Materials
+            </a>
+            <a href="/jobs/post" class="btn btn-primary py-2 px-2 px-xl-3 text-white fw-medium text-nowrap" style="font-size: 0.82rem;">
+                <i class="fa fa-tools me-1"></i>Post Project
+            </a>
+        </div>
+    </div>
+</nav>
+<!-- Navbar End -->

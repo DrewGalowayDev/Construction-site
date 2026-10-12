@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title><%= title %></title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+            color: #2b303a;
+        }
+        .invoice-card {
+            max-width: 860px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 45px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .invoice-header-logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            color: #182333;
+        }
+        .invoice-header-logo span {
+            color: #FDA12B;
+        }
+        .stamp-paid {
+            border: 3px solid #198754;
+            color: #198754;
+            font-size: 20px;
+            font-weight: 800;
+            padding: 8px 18px;
+            text-transform: uppercase;
+            border-radius: 8px;
+            display: inline-block;
+            transform: rotate(-5deg);
+        }
+        .stamp-pending {
+            border: 3px dashed #ffc107;
+            color: #b58100;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 6px 14px;
+            text-transform: uppercase;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                padding: 0 !important;
+            }
+            .invoice-card {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 20px !important;
+                max-width: 100% !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Print / Navigation Bar -->
+    <div class="container text-center pt-4 no-print">
+        <div class="d-inline-flex gap-2">
+            <button onclick="window.print()" class="btn btn-primary text-white fw-bold px-4">
+                <i class="fa fa-print me-2"></i>Print Tax Invoice / Receipt
+            </button>
+            <a href="/orders/<%= order.id %>/checkout" class="btn btn-outline-dark px-4">
+                <i class="fa fa-arrow-left me-1"></i>Back to Checkout
+            </a>
+            <a href="/dashboard?tab=orders" class="btn btn-outline-secondary px-3">
+                <i class="fa fa-th-large me-1"></i>Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="invoice-card">
+        <!-- Company & Invoice Header -->
+        <div class="row align-items-start border-bottom pb-4 mb-4">
+            <div class="col-sm-7">
+                <div class="invoice-header-logo mb-2">
+                    <i class="fa fa-hard-hat text-warning me-2"></i>TOPLINE<span>HUB</span>
+                </div>
+                <div class="small text-muted">
+                    <strong>TopLineHub Construction Logistics Ltd</strong><br>
+                    Delta Corner Tower B, Westlands, Nairobi, Kenya<br>
+                    P.O. Box 45291 - 00100 Nairobi • Tel: +254 711 000 000<br>
+                    Email: dispatch@toplinehub.co.ke • Web: www.toplinehub.co.ke<br>
+                    <strong>KRA PIN: P051938291X • VAT Registered</strong>
+                </div>
+            </div>
+            <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+                <h3 class="fw-bold text-dark text-uppercase mb-1">Tax Invoice</h3>
+                <div class="text-muted small"><strong>Invoice No:</strong> TLH-INV-<%= String(order.id).padStart(5, '0') %></div>
+                <div class="text-muted small"><strong>Date:</strong> <%= new Date(order.createdAt || order.created_at || Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %></div>
+                <div class="text-muted small mb-3"><strong>Due Date:</strong> Immediate</div>
+                <div>
+                    <% if (order.payment_status === 'paid') { %>
+                        <div class="stamp-paid">
+                            <i class="fa fa-check-circle me-1"></i>PAID IN FULL
+                        </div>
+                    <% } else { %>
+                        <div class="stamp-pending">
+                            <i class="fa fa-hourglass-half me-1"></i>PAYMENT PENDING
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billed To & Shipping Destination -->
+        <div class="row mb-4">
+            <div class="col-sm-6">
+                <small class="text-uppercase text-muted fw-bold d-block mb-1">Customer / Billed To:</small>
+                <h6 class="fw-bold text-dark mb-1"><%= order.buyer ? order.buyer.name : 'Valued Client' %></h6>
+                <div class="small text-muted">
+                    Phone: <%= order.contact_phone %><br>
+                    Email: <%= order.buyer ? order.buyer.email : 'N/A' %><br>
+                    Account: TopLineHub Client #<%= order.buyer_id || 'Guest' %>
+                </div>
+            </div>
+            <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                <small class="text-uppercase text-muted fw-bold d-block mb-1">Site Delivery Destination:</small>
+                <h6 class="fw-bold text-dark mb-1"><%= order.product ? order.product.location_county : 'Kenya' %> County</h6>
+                <div class="small text-muted">
+                    <%= order.delivery_address %><br>
+                    <% if (order.notes) { %>
+                        <em>Instructions: <%= order.notes %></em>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Items Table -->
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Material Description / Equipment Plant</th>
+                        <th class="text-center" style="width: 90px;">Qty</th>
+                        <th class="text-end" style="width: 140px;">Unit Rate (Ksh)</th>
+                        <th class="text-end" style="width: 160px;">Total (Ksh)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>
+                            <strong class="text-dark"><%= order.product ? order.product.title : 'Building Materials' %></strong>
+                            <div class="small text-muted">
+                                Category: <%= order.product && order.product.is_rental ? 'Machinery Hire & Plant Rental' : 'Direct Hardware Supply' %>
+                            </div>
+                        </td>
+                        <td class="text-center fw-bold"><%= order.quantity %></td>
+                        <td class="text-end">Ksh <%= Number(order.product ? order.product.price : 0).toLocaleString() %></td>
+                        <td class="text-end fw-bold">Ksh <%= Number(order.total_price).toLocaleString() %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals & Payment Summary -->
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="p-3 bg-light rounded small">
+                    <strong class="text-dark d-block mb-1">M-Pesa Payment Details:</strong>
+                    <div>Safaricom Paybill: <strong>522522</strong></div>
+                    <div>Account Reference: <strong>TLH-<%= order.id %></strong></div>
+                    <% if (order.mpesa_receipt) { %>
+                        <div class="text-success mt-2">
+                            <i class="fa fa-check-circle me-1"></i><strong>M-Pesa Receipt: <%= order.mpesa_receipt %></strong><br>
+                            Paid via: +<%= order.mpesa_phone %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            <div class="col-sm-6 text-sm-end">
+                <div class="d-flex justify-content-between py-1 border-bottom small">
+                    <span class="text-muted">Net Subtotal:</span>
+                    <strong class="text-dark">Ksh <%= subtotal.toLocaleString() %></strong>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom small">
+                    <span class="text-muted">VAT (16% Standard Rate):</span>
+                    <span class="text-dark">Ksh <%= vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="fw-bold text-dark fs-5">Grand Total:</span>
+                    <strong class="text-primary fs-5">Ksh <%= grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></strong>
+                </div>
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">Amount Paid:</span>
+                    <strong class="<%= order.payment_status === 'paid' ? 'text-success' : 'text-muted' %>">
+                        Ksh <%= order.payment_status === 'paid' ? grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00' %>
+                    </strong>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-top small">
+                    <span class="text-muted">Balance Due:</span>
+                    <strong class="text-dark">
+                        Ksh <%= order.payment_status === 'paid' ? '0.00' : grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+                    </strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Official Signoff -->
+        <div class="border-top pt-4 mt-5 text-center small text-muted">
+            <p class="mb-1">Thank you for building with TopLineHub — Kenya's Trusted Construction Marketplace.</p>
+            <p class="mb-0">This document is a computer-generated tax invoice issued in accordance with the Kenya Revenue Authority (KRA) eTIMS electronic tax standards.</p>
+        </div>
+    </div>
+
+</body>
+</html>

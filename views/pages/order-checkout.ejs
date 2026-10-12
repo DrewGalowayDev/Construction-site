@@ -1,0 +1,269 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Order Checkout & Payment</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item"><a class="text-white" href="/materials">Materials</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Checkout #<%= order.id %></li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-xxl py-4">
+    <div class="container">
+        <!-- Top Status Alert -->
+        <% if (order.payment_status === 'paid') { %>
+            <div class="alert alert-success d-flex align-items-center justify-content-between p-4 mb-4 shadow-sm border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-success text-white rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fa fa-check-double fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="alert-heading mb-1 text-success fw-bold">Payment Confirmed via Lipa na M-Pesa!</h5>
+                        <p class="mb-0 text-muted small">
+                            Transaction Reference: <strong class="text-dark"><%= order.mpesa_receipt %></strong> • Paid at <%= new Date(order.paid_at || order.updatedAt).toLocaleString() %>
+                        </p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="/orders/<%= order.id %>/invoice" class="btn btn-outline-success btn-sm"><i class="fa fa-file-invoice me-1"></i>Official Invoice</a>
+                </div>
+            </div>
+        <% } %>
+
+        <div class="row g-4">
+            <!-- Left Column: Order Summary & Delivery Details -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm bg-white p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                        <h5 class="fw-bold text-dark mb-0"><i class="fa fa-clipboard-list text-primary me-2"></i>Order Summary (#<%= order.id %>)</h5>
+                        <span class="badge <%= order.payment_status === 'paid' ? 'bg-success' : 'bg-warning text-dark' %> px-3 py-2 text-uppercase">
+                            <i class="fa <%= order.payment_status === 'paid' ? 'fa-check-circle' : 'fa-clock' %> me-1"></i>
+                            <%= order.payment_status === 'paid' ? 'Paid in Full' : 'Awaiting Payment' %>
+                        </span>
+                    </div>
+
+                    <!-- Product Item Detail -->
+                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded mb-4">
+                        <img src="<%= order.product ? order.product.image_url : '/img/service-1.jpg' %>" alt="<%= order.product ? order.product.title : 'Product' %>" class="rounded" style="width: 90px; height: 90px; object-fit: cover;">
+                        <div class="flex-grow-1">
+                            <span class="badge <%= order.product && order.product.is_rental ? 'bg-primary' : 'bg-dark' %> mb-1">
+                                <%= order.product && order.product.is_rental ? 'Equipment Hire' : 'Building Material' %>
+                            </span>
+                            <h6 class="fw-bold text-dark mb-1"><%= order.product ? order.product.title : 'Building Supplies' %></h6>
+                            <div class="small text-muted">
+                                <span>Unit Rate: Ksh <%= Number(order.product ? order.product.price : 0).toLocaleString() %> / <%= order.product ? order.product.unit : 'unit' %></span>
+                                <span class="mx-2">•</span>
+                                <strong class="text-dark">Qty: <%= order.quantity %></strong>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-5 fw-bold text-primary">Ksh <%= Number(order.total_price).toLocaleString() %></div>
+                            <small class="text-muted">Subtotal</small>
+                        </div>
+                    </div>
+
+                    <!-- Delivery & Contact Info -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded h-100">
+                                <small class="text-muted d-block fw-bold text-uppercase mb-1"><i class="fa fa-truck text-primary me-1"></i>Site Delivery Address</small>
+                                <strong class="text-dark d-block"><%= order.delivery_address %></strong>
+                                <% if (order.notes) { %>
+                                    <small class="text-muted mt-2 d-block fst-italic">"<%= order.notes %>"</small>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded h-100">
+                                <small class="text-muted d-block fw-bold text-uppercase mb-1"><i class="fa fa-user text-primary me-1"></i>Recipient Details</small>
+                                <strong class="text-dark d-block"><%= order.buyer ? order.buyer.name : 'Site Manager' %></strong>
+                                <span class="text-muted small"><i class="fa fa-phone text-muted me-1"></i><%= order.contact_phone %></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vendor / Supplier Card -->
+                    <% if (order.product && order.product.seller) { %>
+                        <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="<%= order.product.seller.avatar || '/img/team-1.jpg' %>" class="rounded-circle border" style="width: 45px; height: 45px; object-fit: cover;" alt="Seller">
+                                <div>
+                                    <div class="small text-muted">Fulfilling Hardware / Quarry:</div>
+                                    <strong class="text-dark"><%= order.product.seller.name %></strong>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="https://wa.me/<%= (order.product.seller.phone || '254711000000').replace(/[^0-9]/g, '') %>?text=Hello%2C%20regarding%20TopLineHub%20Order%20%23<%= order.id %>%20for%20<%= encodeURIComponent(order.product.title) %>" target="_blank" class="btn btn-whatsapp btn-sm">
+                                    <i class="fab fa-whatsapp me-1"></i>Supplier WhatsApp
+                                </a>
+                                <a href="tel:<%= order.product.seller.phone %>" class="btn btn-outline-dark btn-sm">
+                                    <i class="fa fa-phone me-1"></i>Call
+                                </a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Right Column: Lipa na M-Pesa Checkout & Bill Breakdown -->
+            <div class="col-lg-5">
+                <!-- Payment Breakdown Card -->
+                <div class="card border-0 shadow-sm bg-white p-4 mb-4">
+                    <h5 class="fw-bold text-dark border-bottom pb-3 mb-3"><i class="fa fa-receipt text-primary me-2"></i>Invoice Breakdown</h5>
+
+                    <div class="d-flex justify-content-between py-2 border-bottom small">
+                        <span class="text-muted">Material / Equipment Cost</span>
+                        <strong class="text-dark">Ksh <%= subtotal.toLocaleString() %></strong>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom small">
+                        <span class="text-muted">Standard VAT (16%)</span>
+                        <span class="text-dark">Ksh <%= vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom small">
+                        <span class="text-muted">Site Delivery & Offloading</span>
+                        <span class="badge bg-light text-success fw-bold">Arranged with Supplier</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-3 mb-3">
+                        <span class="fs-5 fw-bold text-dark">Total Payable:</span>
+                        <span class="fs-4 fw-bold text-primary">Ksh <%= grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+                    </div>
+
+                    <% if (order.payment_status !== 'paid') { %>
+                        <!-- Lipa na M-Pesa Express Box -->
+                        <div class="border rounded p-4 mb-3" style="background-color: #f7faf8; border-color: #25D366 !important;">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge" style="background-color: #0b9e43; color: #fff; font-size: 0.9rem; padding: 6px 12px;">
+                                        <i class="fa fa-mobile-alt me-1"></i>Lipa na M-PESA
+                                    </span>
+                                </div>
+                                <span class="badge bg-dark">Paybill: 522522</span>
+                            </div>
+
+                            <p class="small text-muted mb-3">
+                                Enter your Safaricom mobile number. You will receive an instant <strong>STK PIN prompt</strong> on your handset to authorize payment.
+                            </p>
+
+                            <form id="mpesaForm" onsubmit="triggerMpesaStk(event)">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark">Safaricom M-Pesa Phone Number *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white fw-bold text-muted">+254</span>
+                                        <input type="tel" id="mpesa_phone_input" class="form-control" placeholder="712345678" value="<%= (order.contact_phone || '').replace(/^(\+?254|0)/, '') %>" required>
+                                    </div>
+                                    <small class="text-muted">Format: 7XX XXX XXX or 1XX XXX XXX</small>
+                                </div>
+
+                                <button type="submit" id="mpesaSubmitBtn" class="btn w-100 py-3 fw-bold text-white shadow-sm" style="background-color: #0b9e43;">
+                                    <i class="fa fa-paper-plane me-2"></i>Send STK Push Prompt (Ksh <%= Math.round(grandTotal).toLocaleString() %>)
+                                </button>
+                            </form>
+
+                            <!-- STK Processing Status Card (hidden initially) -->
+                            <div id="stkProcessingBox" class="mt-3 p-3 bg-white border rounded text-center d-none">
+                                <div class="spinner-border text-success mb-2" role="status" style="width: 2.2rem; height: 2.2rem;"></div>
+                                <h6 class="fw-bold text-dark mb-1" id="stkStatusTitle">Prompting Safaricom Daraja...</h6>
+                                <p class="small text-muted mb-2" id="stkStatusMsg">Please check your phone screen and enter your M-Pesa PIN.</p>
+                                <div class="progress" style="height: 6px;">
+                                    <div id="stkProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 25%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <!-- Paid Receipt Badge -->
+                        <div class="p-3 bg-light rounded text-center mb-3">
+                            <span class="badge bg-success mb-2 px-3 py-2"><i class="fa fa-check me-1"></i>M-Pesa Receipt: <%= order.mpesa_receipt %></span>
+                            <div class="small text-muted">Phone: +<%= order.mpesa_phone %></div>
+                            <div class="small text-muted">Paid at: <%= new Date(order.paid_at || order.updatedAt).toLocaleString() %></div>
+                        </div>
+                    <% } %>
+
+                    <!-- Secondary Document Actions -->
+                    <div class="d-grid gap-2">
+                        <a href="/orders/<%= order.id %>/invoice" class="btn btn-outline-dark py-2">
+                            <i class="fa fa-file-invoice me-2"></i>Print / Download Tax Invoice (PDF)
+                        </a>
+                        <a href="/dashboard?tab=orders" class="btn btn-link text-decoration-none small text-muted text-center">
+                            <i class="fa fa-arrow-left me-1"></i>Return to My Orders Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function triggerMpesaStk(e) {
+        e.preventDefault();
+        const phoneInput = document.getElementById('mpesa_phone_input');
+        const submitBtn = document.getElementById('mpesaSubmitBtn');
+        const processingBox = document.getElementById('stkProcessingBox');
+        const statusTitle = document.getElementById('stkStatusTitle');
+        const statusMsg = document.getElementById('stkStatusMsg');
+        const progressBar = document.getElementById('stkProgressBar');
+
+        let rawPhone = phoneInput.value.trim().replace(/[^0-9]/g, '');
+        if (!rawPhone) {
+            alert('Please enter a valid Safaricom phone number.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        processingBox.classList.remove('d-none');
+        progressBar.style.width = '35%';
+        statusTitle.textContent = 'Connecting to Safaricom Daraja STK...';
+        statusMsg.textContent = 'Initiating push request for Ksh <%= Math.round(grandTotal).toLocaleString() %>...';
+
+        try {
+            // Stage 1: Send STK push
+            setTimeout(() => {
+                progressBar.style.width = '70%';
+                statusTitle.textContent = 'STK Prompt Sent to Handset!';
+                statusMsg.textContent = 'Please check phone screen (' + rawPhone + ') and enter your secret M-Pesa PIN.';
+            }, 1200);
+
+            // Stage 2: Trigger backend confirm
+            setTimeout(async () => {
+                progressBar.style.width = '95%';
+                statusTitle.textContent = 'Validating M-Pesa PIN & Transaction...';
+
+                const response = await fetch('/orders/<%= order.id %>/mpesa-stk', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ phone: rawPhone })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    progressBar.style.width = '100%';
+                    statusTitle.innerHTML = '<span class="text-success"><i class="fa fa-check-circle me-1"></i>Payment Received!</span>';
+                    statusMsg.textContent = 'Receipt: ' + data.receipt + ' • Reloading receipt...';
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    submitBtn.disabled = false;
+                    progressBar.style.width = '0%';
+                    statusTitle.innerHTML = '<span class="text-danger">Payment Incomplete</span>';
+                    statusMsg.textContent = data.message || 'M-Pesa transaction was not completed. Please try again.';
+                }
+            }, 3200);
+
+        } catch (err) {
+            console.error('STK Error:', err);
+            submitBtn.disabled = false;
+            processingBox.classList.add('d-none');
+            alert('Failed to connect to M-Pesa gateway. Please retry.');
+        }
+    }
+</script>

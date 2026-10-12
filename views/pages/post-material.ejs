@@ -1,0 +1,608 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Post Materials & Plant Equipment</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item"><a class="text-white" href="/materials">Materials</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Post Listing</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Post Material & Equipment Section Start -->
+<div class="container-fluid appointment my-5 py-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <div class="row g-5">
+            <!-- Left Info Panel -->
+            <div class="col-lg-5 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="border-start border-5 border-primary ps-4 mb-5">
+                    <h6 class="text-body text-uppercase mb-2 text-white">Supplier & Machinery Portal</h6>
+                    <h1 class="display-6 mb-0 text-white">Sell Materials or Rent Plant Fleets to Active Sites</h1>
+                </div>
+                <p class="text-light mb-4">
+                    List your hardware inventory, quarry supplies, bulk aggregates, or construction plant equipment directly to Kenyan developers, site engineers, and main contractors.
+                </p>
+
+                <div class="bg-dark p-4 rounded text-white border border-secondary mb-4">
+                    <h5 class="text-primary mb-3"><i class="fa fa-handshake me-2"></i>Why List on TopLineHub?</h5>
+                    <ul class="list-unstyled mb-0 text-secondary">
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 me-2"></i>
+                            <div><strong class="text-white">Direct Client Contact:</strong> Site managers contact you directly via phone, WhatsApp, and formal quote requests.</div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 me-2"></i>
+                            <div><strong class="text-white">Materials & Plant Hire:</strong> List retail/bulk building materials or heavy plant on daily/monthly lease terms.</div>
+                        </li>
+                        <li class="mb-0 d-flex align-items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 me-2"></i>
+                            <div><strong class="text-white">Nationwide Footprint:</strong> Geotargeted visibility across Nairobi, Kiambu, Machakos, Coast, and Rift Valley.</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="p-3 bg-white rounded border-start border-4 border-warning shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-lightbulb text-warning fa-2x me-3"></i>
+                        <small class="text-dark">
+                            <strong>Vendor Tip:</strong> State whether machine transport/haulage is included and specify minimum order quantities for bulk tipper deliveries.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Form Panel -->
+            <div class="col-lg-7 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="bg-white p-4 p-md-5 rounded shadow">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="text-dark fw-bold mb-0">Publish New Listing</h3>
+                        <span class="badge bg-primary px-3 py-2 text-white"><i class="fa fa-bullhorn me-1"></i>Direct Marketplace</span>
+                    </div>
+
+                    <form action="/materials/post" method="POST" id="listingForm" enctype="multipart/form-data">
+                        <div class="row g-3">
+                            <!-- Listing Type Selector -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-dark small mb-2">Listing Category Type *</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <input type="radio" class="btn-check" name="listing_type" id="type_material" value="material" <%= preselectedType === 'rental' ? '' : 'checked' %>>
+                                        <label class="btn btn-outline-primary w-100 py-3 text-start d-flex align-items-center" for="type_material">
+                                            <i class="fa fa-cubes fa-2x me-3 text-primary"></i>
+                                            <div>
+                                                <div class="fw-bold">Building Material</div>
+                                                <small class="text-muted d-block">For Sale (Cement, Steel, Stones)</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="radio" class="btn-check" name="listing_type" id="type_rental" value="rental" <%= preselectedType === 'rental' ? 'checked' : '' %>>
+                                        <label class="btn btn-outline-primary w-100 py-3 text-start d-flex align-items-center" for="type_rental">
+                                            <i class="fa fa-truck-pickup fa-2x me-3 text-primary"></i>
+                                            <div>
+                                                <div class="fw-bold">Plant & Equipment</div>
+                                                <small class="text-muted d-block">For Hire (Mixers, Plant, Scaffolding)</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" name="title" class="form-control bg-light border-0" id="listing_title" placeholder="e.g. Bamburi Tembo Cement (32.5R)" required>
+                                    <label for="listing_title" id="title_label">Material or Equipment Name *</label>
+                                </div>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <select name="category_id" class="form-select bg-light border-0" id="category_select" required>
+                                        <option value="">Select Category</option>
+                                        <% categories.forEach(cat => { %>
+                                            <option value="<%= cat.id %>" data-type="<%= cat.type %>"><%= cat.name %> (<%= cat.type %>)</option>
+                                        <% }) %>
+                                    </select>
+                                    <label for="category_select">Industry Category *</label>
+                                </div>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="number" step="0.01" min="1" name="price" class="form-control bg-light border-0" id="price_val" placeholder="780" required>
+                                    <label for="price_val" id="price_label">Price / Rate (Ksh) *</label>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Unit -->
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="text" name="unit" class="form-control bg-light border-0" id="unit_val" placeholder="e.g. 50kg Bag" value="50kg Bag" required list="unit_suggestions">
+                                    <label for="unit_val">Pricing Unit *</label>
+                                    <datalist id="unit_suggestions">
+                                        <option value="50kg Bag">
+                                        <option value="Tonne / Tipper Trip">
+                                        <option value="12m Length">
+                                        <option value="Square Metre">
+                                        <option value="Linear Metre">
+                                        <option value="Piece / Block">
+                                        <option value="Per Day">
+                                        <option value="Per Week">
+                                        <option value="Per Month">
+                                        <option value="Per Hour (With Operator)">
+                                    </datalist>
+                                </div>
+                                <div class="mt-1" id="quick_unit_badges">
+                                    <span class="badge bg-light text-dark border me-1 cursor-pointer unit-pill">50kg Bag</span>
+                                    <span class="badge bg-light text-dark border me-1 cursor-pointer unit-pill">Tonne</span>
+                                    <span class="badge bg-light text-dark border me-1 cursor-pointer unit-pill">Per Day</span>
+                                    <span class="badge bg-light text-dark border me-1 cursor-pointer unit-pill">Per Month</span>
+                                </div>
+                            </div>
+
+                            <!-- Stock / Units Available -->
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="number" min="1" name="stock_quantity" class="form-control bg-light border-0" id="stock_val" placeholder="100" value="100" required>
+                                    <label for="stock_val" id="stock_label">Available Stock / Fleet Count</label>
+                                </div>
+                            </div>
+
+                            <!-- County -->
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <select name="location_county" class="form-select bg-light border-0" id="county_val" required>
+                                        <% counties.forEach(c => { %>
+                                            <option value="<%= c %>" <%= c === 'Nairobi' ? 'selected' : '' %>><%= c %></option>
+                                        <% }) %>
+                                    </select>
+                                    <label for="county_val">Base County / Yard Location *</label>
+                                </div>
+                            </div>
+
+                            <!-- Town / Specific Depot -->
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="text" name="location_town" class="form-control bg-light border-0" id="town_val" placeholder="e.g. Industrial Area / Ruiru Yard" value="<%= user ? user.town : '' %>">
+                                    <label for="town_val">Depot Town / Yard Landmark</label>
+                                </div>
+                            </div>
+
+                            <!-- Vendor Name -->
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="text" name="contact_name" class="form-control bg-light border-0" id="vendor_name" placeholder="Hardware / Vendor Name" value="<%= user ? user.name : '' %>" required>
+                                    <label for="vendor_name">Vendor / Business Name *</label>
+                                </div>
+                            </div>
+
+                            <!-- Contact Phone / WhatsApp -->
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input type="tel" name="contact_phone" class="form-control bg-light border-0" id="phone_val" placeholder="0711000000" value="<%= user ? user.phone : '' %>" required>
+                                    <label for="phone_val">Contact Phone / WhatsApp *</label>
+                                </div>
+                            </div>
+
+                            <!-- Photo / Image Upload -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-dark small mb-2"><i class="fa fa-images text-primary me-1"></i>Product Photos (Up to 5 images)</label>
+                                
+                                <!-- Drag & Drop Zone -->
+                                <div id="dropZone" class="upload-drop-zone text-center p-4 rounded border-2 border-dashed mb-2" style="border-color: #ccc; cursor: pointer; transition: all 0.3s ease; background: #fafafa;">
+                                    <div id="dropZonePlaceholder">
+                                        <i class="fa fa-cloud-upload-alt text-primary fa-3x mb-2 d-block"></i>
+                                        <p class="fw-bold text-dark mb-1">Drag & drop product images here</p>
+                                        <p class="text-muted small mb-2">or click to browse from your device</p>
+                                        <span class="badge bg-light text-dark border px-3 py-2"><i class="fa fa-camera me-1"></i>Choose Files</span>
+                                        <p class="text-muted mt-2 mb-0" style="font-size: 11px;">Max 5 images &bull; JPG, PNG, WEBP &bull; 5MB each</p>
+                                    </div>
+                                    <input type="file" name="product_images" id="productImageInput" class="d-none" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+                                </div>
+
+                                <!-- Preview Thumbnails -->
+                                <div id="imagePreviewContainer" class="row g-2 mb-2" style="display: none;"></div>
+
+                                <!-- Fallback: preset images or URL (shown when no files uploaded) -->
+                                <div id="fallbackImageSection">
+                                    <p class="text-muted small mb-2"><i class="fa fa-info-circle me-1"></i>No camera? Pick a stock image below or paste a URL:</p>
+                                    <div class="row g-2 mb-2">
+                                        <div class="col-4 col-md-2 text-center">
+                                            <label class="d-block border p-1 rounded cursor-pointer img-choice selected">
+                                                <input type="radio" name="image_choice" value="/img/service-1.jpg" class="d-none" checked>
+                                                <img src="/img/service-1.jpg" class="img-fluid rounded mb-1" style="height: 42px; width: 100%; object-fit: cover;" alt="Cement">
+                                                <span class="small d-block text-truncate">Cement</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-4 col-md-2 text-center">
+                                            <label class="d-block border p-1 rounded cursor-pointer img-choice">
+                                                <input type="radio" name="image_choice" value="/img/service-2.jpg" class="d-none">
+                                                <img src="/img/service-2.jpg" class="img-fluid rounded mb-1" style="height: 42px; width: 100%; object-fit: cover;" alt="Plant">
+                                                <span class="small d-block text-truncate">Mixer/Plant</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-4 col-md-2 text-center">
+                                            <label class="d-block border p-1 rounded cursor-pointer img-choice">
+                                                <input type="radio" name="image_choice" value="/img/service-4.jpg" class="d-none">
+                                                <img src="/img/service-4.jpg" class="img-fluid rounded mb-1" style="height: 42px; width: 100%; object-fit: cover;" alt="Steel">
+                                                <span class="small d-block text-truncate">Steel</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-4 col-md-2 text-center">
+                                            <label class="d-block border p-1 rounded cursor-pointer img-choice">
+                                                <input type="radio" name="image_choice" value="/img/service-3.jpg" class="d-none">
+                                                <img src="/img/service-3.jpg" class="img-fluid rounded mb-1" style="height: 42px; width: 100%; object-fit: cover;" alt="Roofing">
+                                                <span class="small d-block text-truncate">Roofing</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-4 col-md-2 text-center">
+                                            <label class="d-block border p-1 rounded cursor-pointer img-choice">
+                                                <input type="radio" name="image_choice" value="/img/service-5.jpg" class="d-none">
+                                                <img src="/img/service-5.jpg" class="img-fluid rounded mb-1" style="height: 42px; width: 100%; object-fit: cover;" alt="Timber">
+                                                <span class="small d-block text-truncate">Timber</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-4 col-md-2 text-center">
+                                            <label class="d-block border p-1 rounded cursor-pointer img-choice">
+                                                <input type="radio" name="image_choice" value="/img/service-6.jpg" class="d-none">
+                                                <img src="/img/service-6.jpg" class="img-fluid rounded mb-1" style="height: 42px; width: 100%; object-fit: cover;" alt="Excavator">
+                                                <span class="small d-block text-truncate">Excavator</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-12">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-light border-0"><i class="fa fa-link text-primary"></i></span>
+                                                <input type="text" name="image_url" class="form-control form-control-sm bg-light border-0" id="custom_image_url" placeholder="Or paste custom image URL" value="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea name="description" class="form-control bg-light border-0" placeholder="Product specifications" id="desc_val" style="height: 120px" required></textarea>
+                                    <label for="desc_val" id="desc_label">Technical Specifications & Terms (Delivery terms, minimum order, operator info) *</label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12 pt-2">
+                                <button class="btn btn-primary w-100 py-3 text-white fw-bold shadow-sm" type="submit">
+                                    <i class="fa fa-check-circle me-2"></i>Publish Listing Now
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Post Material & Equipment Section End -->
+
+<style>
+.cursor-pointer { cursor: pointer; }
+.img-choice.selected {
+    border-color: #fd7e14 !important;
+    background-color: #fff8f2;
+}
+.unit-pill:hover {
+    background-color: #fd7e14 !important;
+    color: #fff !important;
+}
+/* Drag & Drop Zone */
+.upload-drop-zone {
+    border: 2px dashed #ccc;
+    transition: all 0.3s ease;
+}
+.upload-drop-zone.drag-over {
+    border-color: #fd7e14 !important;
+    background-color: #fff8f2 !important;
+    transform: scale(1.01);
+}
+.upload-drop-zone:hover {
+    border-color: #fd7e14;
+    background-color: #fefaf6 !important;
+}
+/* Preview thumbnails */
+.img-preview-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+.img-preview-card:hover {
+    border-color: #fd7e14;
+    box-shadow: 0 2px 8px rgba(253, 126, 20, 0.2);
+}
+.img-preview-card .remove-img {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(220, 53, 69, 0.9);
+    color: #fff;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.img-preview-card:hover .remove-img {
+    opacity: 1;
+}
+.img-preview-card .cover-badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(253, 126, 20, 0.9));
+    color: #fff;
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 12px 4px 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeMaterial = document.getElementById('type_material');
+    const typeRental = document.getElementById('type_rental');
+    const unitInput = document.getElementById('unit_val');
+    const stockInput = document.getElementById('stock_val');
+    const stockLabel = document.getElementById('stock_label');
+    const priceLabel = document.getElementById('price_label');
+    const titleLabel = document.getElementById('title_label');
+    const descLabel = document.getElementById('desc_label');
+    const customImgInput = document.getElementById('custom_image_url');
+    const imgChoices = document.querySelectorAll('.img-choice');
+    const unitPills = document.querySelectorAll('.unit-pill');
+
+    // === Drag & Drop Multi-Image Upload ===
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('productImageInput');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    const fallbackSection = document.getElementById('fallbackImageSection');
+    let selectedFiles = []; // Track selected files
+
+    // Click to open file picker
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Drag events
+    ['dragenter', 'dragover'].forEach(evt => {
+        dropZone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('drag-over');
+        });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+        dropZone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+        });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        addFiles(files);
+    });
+
+    fileInput.addEventListener('change', () => {
+        addFiles(Array.from(fileInput.files));
+    });
+
+    function addFiles(newFiles) {
+        // Max 5 images total
+        const remaining = 5 - selectedFiles.length;
+        if (remaining <= 0) {
+            alert('Maximum 5 images allowed. Remove existing images to add new ones.');
+            return;
+        }
+
+        const filesToAdd = newFiles.slice(0, remaining);
+        
+        // Validate sizes
+        for (const f of filesToAdd) {
+            if (f.size > 5 * 1024 * 1024) {
+                alert(`"${f.name}" exceeds 5MB limit. Skipping.`);
+                continue;
+            }
+            selectedFiles.push(f);
+        }
+
+        updateFileInput();
+        renderPreviews();
+    }
+
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFileInput();
+        renderPreviews();
+    }
+
+    function updateFileInput() {
+        // Reconstruct the file input using DataTransfer
+        const dt = new DataTransfer();
+        selectedFiles.forEach(f => dt.items.add(f));
+        fileInput.files = dt.files;
+
+        // Toggle fallback visibility
+        if (selectedFiles.length > 0) {
+            fallbackSection.style.display = 'none';
+        } else {
+            fallbackSection.style.display = 'block';
+        }
+    }
+
+    function renderPreviews() {
+        previewContainer.innerHTML = '';
+        if (selectedFiles.length === 0) {
+            previewContainer.style.display = 'none';
+            return;
+        }
+
+        previewContainer.style.display = 'flex';
+
+        selectedFiles.forEach((file, idx) => {
+            const col = document.createElement('div');
+            col.className = 'col-4 col-md-2';
+
+            const card = document.createElement('div');
+            card.className = 'img-preview-card';
+            card.style.height = '100px';
+
+            const img = document.createElement('img');
+            img.className = 'w-100 h-100';
+            img.style.objectFit = 'cover';
+            img.alt = file.name;
+
+            const reader = new FileReader();
+            reader.onload = (e) => { img.src = e.target.result; };
+            reader.readAsDataURL(file);
+
+            card.appendChild(img);
+
+            // Remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-img';
+            removeBtn.innerHTML = '<i class="fa fa-times"></i>';
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFile(idx);
+            });
+            card.appendChild(removeBtn);
+
+            // Cover badge on first image
+            if (idx === 0) {
+                const badge = document.createElement('div');
+                badge.className = 'cover-badge';
+                badge.textContent = '★ Cover Photo';
+                card.appendChild(badge);
+            }
+
+            // File size label
+            const sizeLabel = document.createElement('small');
+            sizeLabel.className = 'text-muted d-block text-center mt-1';
+            sizeLabel.style.fontSize = '10px';
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            sizeLabel.textContent = `${sizeMB} MB`;
+
+            col.appendChild(card);
+            col.appendChild(sizeLabel);
+            previewContainer.appendChild(col);
+        });
+
+        // Add "+" button if under limit
+        if (selectedFiles.length < 5) {
+            const addCol = document.createElement('div');
+            addCol.className = 'col-4 col-md-2';
+            addCol.innerHTML = `
+                <div class="img-preview-card d-flex align-items-center justify-content-center bg-light" 
+                     style="height: 100px; cursor: pointer; border-style: dashed;" 
+                     onclick="document.getElementById('productImageInput').click()">
+                    <div class="text-center text-muted">
+                        <i class="fa fa-plus fa-lg"></i>
+                        <small class="d-block mt-1">Add More</small>
+                    </div>
+                </div>`;
+            previewContainer.appendChild(addCol);
+        }
+    }
+
+    // === Form Type Switcher ===
+    function updateFormForType() {
+        if (typeRental.checked) {
+            titleLabel.innerText = "Equipment / Plant Name & Model *";
+            priceLabel.innerText = "Rental Rate (Ksh) *";
+            stockLabel.innerText = "Number of Fleet Units Available";
+            if (!unitInput.value || unitInput.value === '50kg Bag' || unitInput.value === 'Piece') {
+                unitInput.value = 'Per Day';
+            }
+            if (stockInput.value === '100') {
+                stockInput.value = '2';
+            }
+            descLabel.innerText = "Machine Specs & Hire Terms (Fuel policy, operator included, mobilize terms) *";
+            // Pre-select machinery image if on default
+            if (customImgInput && customImgInput.value === '/img/service-1.jpg') {
+                customImgInput.value = '/img/service-2.jpg';
+                selectPresetImage('/img/service-2.jpg');
+            }
+        } else {
+            titleLabel.innerText = "Material Name & Specification *";
+            priceLabel.innerText = "Price per Unit (Ksh) *";
+            stockLabel.innerText = "Current Stock Quantity";
+            if (!unitInput.value || unitInput.value === 'Per Day') {
+                unitInput.value = '50kg Bag';
+            }
+            if (stockInput.value === '2') {
+                stockInput.value = '100';
+            }
+            descLabel.innerText = "Product Specs & Delivery Terms (Brand, standard, minimum orders, delivery terms) *";
+        }
+    }
+
+    typeMaterial.addEventListener('change', updateFormForType);
+    typeRental.addEventListener('change', updateFormForType);
+
+    // Image preset handler
+    function selectPresetImage(src) {
+        imgChoices.forEach(choice => {
+            const radio = choice.querySelector('input[type="radio"]');
+            if (radio.value === src) {
+                radio.checked = true;
+                choice.classList.add('selected');
+            } else {
+                choice.classList.remove('selected');
+            }
+        });
+    }
+
+    imgChoices.forEach(choice => {
+        choice.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+            if (customImgInput) customImgInput.value = radio.value;
+            imgChoices.forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+
+    // Quick unit pills
+    unitPills.forEach(pill => {
+        pill.addEventListener('click', function() {
+            unitInput.value = this.innerText;
+        });
+    });
+
+    // Initial sync
+    if (typeRental.checked) {
+        updateFormForType();
+    } else {
+        selectPresetImage('/img/service-1.jpg');
+    }
+});
+</script>
+

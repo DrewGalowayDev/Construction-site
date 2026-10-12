@@ -1,0 +1,217 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3"><%= product.title %></h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item">
+                    <a class="text-white" href="<%= product.is_rental ? '/rentals' : '/materials' %>">
+                        <%= product.is_rental ? 'Equipment Hire' : 'Building Materials' %>
+                    </a>
+                </li>
+                <li class="breadcrumb-item text-primary active" aria-current="page"><%= product.title %></li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-xxl py-4">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Left Column: Image and Full Specs -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm overflow-hidden mb-4 bg-white">
+                    <div class="position-relative" style="height: 380px;">
+                        <img src="<%= product.image_url %>" class="w-100 h-100" style="object-fit: cover; transition: opacity 0.3s ease;" alt="<%= product.title %>" id="mainProductImage">
+                        <span class="badge <%= product.is_rental ? 'bg-primary' : 'bg-dark' %> position-absolute top-0 start-0 m-3 fs-6 px-3 py-2">
+                            <i class="<%= product.is_rental ? 'fa fa-truck-pickup' : 'fa fa-cubes' %> me-1"></i>
+                            <%= product.is_rental ? 'Equipment For Hire' : 'Building Material' %>
+                        </span>
+                        <span class="badge bg-secondary position-absolute top-0 end-0 m-3 fs-6 px-3 py-2">
+                            <i class="fa fa-map-marker-alt me-1"></i><%= product.location_county %>
+                        </span>
+                        <% if (product.images && product.images.length > 1) { %>
+                            <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 end-0 m-3 px-3 py-2">
+                                <i class="fa fa-images me-1"></i><%= product.images.length %> Photos
+                            </span>
+                        <% } %>
+                    </div>
+
+                    <% if (product.images && product.images.length > 1) { %>
+                        <!-- Image Gallery Thumbnails -->
+                        <div class="p-2 bg-light border-top">
+                            <div class="d-flex gap-2 overflow-auto pb-1" style="scrollbar-width: thin;">
+                                <% product.images.forEach((imgUrl, idx) => { %>
+                                    <img src="<%= imgUrl %>" 
+                                         class="gallery-thumb rounded border <%= idx === 0 ? 'border-primary border-2' : 'border-secondary' %>" 
+                                         style="width: 70px; height: 55px; object-fit: cover; cursor: pointer; flex-shrink: 0; transition: all 0.2s ease;"
+                                         alt="Photo <%= idx + 1 %>"
+                                         onclick="switchMainImage(this, '<%= imgUrl %>')">
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+
+                <!-- Product Specifications Card -->
+                <div class="card border-0 shadow-sm p-4 bg-white mb-4">
+                    <h4 class="fw-bold text-dark mb-3">Item Description & Specifications</h4>
+                    <p class="text-muted leading-relaxed mb-4" style="font-size: 1.05rem;">
+                        <%= product.description %>
+                    </p>
+
+                    <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">Technical Overview</h5>
+                    <div class="row g-3 text-secondary mb-4">
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Industry Category</small>
+                                <strong class="text-dark"><%= product.category ? product.category.name : 'General' %></strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Measurement / Pricing Unit</small>
+                                <strong class="text-dark"><%= product.unit %></strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Available Inventory / Fleet Count</small>
+                                <strong class="text-dark"><%= product.stock_quantity %> units available</strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Location Base</small>
+                                <strong class="text-dark"><%= product.location_county %></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery & Haulage terms -->
+                    <div class="alert alert-light border d-flex align-items-start gap-3 mb-0">
+                        <i class="fa fa-truck-loading fa-2x text-primary mt-1"></i>
+                        <div>
+                            <strong class="text-dark d-block">Site Delivery & Mobilization</strong>
+                            <small class="text-muted">
+                                Direct site delivery available across <%= product.location_county %> and neighboring counties. Minimum order quantities and offloading terms apply for bulk aggregates and tippers.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Pricing, Booking & Vendor Contact -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm p-4 bg-white sticky-top" style="top: 100px;">
+                    <div class="small text-primary fw-bold text-uppercase mb-1">
+                        <%= product.category ? product.category.name : 'Construction Supply' %>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-3"><%= product.title %></h3>
+
+                    <div class="p-3 bg-light rounded mb-4">
+                        <small class="text-muted d-block">
+                            <%= product.is_rental ? 'Daily Hire Rate' : 'Material Price' %>
+                        </small>
+                        <div class="display-6 fw-bold text-primary mb-1">
+                            Ksh <%= Number(product.price).toLocaleString() %>
+                            <span class="fs-6 text-muted fw-normal">/ <%= product.unit %></span>
+                        </div>
+                        <span class="badge bg-success"><i class="fa fa-check-circle me-1"></i>In Stock & Available</span>
+                    </div>
+
+                    <!-- Direct Order Action -->
+                    <div class="d-grid gap-2 mb-4">
+                        <a href="/orders/request/<%= product.id %>" class="btn btn-primary py-3 text-white fw-bold shadow-sm">
+                            <i class="fa fa-shopping-cart me-2"></i>
+                            <%= product.is_rental ? 'Book Equipment Hire' : 'Request Order / Quote' %>
+                        </a>
+                        <% 
+                            const sellerPhone = product.seller ? product.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
+                            const waClean = sellerPhone.startsWith('0') ? '254' + sellerPhone.slice(1) : sellerPhone;
+                            const waMsg = encodeURIComponent('Hi ' + (product.seller ? product.seller.name : 'Vendor') + ', I am inquiring about "' + product.title + '" (Ksh ' + Number(product.price).toLocaleString() + '/' + product.unit + ') listed on TopLineHub.');
+                        %>
+                        <a href="https://wa.me/<%= waClean %>?text=<%= waMsg %>" target="_blank" class="btn btn-whatsapp py-3 fw-bold">
+                            <i class="fab fa-whatsapp me-2"></i>Inquire on WhatsApp
+                        </a>
+                        <% if (product.seller && product.seller.phone) { %>
+                            <a href="tel:<%= product.seller.phone %>" class="btn btn-outline-dark py-2">
+                                <i class="fa fa-phone me-2"></i>Call Vendor (<%= product.seller.phone %>)
+                            </a>
+                        <% } %>
+                    </div>
+
+                    <!-- Vendor Profile Card -->
+                    <div class="border-top pt-4">
+                        <h6 class="fw-bold text-dark mb-3"><i class="fa fa-store text-primary me-2"></i>Listed By Vendor</h6>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="<%= product.seller && product.seller.avatar ? product.seller.avatar : '/img/team-1.jpg' %>" class="rounded-circle border" style="width: 55px; height: 55px; object-fit: cover;" alt="Seller">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0"><%= product.seller ? product.seller.name : 'Verified Hardware Supplier' %></h6>
+                                <small class="text-muted d-block">
+                                    <i class="fa fa-map-marker-alt me-1 text-primary"></i><%= product.seller ? product.seller.town + ', ' + product.seller.county : product.location_county %>
+                                </small>
+                                <% if (product.seller && product.seller.is_verified) { %>
+                                    <span class="badge bg-success mt-1"><i class="fa fa-shield-alt me-1"></i>Verified Supplier</span>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products Section -->
+        <% if (relatedProducts && relatedProducts.length > 0) { %>
+            <div class="mt-5 pt-4 border-top">
+                <div class="border-start border-5 border-primary ps-4 mb-4">
+                    <h6 class="text-body text-uppercase mb-1">Related Inventory</h6>
+                    <h3 class="mb-0">More in <%= product.category ? product.category.name : 'This Category' %></h3>
+                </div>
+                <div class="row g-4">
+                    <% relatedProducts.forEach(rel => { %>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card card-custom h-100 bg-white border-0 shadow-sm">
+                                <div style="height: 180px; overflow: hidden;" class="position-relative">
+                                    <img src="<%= rel.image_url %>" class="w-100 h-100" style="object-fit: cover;" alt="<%= rel.title %>">
+                                    <span class="badge bg-dark position-absolute top-0 end-0 m-2"><%= rel.location_county %></span>
+                                </div>
+                                <div class="card-body p-3 d-flex flex-column">
+                                    <h6 class="card-title fw-bold text-dark mb-2"><%= rel.title %></h6>
+                                    <div class="product-price mb-3 mt-auto">
+                                        Ksh <%= Number(rel.price).toLocaleString() %> <span class="small text-muted">/ <%= rel.unit %></span>
+                                    </div>
+                                    <a href="/materials/<%= rel.id %>" class="btn btn-outline-primary btn-sm fw-bold">
+                                        View Details & Rates
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+function switchMainImage(thumbEl, imageUrl) {
+    const mainImg = document.getElementById('mainProductImage');
+    if (!mainImg) return;
+    
+    mainImg.style.opacity = '0.3';
+    setTimeout(() => {
+        mainImg.src = imageUrl;
+        mainImg.style.opacity = '1';
+    }, 150);
+
+    document.querySelectorAll('.gallery-thumb').forEach(el => {
+        el.classList.remove('border-primary', 'border-2');
+        el.classList.add('border-secondary');
+    });
+    thumbEl.classList.remove('border-secondary');
+    thumbEl.classList.add('border-primary', 'border-2');
+}
+</script>

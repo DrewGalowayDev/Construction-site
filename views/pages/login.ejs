@@ -1,0 +1,33 @@
+<!-- Login Page Start -->
+<div class="container-fluid py-5 my-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card card-custom p-4 p-md-5 bg-white">
+                    <div class="text-center mb-4">
+                        <i class="fa fa-hard-hat text-primary fa-3x mb-2"></i>
+                        <h3 class="fw-bold text-dark">Sign In to TopLineHub</h3>
+                        <p class="text-muted small">Access your quote requests, job posts, or artisan profile</p>
+                    </div>
+
+                    <form action="/auth/login" method="POST">
+                        <div class="form-floating mb-3">
+                            <input type="email" name="email" class="form-control" id="login_email" placeholder="name@example.com" required>
+                            <label for="login_email">Email address</label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="password" name="password" class="form-control" id="login_password" placeholder="Password" required>
+                            <label for="login_password">Password</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-3 text-white fw-bold mb-3">Login</button>
+                    </form>
+
+                    <div class="text-center pt-3 border-top">
+                        <span class="text-muted small">Don't have an account? </span>
+                        <a href="/auth/register" class="fw-bold text-primary">Register Here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

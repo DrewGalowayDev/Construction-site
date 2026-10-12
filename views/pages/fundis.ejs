@@ -1,0 +1,107 @@
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-4 text-white animated slideInDown mb-3">Hire Verified Fundis & Artisans</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Artisans & Fundis</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5 align-items-end mb-5">
+            <div class="col-lg-7">
+                <div class="border-start border-5 border-primary ps-4">
+                    <h6 class="text-body text-uppercase mb-2">Vetted Site Hands</h6>
+                    <h1 class="display-6 mb-0">Skilled Tradesmen Ready for Hire</h1>
+                </div>
+                <p class="mt-3 text-muted">All artisans listed on TopLineHub are background-checked, NCA registered or trade-tested, and reviewed by real site foremen across Kenya.</p>
+            </div>
+            <div class="col-lg-5 text-lg-end">
+                <a href="/jobs/post" class="btn btn-primary py-3 px-4 text-white fw-bold me-2"><i class="fa fa-bullhorn me-2"></i>Post A Job For Bids</a>
+                <a href="/auth/register" class="btn btn-outline-dark py-3 px-4">Register As A Fundi</a>
+            </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="bg-light p-3 rounded mb-5 border">
+            <form action="/fundis" method="GET" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Search name or trade..." value="<%= typeof query !== 'undefined' ? query.q || '' : '' %>">
+                </div>
+                <div class="col-md-3">
+                    <select name="trade" class="form-select">
+                        <option value="">All Trades</option>
+                        <option value="Mason" <%= (typeof query !== 'undefined' && query.trade === 'Mason') ? 'selected' : '' %>>Mason / Bricklayer</option>
+                        <option value="Electrician" <%= (typeof query !== 'undefined' && query.trade === 'Electrician') ? 'selected' : '' %>>Certified Electrician</option>
+                        <option value="Plumber" <%= (typeof query !== 'undefined' && query.trade === 'Plumber') ? 'selected' : '' %>>Plumber</option>
+                        <option value="Painter" <%= (typeof query !== 'undefined' && query.trade === 'Painter') ? 'selected' : '' %>>Painter & Finisher</option>
+                        <option value="Carpenter" <%= (typeof query !== 'undefined' && query.trade === 'Carpenter') ? 'selected' : '' %>>Carpenter / Roofer</option>
+                        <option value="Welder" <%= (typeof query !== 'undefined' && query.trade === 'Welder') ? 'selected' : '' %>>Welder & Fabricator</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="county" class="form-select">
+                        <option value="">All 47 Counties</option>
+                        <% counties.forEach(c => { %>
+                            <option value="<%= c %>" <%= (typeof query !== 'undefined' && query.county === c) ? 'selected' : '' %>><%= c %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 text-white fw-bold">Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4">
+            <% artisans.forEach(artisan => { %>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card card-custom h-100 bg-white p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <a href="/fundis/<%= artisan.id %>">
+                                <img src="<%= artisan.user.avatar || '/img/team-1.jpg' %>" class="rounded-circle me-3 border border-2 border-primary" style="width: 70px; height: 70px; object-fit: cover;" alt="<%= artisan.user.name %>">
+                            </a>
+                            <div>
+                                <h5 class="fw-bold mb-1">
+                                    <a href="/fundis/<%= artisan.id %>" class="text-dark text-decoration-none"><%= artisan.user.name %></a>
+                                </h5>
+                                <span class="badge-trade"><%= artisan.trade %></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="badge-verified me-2"><i class="fa fa-shield-alt me-1"></i><%= artisan.nca_reg_number ? 'NCA Registered' : 'ID Verified' %></span>
+                            <span class="text-warning small"><i class="fa fa-star"></i> <%= artisan.rating %> / 5.0</span>
+                        </div>
+                        <p class="small text-muted mb-3"><%= artisan.bio %></p>
+                        <div class="border-top pt-3 mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <small class="text-muted d-block">Location:</small>
+                                    <strong class="text-dark small"><i class="fa fa-map-marker-alt text-primary me-1"></i><%= artisan.user.town %>, <%= artisan.user.county %></strong>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block">Daily Rate:</small>
+                                    <strong class="text-primary">Ksh <%= Number(artisan.daily_rate).toLocaleString() %></strong>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="/fundis/<%= artisan.id %>" class="btn btn-outline-primary btn-sm fw-bold flex-grow-1">
+                                    <i class="fa fa-user me-1"></i>Profile & Hire
+                                </a>
+                                <a href="https://wa.me/<%= artisan.user.phone.replace(/[^0-9]/g, '') %>?text=Hello%20<%= encodeURIComponent(artisan.user.name) %>,%20I%20am%20reaching%20out%20via%20TopLineHub%20for%20a%20site%20job" class="btn btn-whatsapp fw-bold btn-sm flex-grow-1" target="_blank">
+                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
