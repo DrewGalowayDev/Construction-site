@@ -1052,42 +1052,149 @@
             <span class="badge bg-danger text-white">Superadmin Access</span>
         </div>
         <div class="dash-card-body">
-            <!-- Platform Counters -->
+            <!-- Platform Financial & Escrow Counters -->
             <div class="row g-3 mb-4">
-                <div class="col-4 col-lg-2">
+                <div class="col-6 col-lg-2">
                     <div class="border rounded p-3 text-center bg-light">
                         <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalUsers %></div>
-                        <small class="text-muted">Users</small>
+                        <small class="text-muted fw-bold">Users</small>
                     </div>
                 </div>
-                <div class="col-4 col-lg-2">
+                <div class="col-6 col-lg-2">
                     <div class="border rounded p-3 text-center bg-light">
                         <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalProducts %></div>
-                        <small class="text-muted">Listings</small>
+                        <small class="text-muted fw-bold">Listings</small>
                     </div>
                 </div>
-                <div class="col-4 col-lg-2">
-                    <div class="border rounded p-3 text-center bg-light">
-                        <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalJobs %></div>
-                        <small class="text-muted">Jobs</small>
-                    </div>
-                </div>
-                <div class="col-4 col-lg-2">
-                    <div class="border rounded p-3 text-center bg-light">
-                        <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalBids %></div>
-                        <small class="text-muted">Bids</small>
-                    </div>
-                </div>
-                <div class="col-4 col-lg-2">
+                <div class="col-6 col-lg-2">
                     <div class="border rounded p-3 text-center bg-light">
                         <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalOrders %></div>
-                        <small class="text-muted">Orders</small>
+                        <small class="text-muted fw-bold">Orders</small>
                     </div>
                 </div>
-                <div class="col-4 col-lg-2">
-                    <div class="border rounded p-3 text-center bg-light">
-                        <div class="fs-4 fw-bold text-primary">KES <%= Number(adminData.stats.totalVolume).toLocaleString() %></div>
-                        <small class="text-muted">Volume</small>
+                <div class="col-6 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-warning bg-opacity-10 border-warning">
+                        <div class="fs-4 fw-bold text-warning">KES <%= Number(adminData.stats.totalEscrowHeld || 0).toLocaleString() %></div>
+                        <small class="text-warning-emphasis fw-bold"><i class="fa fa-lock me-1"></i>Escrow Held</small>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-info bg-opacity-10 border-info">
+                        <div class="fs-4 fw-bold text-info">KES <%= Number(adminData.stats.totalEscrowReady || 0).toLocaleString() %></div>
+                        <small class="text-info fw-bold"><i class="fa fa-clock me-1"></i>Ready for Payout</small>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-success bg-opacity-10 border-success">
+                        <div class="fs-4 fw-bold text-success">KES <%= Number(adminData.stats.totalCommission || 0).toLocaleString() %></div>
+                        <small class="text-success fw-bold"><i class="fa fa-chart-line me-1"></i>Net Commission</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESCROW & PRODUCT PURCHASES DISBURSEMENT QUEUE -->
+            <div class="dash-card border shadow-sm mb-4">
+                <div class="dash-card-header bg-light d-flex justify-content-between align-items-center py-2 px-3">
+                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <i class="fa fa-hand-holding-usd text-success"></i>
+                        <span>Escrow & Supplier Payout Queue</span>
+                    </h6>
+                    <span class="badge bg-primary text-white">Live Paystack Escrow</span>
+                </div>
+                <div class="dash-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light small">
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Product & Buyer</th>
+                                    <th>Supplier</th>
+                                    <th>Total / Fee</th>
+                                    <th>Supplier Net Payout</th>
+                                    <th>Escrow Status</th>
+                                    <th class="text-end">Disbursement Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% const escrowOrders = adminData.orders.filter(o => o.order_type === 'purchase' || o.escrow_status !== 'none'); %>
+                                <% if (escrowOrders.length === 0) { %>
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-muted">
+                                            <i class="fa fa-inbox fs-3 d-block mb-2 text-secondary"></i>
+                                            No product purchase orders with escrow on record yet.
+                                        </td>
+                                    </tr>
+                                <% } else { %>
+                                    <% escrowOrders.forEach(o => { %>
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-dark fw-bold">#<%= o.id %></span>
+                                                <div class="small text-muted"><%= new Date(o.created_at).toLocaleDateString() %></div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold text-dark"><%= o.product ? o.product.title : 'Material Item' %> (x<%= o.quantity %>)</div>
+                                                <small class="text-muted">
+                                                    Buyer: <%= o.buyer ? o.buyer.name : 'Guest' %> &bull; <%= o.contact_phone || (o.buyer ? o.buyer.phone : '') %>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <% const seller = o.product && o.product.seller ? o.product.seller : null; %>
+                                                <% if (seller) { %>
+                                                    <div class="fw-bold text-dark"><%= seller.name %></div>
+                                                    <small class="text-muted"><%= seller.phone %></small>
+                                                <% } else { %>
+                                                    <span class="text-muted">Platform / Direct</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold text-dark">KES <%= Number(o.total_price).toLocaleString() %></div>
+                                                <small class="text-muted">Fee: KES <%= Number(o.platform_fee || 0).toLocaleString() %></small>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold text-success fs-6">KES <%= Number(o.seller_payout_amount || 0).toLocaleString() %></div>
+                                            </td>
+                                            <td>
+                                                <% if (o.escrow_status === 'held') { %>
+                                                    <span class="badge bg-warning text-dark py-1 px-2">
+                                                        <i class="fa fa-lock me-1"></i>Held in Escrow
+                                                    </span>
+                                                    <div class="small text-muted mt-1">Awaiting delivery</div>
+                                                <% } else if (o.escrow_status === 'released') { %>
+                                                    <span class="badge bg-info text-dark py-1 px-2">
+                                                        <i class="fa fa-check-circle me-1"></i>Buyer Confirmed
+                                                    </span>
+                                                    <div class="small text-success fw-bold mt-1">Ready for Payout!</div>
+                                                <% } else if (o.escrow_status === 'disbursed') { %>
+                                                    <span class="badge bg-success py-1 px-2">
+                                                        <i class="fa fa-coins me-1"></i>Disbursed
+                                                    </span>
+                                                    <div class="small text-muted mt-1"><%= o.disbursement_date ? new Date(o.disbursement_date).toLocaleDateString() : 'Paid' %></div>
+                                                <% } else { %>
+                                                    <span class="badge bg-secondary">None</span>
+                                                <% } %>
+                                            </td>
+                                            <td class="text-end">
+                                                <% if (o.escrow_status === 'released') { %>
+                                                    <form action="/admin/orders/<%= o.id %>/disburse-escrow" method="POST" class="d-inline" onsubmit="return confirm('Disburse KES <%= Number(o.seller_payout_amount).toLocaleString() %> to supplier wallet?');">
+                                                        <button type="submit" class="btn btn-sm btn-success fw-bold py-1 px-2 shadow-sm">
+                                                            <i class="fa fa-paper-plane me-1"></i>Disburse Payout
+                                                        </button>
+                                                    </form>
+                                                <% } else if (o.escrow_status === 'held') { %>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" disabled title="Awaiting buyer delivery confirmation">
+                                                        <i class="fa fa-hourglass-half me-1"></i>Awaiting Buyer
+                                                    </button>
+                                                <% } else if (o.escrow_status === 'disbursed') { %>
+                                                    <span class="text-success small fw-bold">
+                                                        <i class="fa fa-check-double me-1"></i>Completed
+                                                    </span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } %>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

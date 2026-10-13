@@ -709,12 +709,13 @@
                 </a>
 
                 <% if (user && user.role === 'admin') { %>
-                    <div class="nav-section-title text-danger">Platform Administration</div>
-                    <a href="/dashboard?tab=admin" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'admin') ? 'active' : '' %>" data-tab-target="admin">
+                    <div class="nav-section-title text-danger">Executive Governance</div>
+                    <a href="/admin" class="sidebar-link">
                         <div class="link-content">
                             <i class="fa fa-shield-alt text-danger"></i>
-                            <span class="text-danger fw-bold">Admin Console</span>
+                            <span class="text-danger fw-bold">Admin Command Center</span>
                         </div>
+                        <span class="badge bg-danger text-white">Root</span>
                     </a>
                 <% } %>
             </nav>

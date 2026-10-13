@@ -18,6 +18,7 @@ const orderRoutes = require('./routes/orders');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const walletRoutes = require('./routes/wallet');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -98,6 +99,7 @@ app.use('/', jobRoutes);
 app.use('/', orderRoutes);
 app.use('/', dashboardRoutes);
 app.use('/', walletRoutes);
+app.use('/admin', adminRoutes);
 
 // 404 Handler
 app.use((req, res) => {

@@ -32,5 +32,6 @@ router.post('/admin/users/:userId/toggle-verify', requireRole('admin'), dashboar
 router.post('/admin/users/:userId/role', requireRole('admin'), dashboardController.adminUpdateUserRole);
 router.post('/admin/products/:productId/delete', requireRole('admin'), dashboardController.adminDeleteProduct);
 router.post('/admin/jobs/:jobId/delete', requireRole('admin'), dashboardController.adminDeleteJob);
+router.post('/admin/orders/:orderId/disburse-escrow', requireRole('admin'), dashboardController.adminDisburseEscrow);
 
 module.exports = router;

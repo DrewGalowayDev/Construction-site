@@ -179,8 +179,12 @@ exports.getDashboard = async (req, res) => {
         }),
         OrderRequest.findAll({
           include: [
-            { model: Product, as: 'product' },
-            { model: User, as: 'buyer', attributes: ['name', 'phone'] }
+            {
+              model: Product,
+              as: 'product',
+              include: [{ model: User, as: 'seller', attributes: ['id', 'name', 'phone', 'email'] }]
+            },
+            { model: User, as: 'buyer', attributes: ['id', 'name', 'phone', 'email'] }
           ],
           order: [['created_at', 'DESC']]
         })
@@ -188,6 +192,18 @@ exports.getDashboard = async (req, res) => {
 
       const totalBids = allJobs.reduce((acc, j) => acc + (j.applications ? j.applications.length : 0), 0);
       const totalVolume = allOrders.reduce((acc, o) => acc + parseFloat(o.total_price || 0), 0);
+      const totalEscrowHeld = allOrders
+        .filter(o => o.escrow_status === 'held')
+        .reduce((acc, o) => acc + parseFloat(o.total_price || 0), 0);
+      const totalEscrowReady = allOrders
+        .filter(o => o.escrow_status === 'released')
+        .reduce((acc, o) => acc + parseFloat(o.seller_payout_amount || 0), 0);
+      const totalEscrowDisbursed = allOrders
+        .filter(o => o.escrow_status === 'disbursed')
+        .reduce((acc, o) => acc + parseFloat(o.seller_payout_amount || 0), 0);
+      const totalCommission = allOrders
+        .filter(o => o.payment_status === 'paid')
+        .reduce((acc, o) => acc + parseFloat(o.platform_fee || 0), 0);
 
       adminData = {
         users: allUsers,
@@ -200,7 +216,11 @@ exports.getDashboard = async (req, res) => {
           totalJobs: allJobs.length,
           totalBids,
           totalOrders: allOrders.length,
-          totalVolume
+          totalVolume,
+          totalEscrowHeld,
+          totalEscrowReady,
+          totalEscrowDisbursed,
+          totalCommission
         }
       };
     }
@@ -263,8 +283,12 @@ exports.getDashboard = async (req, res) => {
     }));
 
     // Determine Active Tab
+    if ((req.query.tab === 'admin' || defaultTab === 'admin') && currentUser.role === 'admin' && req.query.tab === 'admin') {
+      return res.redirect('/admin');
+    }
+
     const defaultTab = currentUser.role === 'admin'
-      ? 'admin'
+      ? 'overview'
       : currentUser.role === 'artisan'
       ? 'artisan'
       : currentUser.role === 'seller'
@@ -572,6 +596,80 @@ exports.adminDeleteJob = async (req, res) => {
   } catch (err) {
     console.error('Admin delete job error:', err);
     req.flash('error', 'Failed to remove project.');
+    res.redirect('/dashboard?tab=admin');
+  }
+};
+
+// Admin Escrow Disbursement to Supplier
+exports.adminDisburseEscrow = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await OrderRequest.findByPk(orderId, {
+      include: [
+        { model: Product, as: 'product', include: [{ model: User, as: 'seller' }] },
+        { model: User, as: 'buyer' }
+      ]
+    });
+
+    if (!order) {
+      req.flash('error', 'Order not found.');
+      return res.redirect('/dashboard?tab=admin');
+    }
+
+    if (order.escrow_status !== 'released') {
+      req.flash('error', `Cannot disburse Order #${order.id}. Current escrow status is "${order.escrow_status}". It must be "released" by the buyer first.`);
+      return res.redirect('/dashboard?tab=admin');
+    }
+
+    const seller = order.product ? order.product.seller : null;
+    if (!seller) {
+      req.flash('error', 'Supplier associated with this product could not be identified.');
+      return res.redirect('/dashboard?tab=admin');
+    }
+
+    // Get or initialize supplier wallet
+    let sellerWallet = await Wallet.findOne({ where: { user_id: seller.id } });
+    if (!sellerWallet) {
+      sellerWallet = await Wallet.create({
+        user_id: seller.id,
+        balance: 0.00
+      });
+    }
+
+    const payoutAmount = parseFloat(order.seller_payout_amount) || (parseFloat(order.total_price) * 0.90);
+    const balanceBefore = parseFloat(sellerWallet.balance);
+    const balanceAfter = balanceBefore + payoutAmount;
+
+    sellerWallet.balance = balanceAfter;
+    await sellerWallet.save();
+
+    // Mark order as disbursed
+    await order.update({
+      escrow_status: 'disbursed',
+      disbursement_date: new Date(),
+      status: 'completed'
+    });
+
+    // Record Transaction for seller
+    await Transaction.create({
+      user_id: seller.id,
+      type: 'seller_payout',
+      amount: payoutAmount,
+      balance_before: balanceBefore,
+      balance_after: balanceAfter,
+      description: `Escrow Payout Disbursed — Order #${order.id} for "${order.product.title}". Credited to supplier wallet balance.`,
+      reference_type: 'product',
+      reference_id: order.product_id,
+      payment_method: 'paystack',
+      mpesa_receipt: order.paystack_reference || `DISB_${order.id}_${Date.now()}`,
+      status: 'completed'
+    });
+
+    req.flash('success', `Successfully disbursed KES ${payoutAmount.toLocaleString()} to supplier ${seller.name} (${seller.phone}) for Order #${order.id}! Funds are now in their wallet.`);
+    res.redirect('/dashboard?tab=admin');
+  } catch (err) {
+    console.error('Admin disburse escrow error:', err);
+    req.flash('error', 'Failed to disburse escrow payout.');
     res.redirect('/dashboard?tab=admin');
   }
 };

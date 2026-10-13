@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title><%= typeof title !== 'undefined' ? title : 'Admin Command Center | TopLineHub' %></title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="TopLineHub Platform Administration & Escrow Control Center" name="description">
+
+    <!-- Favicon -->
+    <link href="/img/favicon.ico" rel="icon">
+    <link href="/img/favicon.svg" rel="icon" type="image/svg+xml">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"> 
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --admin-bg: #0b0f19;
+            --admin-surface: #111827;
+            --admin-card: #1f2937;
+            --admin-border: #1e293b;
+            --admin-accent: #6366f1;
+            --admin-accent-hover: #4f46e5;
+            --admin-primary: #FDA12B;
+            --admin-success: #10b981;
+            --admin-warning: #f59e0b;
+            --admin-danger: #ef4444;
+            --admin-text-main: #f8fafc;
+            --admin-text-muted: #94a3b8;
+            --admin-canvas: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--admin-canvas);
+            color: #1e293b;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .admin-shell {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 275px;
+            background: linear-gradient(180deg, #090d16 0%, #0f172a 100%);
+            border-right: 1px solid var(--admin-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1040;
+            transition: all 0.25s ease-in-out;
+            overflow-y: auto;
+        }
+
+        .admin-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background-color: #334155;
+            border-radius: 4px;
+        }
+
+        .sidebar-brand-box {
+            padding: 1.25rem 1.4rem;
+            border-bottom: 1px solid var(--admin-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-shield {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+        }
+
+        .brand-title {
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        .brand-subhead {
+            color: #ef4444;
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 800;
+            display: block;
+        }
+
+        /* Admin User Card in Sidebar */
+        .admin-user-pill {
+            padding: 1rem 1.4rem;
+            border-bottom: 1px solid var(--admin-border);
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: 2px solid #ef4444;
+            object-fit: cover;
+        }
+
+        /* Nav links */
+        .admin-nav {
+            padding: 1rem 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+
+        .nav-category {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #64748b;
+            font-weight: 800;
+            padding: 0.8rem 0.8rem 0.3rem;
+        }
+
+        .admin-nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 0.9rem;
+            border-radius: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .admin-nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.06);
+            transform: translateX(2px);
+        }
+
+        .admin-nav-link.active {
+            color: #ffffff;
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.05) 100%);
+            border-left: 3px solid #ef4444;
+            font-weight: 700;
+        }
+
+        .admin-nav-link.active i {
+            color: #ef4444;
+        }
+
+        .admin-nav-link i {
+            width: 22px;
+            font-size: 1rem;
+            color: #64748b;
+            transition: color 0.15s;
+        }
+
+        .admin-nav-link:hover i {
+            color: #ffffff;
+        }
+
+        /* Sidebar Footer */
+        .admin-sidebar-footer {
+            padding: 1rem 1.2rem;
+            border-top: 1px solid var(--admin-border);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .admin-sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 6px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .admin-sidebar-footer a:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Main Content Container */
+        .admin-main {
+            margin-left: 275px;
+            flex-grow: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s ease-in-out;
+        }
+
+        /* Top Bar */
+        .admin-header {
+            height: 68px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.75rem;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn-admin-toggle {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .system-pill {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse-red {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
+            animation: pulse-red-anim 2s infinite;
+        }
+
+        @keyframes pulse-red-anim {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .escrow-pill {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #b45309;
+            padding: 6px 14px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-client-switch {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 6px 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-client-switch:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Content Area */
+        .admin-content {
+            padding: 1.75rem;
+            flex-grow: 1;
+        }
+
+        /* KPI Card */
+        .admin-kpi-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem 1.4rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .admin-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+        }
+
+        .kpi-icon-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .admin-card-base {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-card-header {
+            padding: 1rem 1.4rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .admin-card-body {
+            padding: 1.4rem;
+        }
+
+        @media (max-width: 991.98px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+            .admin-main {
+                margin-left: 0;
+            }
+            .admin-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 1035;
+                display: none;
+            }
+            .admin-backdrop.show {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-shell">
+        <!-- Backdrop for mobile -->
+        <div class="admin-backdrop" id="adminBackdrop"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-brand-box">
+                <a href="/admin" class="brand-badge">
+                    <div class="brand-shield">
+                        <i class="fa fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <span class="brand-title">TopLineHub</span>
+                        <span class="brand-subhead">Admin Console</span>
+                    </div>
+                </a>
+                <button type="button" class="btn btn-sm btn-link text-white-50 d-lg-none p-0" id="adminCloseBtn">
+                    <i class="fa fa-times fs-5"></i>
+                </button>
+            </div>
+
+            <!-- Logged-in Admin Card -->
+            <div class="admin-user-pill">
+                <img src="<%= adminUser && adminUser.avatar ? adminUser.avatar : '/img/team-1.jpg' %>" alt="<%= adminUser ? adminUser.name : 'Admin' %>" class="admin-avatar">
+                <div class="flex-grow-1 overflow-hidden">
+                    <div class="text-white fw-bold text-truncate" style="font-size: 0.9rem;">
+                        <%= adminUser ? adminUser.name : 'Super Administrator' %>
+                    </div>
+                    <div class="d-flex align-items-center gap-1 mt-1">
+                        <span class="badge bg-danger text-uppercase px-2 py-0" style="font-size: 0.65rem; font-weight: 800;">
+                            Root Admin
+                        </span>
+                        <span class="text-white-50" style="font-size: 0.72rem;">Full Access</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NAV LINKS -->
+            <nav class="admin-nav">
+                <div class="nav-category">Command & Control</div>
+                <a href="/admin?tab=overview" class="admin-nav-link <%= activeTab === 'overview' ? 'active' : '' %>">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa fa-chart-pie"></i>
+                        <span>Executive Overview</span>
+                    </div>
+                </a>
+
+                <a href="/admin?tab=escrow" class="admin-nav-link <%= activeTab === 'escrow' ? 'active' : '' %>">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa fa-hand-holding-usd text-warning"></i>
+                        <span>Escrow & Payouts</span>
+                    </div>
+                    <% if (stats && stats.pendingPayoutCount > 0) { %>
+                        <span class="badge bg-danger text-white"><%= stats.pendingPayoutCount %></span>
+                    <% } %>
+                </a>
+
+                <div class="nav-category">Governance & Directory</div>
+                <a href="/admin?tab=users" class="admin-nav-link <%= activeTab === 'users' ? 'active' : '' %>">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa fa-users"></i>
+                        <span>User Directory & KYC</span>
+                    </div>
+                    <span class="badge bg-secondary"><%= stats ? stats.totalUsers : 0 %></span>
+                </a>
+
+                <a href="/admin?tab=listings" class="admin-nav-link <%= activeTab === 'listings' ? 'active' : '' %>">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa fa-boxes"></i>
+                        <span>Materials & Plant Hire</span>
+                    </div>
+                    <span class="badge bg-secondary"><%= stats ? stats.totalProducts : 0 %></span>
+                </a>
+
+                <a href="/admin?tab=jobs" class="admin-nav-link <%= activeTab === 'jobs' ? 'active' : '' %>">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa fa-briefcase"></i>
+                        <span>Client Projects & Bids</span>
+                    </div>
+                    <span class="badge bg-secondary"><%= stats ? stats.totalJobs : 0 %></span>
+                </a>
+
+                <div class="nav-category">Platform Finance</div>
+                <a href="/admin?tab=finances" class="admin-nav-link <%= activeTab === 'finances' ? 'active' : '' %>">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa fa-file-invoice-dollar text-success"></i>
+                        <span>Ledger & Commissions</span>
+                    </div>
+                </a>
+            </nav>
+
+            <!-- SIDEBAR FOOTER -->
+            <div class="admin-sidebar-footer">
+                <a href="/dashboard" title="Switch to user workstation">
+                    <i class="fa fa-th-large text-primary"></i>
+                    <span>Switch to Client Hub</span>
+                </a>
+                <a href="/" target="_blank" title="View public website in new tab">
+                    <i class="fa fa-external-link-alt"></i>
+                    <span>Public Website</span>
+                </a>
+                <a href="/auth/logout" class="text-danger mt-1">
+                    <i class="fa fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <div class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="header-left">
+                    <button type="button" class="btn-admin-toggle d-lg-none" id="adminToggleBtn" aria-label="Toggle Sidebar">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="system-pill d-none d-sm-flex">
+                        <span class="pulse-red"></span>
+                        <span>TopLineHub Master Operations &bull; Production</span>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <!-- Escrow Ticker -->
+                    <a href="/admin?tab=escrow" class="escrow-pill" title="Funds held in escrow">
+                        <i class="fa fa-lock text-warning"></i>
+                        <span>Held in Escrow: KES <%= stats ? Number(stats.totalEscrowHeld).toLocaleString() : '0' %></span>
+                    </a>
+
+                    <!-- Client Site Switch -->
+                    <a href="/dashboard" class="btn-client-switch d-none d-md-flex">
+                        <i class="fa fa-desktop text-muted"></i>
+                        <span>Client Workstation</span>
+                    </a>
+
+                    <a href="/" target="_blank" class="btn btn-sm btn-outline-dark fw-bold d-none d-lg-inline-flex align-items-center gap-1">
+                        <i class="fa fa-external-link-alt"></i> Public Site
+                    </a>
+                </div>
+            </header>
+
+            <!-- FLASH ALERTS -->
+            <div class="px-4 pt-3">
+                <%- include('../partials/flash') %>
+            </div>
+
+            <!-- CONTENT BODY -->
+            <main class="admin-content">
+                <%- body %>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('adminToggleBtn');
+            const closeBtn = document.getElementById('adminCloseBtn');
+            const sidebar = document.getElementById('adminSidebar');
+            const backdrop = document.getElementById('adminBackdrop');
+
+            function openSidebar() {
+                sidebar.classList.add('show');
+                backdrop.classList.add('show');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                backdrop.classList.remove('show');
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeSidebar);
+        });
+    </script>
+</body>
+</html>
