@@ -34,6 +34,25 @@
                 </div>
             </div>
             <a href="/contact" class="nav-item nav-link <%= currentPath === '/contact' ? 'active' : '' %>">Contact</a>
+            
+            <!-- Mobile Auth Actions (Visible on Small Screens) -->
+            <div class="d-lg-none mt-3 pt-3 border-top px-2">
+                <% if (user) { %>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="small text-muted"><i class="fa fa-user me-1"></i><%= user.name %></span>
+                        <span class="badge bg-warning text-dark"><i class="fa fa-wallet me-1"></i>KES <%= userWallet ? Number(userWallet.balance).toLocaleString() : '0' %></span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="/dashboard" class="btn btn-primary btn-sm text-white"><i class="fa fa-th-large me-1"></i>App Dashboard</a>
+                        <a href="/auth/logout" class="btn btn-outline-danger btn-sm"><i class="fa fa-sign-out-alt me-1"></i>Logout</a>
+                    </div>
+                <% } else { %>
+                    <div class="d-grid gap-2">
+                        <a href="/auth/login" class="btn btn-outline-primary btn-sm"><i class="fa fa-user me-1"></i>Sign In / Login</a>
+                        <a href="/auth/register" class="btn btn-primary btn-sm text-white"><i class="fa fa-user-plus me-1"></i>Create Account / Register</a>
+                    </div>
+                <% } %>
+            </div>
         </div>
         <div class="d-none d-lg-flex ms-2 ms-xl-3 gap-2 align-items-center flex-nowrap">
             <a href="/materials/post" class="btn btn-outline-primary py-2 px-2 px-xl-3 fw-medium text-nowrap" style="font-size: 0.82rem;">

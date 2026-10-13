@@ -9,6 +9,7 @@ module.exports = {
   
   // Top-up Options (Denominations)
   TOPUP_OPTIONS: [
+    { amount: 1, bonus: 0, label: 'Ksh 1 (Test)' },
     { amount: 100, bonus: 0, label: 'Ksh 100' },
     { amount: 200, bonus: 10, label: 'Ksh 200 + Ksh 10 Bonus' },
     { amount: 500, bonus: 50, label: 'Ksh 500 + Ksh 50 Bonus' },

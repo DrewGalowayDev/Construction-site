@@ -128,7 +128,8 @@ exports.initializePaystackWalletTopup = async (req, res) => {
     const protocol = req.protocol;
     const callbackUrl = `${protocol}://${host}/wallet/paystack/callback`;
     const reference = `TL_WAL_${userId}_${Date.now()}`;
-    const userEmail = req.session.user.email || `user_${userId}@toplinehub.co.ke`;
+    const rawEmail = (req.session.user && req.session.user.email) ? req.session.user.email : '';
+    const userEmail = rawEmail.includes('@') ? rawEmail : `user_${userId}@toplinehub.co.ke`;
 
     const paystack = require('../helpers/paystackHelper');
     const paystackRes = await paystack.initializeTransaction({

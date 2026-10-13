@@ -841,48 +841,29 @@
 
                         <label class="form-label fw-bold text-dark small mb-2">Select Top-Up Package (KES):</label>
                         <div class="row g-2 mb-3">
-                            <div class="col-4">
-                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
-                                    <input type="radio" name="amount" value="100" class="d-none" checked onchange="updateTopupSelect(100)">
-                                    <div class="fw-bold text-dark">Ksh 100</div>
-                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Starter</small>
-                                </label>
-                            </div>
-                            <div class="col-4">
-                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
-                                    <input type="radio" name="amount" value="200" class="d-none" onchange="updateTopupSelect(200)">
-                                    <div class="fw-bold text-dark">Ksh 200</div>
-                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+10 Bonus</small>
-                                </label>
-                            </div>
-                            <div class="col-4">
-                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
-                                    <input type="radio" name="amount" value="500" class="d-none" onchange="updateTopupSelect(500)">
-                                    <div class="fw-bold text-dark">Ksh 500</div>
-                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+50 Bonus</small>
-                                </label>
-                            </div>
-                            <div class="col-4">
-                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
-                                    <input type="radio" name="amount" value="1000" class="d-none" onchange="updateTopupSelect(1000)">
-                                    <div class="fw-bold text-dark">Ksh 1,000</div>
-                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+150 Bonus</small>
-                                </label>
-                            </div>
-                            <div class="col-4">
-                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
-                                    <input type="radio" name="amount" value="2000" class="d-none" onchange="updateTopupSelect(2000)">
-                                    <div class="fw-bold text-dark">Ksh 2,000</div>
-                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+400 Bonus</small>
-                                </label>
-                            </div>
-                            <div class="col-4">
-                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
-                                    <input type="radio" name="amount" value="5000" class="d-none" onchange="updateTopupSelect(5000)">
-                                    <div class="fw-bold text-dark">Ksh 5,000</div>
-                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+1,250 Bonus</small>
-                                </label>
-                            </div>
+                            <% const topupOptions = (typeof pricing !== 'undefined' && pricing && pricing.TOPUP_OPTIONS) ? pricing.TOPUP_OPTIONS : [
+                                { amount: 1, bonus: 0, label: 'Ksh 1' },
+                                { amount: 100, bonus: 0, label: 'Ksh 100' },
+                                { amount: 200, bonus: 10, label: 'Ksh 200' },
+                                { amount: 500, bonus: 50, label: 'Ksh 500' },
+                                { amount: 1000, bonus: 150, label: 'Ksh 1,000' },
+                                { amount: 2000, bonus: 400, label: 'Ksh 2,000' }
+                            ]; %>
+                            <% topupOptions.forEach((option, idx) => { %>
+                                <div class="col-4">
+                                    <label class="w-100 border rounded p-2 text-center package-card cursor-pointer<%= idx === 0 ? ' selected' : '' %>">
+                                        <input type="radio" name="amount" value="<%= option.amount %>" class="d-none" <%= idx === 0 ? 'checked' : '' %> onchange="updateTopupSelect(<%= option.amount %>)">
+                                        <div class="fw-bold text-dark">Ksh <%= option.amount.toLocaleString() %></div>
+                                        <% if (option.amount === 1) { %>
+                                            <small class="badge bg-primary text-white d-inline-block px-1" style="font-size: 0.65rem;">Live Test</small>
+                                        <% } else if (option.bonus > 0) { %>
+                                            <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+<%= option.bonus.toLocaleString() %> Bonus</small>
+                                        <% } else { %>
+                                            <small class="text-muted d-block" style="font-size: 0.7rem;">Starter</small>
+                                        <% } %>
+                                    </label>
+                                </div>
+                            <% }); %>
                         </div>
 
                         <div class="mb-3 d-none" id="mpesaPhoneField">
@@ -985,7 +966,7 @@
                     }
                 });
             };
-            updateTopupSelect(100);
+            updateTopupSelect(1);
         });
     </script>
 </body>

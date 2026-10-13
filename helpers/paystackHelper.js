@@ -1,16 +1,24 @@
 const crypto = require('crypto');
 
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || '';
-const PAYSTACK_PUBLIC_KEY = process.env.PAYSTACK_PUBLIC_KEY || '';
-const PAYSTACK_CURRENCY = process.env.PAYSTACK_CURRENCY || 'KES';
 const PAYSTACK_API_BASE = 'https://api.paystack.co';
 
 /**
- * Check if Paystack secret key is configured
+ * Check if Paystack secret key is configured with a real key
  */
 function isPaystackConfigured() {
-  return typeof process.env.PAYSTACK_SECRET_KEY === 'string' &&
-    process.env.PAYSTACK_SECRET_KEY.trim().startsWith('sk_');
+  const key = process.env.PAYSTACK_SECRET_KEY;
+  if (!key || typeof key !== 'string') return false;
+  const trimmed = key.trim();
+  // Must start with sk_live_ or sk_test_ and be at least 20 chars
+  return (trimmed.startsWith('sk_live_') || trimmed.startsWith('sk_test_')) && trimmed.length > 20;
+}
+
+/**
+ * Check if using live keys (not test)
+ */
+function isLiveMode() {
+  const key = process.env.PAYSTACK_SECRET_KEY;
+  return key && key.trim().startsWith('sk_live_');
 }
 
 /**
@@ -18,6 +26,13 @@ function isPaystackConfigured() {
  */
 function getPublicKey() {
   return process.env.PAYSTACK_PUBLIC_KEY || '';
+}
+
+/**
+ * Get the configured currency
+ */
+function getCurrency() {
+  return process.env.PAYSTACK_CURRENCY || 'KES';
 }
 
 /**
@@ -34,49 +49,73 @@ async function initializeTransaction(params) {
     channels = ['card', 'mobile_money', 'bank']
   } = params;
 
-  // Paystack expects amount in minor currency units (cents for KES: amount * 100)
-  const amountInCents = Math.round(Number(amount) * 100);
+  const currency = getCurrency();
+
+  // Paystack expects amount in minor currency units (kobo/cents: amount * 100)
+  const amountInMinor = Math.round(Number(amount) * 100);
 
   if (!isPaystackConfigured()) {
-    // Provide simulated Paystack authorization for smooth testing when keys are pending
-    console.log(`ℹ️ [Paystack Sandbox/Simulated] Initializing payment for ${email} - KES ${amount} (Ref: ${reference})`);
+    // Fallback simulated mode when no real keys are present
+    console.log(`⚠️ [Paystack SIMULATED] No valid API key. Simulating payment for ${email} - ${currency} ${amount} (Ref: ${reference})`);
     return {
       status: true,
       isSimulated: true,
-      message: 'Authorization URL created (Simulated mode: Add PAYSTACK_SECRET_KEY to .env for live Paystack)',
+      message: 'Authorization URL created (SIMULATED — configure PAYSTACK_SECRET_KEY in .env for real payments)',
       data: {
-        authorization_url: `${callbackUrl || '/orders/paystack/callback'}?reference=${encodeURIComponent(reference)}&simulated=true`,
+        authorization_url: `${callbackUrl || '/wallet/paystack/callback'}?reference=${encodeURIComponent(reference)}&simulated=true`,
         access_code: `SIM_ACC_${Date.now()}`,
         reference
       }
     };
   }
 
+  const secretKey = process.env.PAYSTACK_SECRET_KEY.trim();
+  const mode = isLiveMode() ? 'LIVE' : 'TEST';
+
+  console.log(`💳 [Paystack ${mode}] Initializing transaction: ${email} - ${currency} ${amount} (${amountInMinor} minor units) Ref: ${reference}`);
+
+  // Sanitize and validate customer email for Paystack API
+  let validEmail = 'customer@toplinehub.co.ke';
+  if (email && typeof email === 'string' && email.includes('@')) {
+    validEmail = email.trim();
+  } else if (email && typeof email === 'string') {
+    const sanitized = email.trim().replace(/[^a-zA-Z0-9._-]/g, '');
+    validEmail = sanitized ? `${sanitized}@toplinehub.co.ke` : 'customer@toplinehub.co.ke';
+  }
+
   const payload = {
-    email: email || 'customer@toplinehub.co.ke',
-    amount: amountInCents,
-    currency: PAYSTACK_CURRENCY,
+    email: validEmail,
+    amount: amountInMinor,
+    currency,
     reference,
     callback_url: callbackUrl,
     channels,
     metadata
   };
 
-  const response = await fetch(`${PAYSTACK_API_BASE}/transaction/initialize`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY.trim()}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
+  try {
+    const response = await fetch(`${PAYSTACK_API_BASE}/transaction/initialize`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${secretKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
 
-  const data = await response.json();
-  if (!response.ok || !data.status) {
-    throw new Error(data.message || 'Failed to initialize Paystack transaction');
+    const data = await response.json();
+
+    if (!response.ok || !data.status) {
+      console.error(`❌ [Paystack ${mode}] Initialize failed:`, data.message || 'Unknown error');
+      throw new Error(data.message || `Paystack initialization failed (HTTP ${response.status})`);
+    }
+
+    console.log(`✅ [Paystack ${mode}] Transaction initialized. Auth URL: ${data.data.authorization_url}`);
+    return data;
+  } catch (err) {
+    console.error(`❌ [Paystack ${mode}] Network/API error:`, err.message);
+    throw err;
   }
-
-  return data;
 }
 
 /**
@@ -88,8 +127,9 @@ async function verifyTransaction(reference) {
     throw new Error('Transaction reference is required');
   }
 
-  if (!isPaystackConfigured() || reference.startsWith('SIM_')) {
-    console.log(`ℹ️ [Paystack Sandbox/Simulated] Verified reference ${reference}`);
+  // If simulated reference, return simulated success
+  if (reference.startsWith('SIM_') || !isPaystackConfigured()) {
+    console.log(`⚠️ [Paystack SIMULATED] Verifying reference ${reference} — returning simulated success`);
     return {
       status: true,
       isSimulated: true,
@@ -97,28 +137,42 @@ async function verifyTransaction(reference) {
         status: 'success',
         reference,
         amount: 0,
-        currency: PAYSTACK_CURRENCY,
-        channel: 'mobile_money',
+        currency: getCurrency(),
+        channel: 'simulated',
         gateway_response: 'Successful (Simulated)',
-        paid_at: new Date().toISOString()
+        paid_at: new Date().toISOString(),
+        metadata: {}
       }
     };
   }
 
-  const response = await fetch(`${PAYSTACK_API_BASE}/transaction/verify/${encodeURIComponent(reference)}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY.trim()}`,
-      'Content-Type': 'application/json'
+  const secretKey = process.env.PAYSTACK_SECRET_KEY.trim();
+  const mode = isLiveMode() ? 'LIVE' : 'TEST';
+
+  console.log(`🔍 [Paystack ${mode}] Verifying transaction: ${reference}`);
+
+  try {
+    const response = await fetch(`${PAYSTACK_API_BASE}/transaction/verify/${encodeURIComponent(reference)}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${secretKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.status) {
+      console.error(`❌ [Paystack ${mode}] Verify failed:`, data.message || 'Unknown error');
+      throw new Error(data.message || `Paystack verification failed (HTTP ${response.status})`);
     }
-  });
 
-  const data = await response.json();
-  if (!response.ok || !data.status) {
-    throw new Error(data.message || 'Failed to verify Paystack transaction');
+    console.log(`✅ [Paystack ${mode}] Verification result: ${data.data.status} — ${data.data.gateway_response} — Amount: ${data.data.amount}`);
+    return data;
+  } catch (err) {
+    console.error(`❌ [Paystack ${mode}] Verify network/API error:`, err.message);
+    throw err;
   }
-
-  return data;
 }
 
 /**
@@ -142,9 +196,11 @@ function verifyWebhookSignature(rawBody, signature) {
 
 module.exports = {
   isPaystackConfigured,
+  isLiveMode,
   getPublicKey,
+  getCurrency,
   initializeTransaction,
   verifyTransaction,
   verifyWebhookSignature,
-  PAYSTACK_CURRENCY
+  PAYSTACK_CURRENCY: getCurrency()
 };

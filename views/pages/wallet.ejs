@@ -247,62 +247,84 @@
     </div>
 </div>
 
-<!-- Top-Up Modal -->
+<!-- Top-Up Modal (Paystack Integrated) -->
 <div class="modal fade" id="topupModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">
-                    <i class="fas fa-plus-circle text-primary me-2"></i>Top Up Credits
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header p-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div>
+                    <h5 class="modal-title fw-bold text-white mb-1">
+                        <i class="fas fa-bolt text-warning me-2"></i>Top Up Wallet Credits
+                    </h5>
+                    <p class="small text-white-50 mb-0">Credits unlock client WhatsApp & phone numbers.</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4">
-                <form action="/wallet/topup" method="POST">
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Select Amount</label>
-                        <div class="row g-2">
-                            <% pricing.TOPUP_OPTIONS.forEach(option => { %>
-                                <div class="col-md-6">
-                                    <input type="radio" class="btn-check" name="amount" id="topup_<%= option.amount %>" value="<%= option.amount %>" required>
-                                    <label class="btn btn-outline-primary w-100 text-start" for="topup_<%= option.amount %>">
-                                        <div class="fw-bold">Ksh <%= option.amount.toLocaleString() %></div>
-                                        <% if (option.bonus > 0) { %>
-                                            <small class="text-success">+ Ksh <%= option.bonus %> Bonus</small>
-                                        <% } %>
-                                    </label>
-                                </div>
-                            <% }) %>
+            <form action="/wallet/paystack/initialize" method="POST" id="walletTopupForm">
+                <div class="modal-body p-4">
+                    <div class="alert alert-info d-flex align-items-center gap-3 py-2 px-3 mb-3 border-0" style="background: #eef6ff;">
+                        <i class="fas fa-shield-alt fs-4 text-primary"></i>
+                        <div class="small">
+                            <strong>Secure Payment via Paystack</strong> — Card, M-Pesa, Bank Transfer & more. Your payment is encrypted and processed securely.
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Payment Method</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_method" id="mpesa" value="mpesa" checked>
-                            <label class="form-check-label" for="mpesa">
-                                <i class="fas fa-mobile-alt text-success me-2"></i>M-Pesa
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_method" id="card" value="card">
-                            <label class="form-check-label" for="card">
-                                <i class="fas fa-credit-card text-primary me-2"></i>Credit/Debit Card
-                            </label>
-                        </div>
+                    <!-- Payment Method Selector -->
+                    <label class="form-label fw-bold text-dark small mb-2">Payment Method:</label>
+                    <div class="d-flex gap-2 mb-3">
+                        <label class="flex-grow-1 border rounded p-2 d-flex align-items-center gap-2 cursor-pointer bg-light" id="walletPaystackLabel" style="border-color: #667eea !important;">
+                            <input type="radio" name="topup_gateway" value="paystack" checked onchange="switchWalletGateway('paystack')">
+                            <div>
+                                <strong class="text-dark d-block small"><i class="fas fa-shield-alt text-primary me-1"></i>Paystack Gateway</strong>
+                                <small class="text-muted" style="font-size: 0.68rem;">Card, M-Pesa, Bank, Apple Pay</small>
+                            </div>
+                        </label>
+                        <label class="flex-grow-1 border rounded p-2 d-flex align-items-center gap-2 cursor-pointer" id="walletMpesaLabel">
+                            <input type="radio" name="topup_gateway" value="mpesa" onchange="switchWalletGateway('mpesa')">
+                            <div>
+                                <strong class="text-dark d-block small"><i class="fas fa-mobile-alt text-success me-1"></i>Direct M-Pesa STK</strong>
+                                <small class="text-muted" style="font-size: 0.68rem;">Instant phone PIN prompt</small>
+                            </div>
+                        </label>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">M-Pesa Phone Number</label>
-                        <input type="tel" name="mpesa_phone" class="form-control" placeholder="0711000000" value="<%= user ? user.phone : '' %>">
-                        <small class="text-muted">You'll receive an STK push to confirm payment</small>
+                    <!-- Amount Selection -->
+                    <label class="form-label fw-bold text-dark small mb-2">Select Top-Up Package (KES):</label>
+                    <div class="row g-2 mb-3">
+                        <% pricing.TOPUP_OPTIONS.forEach((option, idx) => { %>
+                            <div class="col-4">
+                                <label class="w-100 border rounded p-2 text-center wallet-pkg-card cursor-pointer<%= idx === 0 ? ' selected' : '' %>">
+                                    <input type="radio" name="amount" value="<%= option.amount %>" class="d-none" <%= idx === 0 ? 'checked' : '' %> onchange="selectWalletPkg(this)">
+                                    <div class="fw-bold text-dark">Ksh <%= option.amount.toLocaleString() %></div>
+                                    <% if (option.amount === 1) { %>
+                                        <small class="badge bg-primary text-white d-inline-block px-1" style="font-size: 0.65rem;">Live Test</small>
+                                    <% } else if (option.bonus > 0) { %>
+                                        <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+<%= option.bonus.toLocaleString() %> Bonus</small>
+                                    <% } else { %>
+                                        <small class="text-muted d-block" style="font-size: 0.7rem;">Starter</small>
+                                    <% } %>
+                                </label>
+                            </div>
+                        <% }) %>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">
-                        <i class="fas fa-check me-2"></i>Confirm Top-Up
+                    <!-- M-Pesa Phone (hidden by default) -->
+                    <div class="mb-3 d-none" id="walletMpesaPhoneField">
+                        <label class="form-label fw-bold text-dark small">M-Pesa Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light fw-bold text-success"><i class="fas fa-mobile-alt me-1"></i>+254</span>
+                            <input type="text" name="mpesa_phone" class="form-control" placeholder="712345678" value="<%= user && user.phone ? user.phone.replace(/[^0-9]/g, '').slice(-9) : '' %>">
+                        </div>
+                        <small class="text-muted" style="font-size: 0.75rem;">An M-Pesa SIM prompt will trigger on your handset.</small>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light p-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="walletTopupSubmitBtn" class="btn fw-bold text-white px-4 shadow-sm" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="fas fa-lock me-1"></i>Pay via Paystack
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -312,4 +334,58 @@
     background-color: #0d6efd;
     color: white;
 }
+.wallet-pkg-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+.wallet-pkg-card:hover {
+    border-color: #667eea !important;
+    background: #f8f7ff;
+}
+.wallet-pkg-card.selected {
+    border-color: #667eea !important;
+    background: #f0eeff;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+.cursor-pointer { cursor: pointer; }
 </style>
+
+<script>
+function switchWalletGateway(gw) {
+    const form = document.getElementById('walletTopupForm');
+    const mpesaField = document.getElementById('walletMpesaPhoneField');
+    const submitBtn = document.getElementById('walletTopupSubmitBtn');
+    const paystackLabel = document.getElementById('walletPaystackLabel');
+    const mpesaLabel = document.getElementById('walletMpesaLabel');
+
+    if (gw === 'paystack') {
+        if (form) form.action = '/wallet/paystack/initialize';
+        if (mpesaField) mpesaField.classList.add('d-none');
+        if (submitBtn) {
+            submitBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            submitBtn.className = 'btn fw-bold text-white px-4 shadow-sm';
+            submitBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            submitBtn.innerHTML = '<i class="fas fa-lock me-1"></i>Pay via Paystack';
+        }
+        if (paystackLabel) { paystackLabel.classList.add('bg-light'); paystackLabel.style.borderColor = '#667eea'; }
+        if (mpesaLabel) { mpesaLabel.classList.remove('bg-light'); mpesaLabel.style.borderColor = '#dee2e6'; }
+    } else {
+        if (form) form.action = '/wallet/topup';
+        if (mpesaField) mpesaField.classList.remove('d-none');
+        if (submitBtn) {
+            submitBtn.className = 'btn btn-success fw-bold text-white px-4 shadow-sm';
+            submitBtn.style.background = '';
+            submitBtn.innerHTML = '<i class="fas fa-mobile-alt me-1"></i>Send M-Pesa PIN Prompt';
+        }
+        if (mpesaLabel) { mpesaLabel.classList.add('bg-light'); mpesaLabel.style.borderColor = '#198754'; }
+        if (paystackLabel) { paystackLabel.classList.remove('bg-light'); paystackLabel.style.borderColor = '#dee2e6'; }
+    }
+}
+
+function selectWalletPkg(input) {
+    document.querySelectorAll('.wallet-pkg-card').forEach(card => card.classList.remove('selected'));
+    if (input && input.closest) input.closest('.wallet-pkg-card').classList.add('selected');
+}
+</script>
+

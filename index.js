@@ -82,7 +82,15 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// Friendly Auth Aliases (Direct access for /login, /signup, etc.)
+app.get('/login', (req, res) => res.redirect('/auth/login'));
+app.get('/signin', (req, res) => res.redirect('/auth/login'));
+app.get('/signup', (req, res) => res.redirect('/auth/register'));
+app.get('/register', (req, res) => res.redirect('/auth/register'));
+app.get('/logout', (req, res) => res.redirect('/auth/logout'));
+
 // Mount Routes
+app.use('/auth', authRoutes);
 app.use('/', indexRoutes);
 app.use('/', catalogRoutes);
 app.use('/', fundisRoutes);
@@ -90,7 +98,6 @@ app.use('/', jobRoutes);
 app.use('/', orderRoutes);
 app.use('/', dashboardRoutes);
 app.use('/', walletRoutes);
-app.use('/auth', authRoutes);
 
 // 404 Handler
 app.use((req, res) => {
