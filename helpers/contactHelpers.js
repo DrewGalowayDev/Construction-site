@@ -20,15 +20,15 @@ async function hasUnlockedContact(userId, unlockType, targetId) {
 }
 
 /**
- * Get masked phone number (shows only last 3 digits)
+ * Get masked phone number (shows only last 3 digits, clearly indicating protected status)
  */
 function maskPhoneNumber(phone) {
-  if (!phone) return '***-***-***';
+  if (!phone) return '🔒 Hidden (Unlock to View)';
   const cleaned = phone.replace(/[^0-9]/g, '');
-  if (cleaned.length < 4) return '***-***-***';
+  if (cleaned.length < 4) return '🔒 Hidden (Unlock to View)';
   
   const lastThree = cleaned.slice(-3);
-  return `***-***-${lastThree}`;
+  return `+254 7XX *** ${lastThree}`;
 }
 
 /**
@@ -42,9 +42,25 @@ function getUnlockPrice(unlockType) {
       return PRICING.UNLOCK_MATERIAL_SUPPLIER_CONTACT;
     case 'artisan_fundi':
       return PRICING.UNLOCK_ARTISAN_CONTACT;
+    case 'order_client':
+      return PRICING.UNLOCK_ORDER_CLIENT_CONTACT || 50.00;
     default:
-      return 0;
+      return 50.00;
   }
+}
+
+/**
+ * Format clean WhatsApp URL for Kenyan numbers
+ */
+function formatWhatsAppUrl(phone, text = '') {
+  if (!phone) return '#';
+  let cleaned = phone.replace(/[^0-9]/g, '');
+  if (cleaned.startsWith('0')) {
+    cleaned = '254' + cleaned.slice(1);
+  } else if (!cleaned.startsWith('254') && cleaned.length === 9) {
+    cleaned = '254' + cleaned;
+  }
+  return `https://wa.me/${cleaned}${text ? '?text=' + encodeURIComponent(text) : ''}`;
 }
 
 /**
@@ -61,5 +77,6 @@ module.exports = {
   hasUnlockedContact,
   maskPhoneNumber,
   getUnlockPrice,
-  formatContactDisplay
+  formatContactDisplay,
+  formatWhatsAppUrl
 };

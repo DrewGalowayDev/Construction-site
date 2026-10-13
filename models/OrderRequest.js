@@ -45,6 +45,22 @@ const OrderRequest = sequelize.define('OrderRequest', {
   paid_at: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  payment_method: {
+    type: DataTypes.STRING(50),
+    defaultValue: 'paystack'
+  },
+  paystack_reference: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  platform_fee: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0.00
+  },
+  seller_payout_amount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0.00
   }
 }, {
   tableName: 'order_requests'

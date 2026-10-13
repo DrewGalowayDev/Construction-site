@@ -92,14 +92,35 @@
                                         <div class="product-price mb-3 mt-auto">
                                             Ksh <%= Number(product.price).toLocaleString() %> <span class="small">/ <%= product.unit %></span>
                                         </div>
+                                        <div class="mb-2 small">
+                                            <span class="text-muted"><i class="fa fa-store text-secondary me-1"></i>Supplier: </span>
+                                            <% if (product.contactUnlocked) { %>
+                                                <strong class="text-dark"><%= product.seller ? product.seller.phone : 'Verified Supplier' %></strong>
+                                            <% } else { %>
+                                                <span class="badge bg-light text-muted border"><i class="fa fa-lock text-warning me-1"></i><%= product.maskedPhone %></span>
+                                            <% } %>
+                                        </div>
                                         <div class="d-grid gap-2">
                                             <div class="d-flex gap-2">
                                                 <a href="/materials/<%= product.id %>" class="btn btn-outline-primary btn-sm fw-bold flex-grow-1">Details</a>
                                                 <a href="/orders/request/<%= product.id %>" class="btn btn-primary text-white btn-sm fw-bold flex-grow-1">Order / Quote</a>
                                             </div>
-                                            <a href="https://wa.me/254711000000?text=Hi,%20inquiring%20about%20<%= encodeURIComponent(product.title) %>" class="btn btn-whatsapp btn-sm" target="_blank">
-                                                <i class="fab fa-whatsapp me-1"></i>WhatsApp Vendor
-                                            </a>
+                                            <% if (product.contactUnlocked) { %>
+                                                <% 
+                                                    const sPhone = product.seller ? product.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                                    const waClean = sPhone.startsWith('0') ? '254' + sPhone.slice(1) : sPhone;
+                                                    const waUrl = 'https://wa.me/' + waClean + '?text=' + encodeURIComponent('Hi, inquiring about ' + product.title + ' on TopLineHub.');
+                                                %>
+                                                <a href="<%= waUrl %>" class="btn btn-whatsapp btn-sm" target="_blank">
+                                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp Vendor
+                                                </a>
+                                            <% } else { %>
+                                                <form action="/unlock/material/<%= product.id %>" method="POST" class="d-grid">
+                                                    <button type="submit" class="btn btn-outline-warning btn-sm text-dark fw-bold" title="Unlock Supplier WhatsApp & Phone">
+                                                        <i class="fa fa-lock me-1"></i>Unlock WhatsApp (Ksh <%= product.unlockPrice %>)
+                                                    </button>
+                                                </form>
+                                            <% } %>
                                         </div>
                                     </div>
                                 </div>

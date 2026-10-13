@@ -128,18 +128,31 @@
                             <i class="fa fa-shopping-cart me-2"></i>
                             <%= product.is_rental ? 'Book Equipment Hire' : 'Request Order / Quote' %>
                         </a>
-                        <% 
-                            const sellerPhone = product.seller ? product.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
-                            const waClean = sellerPhone.startsWith('0') ? '254' + sellerPhone.slice(1) : sellerPhone;
-                            const waMsg = encodeURIComponent('Hi ' + (product.seller ? product.seller.name : 'Vendor') + ', I am inquiring about "' + product.title + '" (Ksh ' + Number(product.price).toLocaleString() + '/' + product.unit + ') listed on TopLineHub.');
-                        %>
-                        <a href="https://wa.me/<%= waClean %>?text=<%= waMsg %>" target="_blank" class="btn btn-whatsapp py-3 fw-bold">
-                            <i class="fab fa-whatsapp me-2"></i>Inquire on WhatsApp
-                        </a>
-                        <% if (product.seller && product.seller.phone) { %>
-                            <a href="tel:<%= product.seller.phone %>" class="btn btn-outline-dark py-2">
-                                <i class="fa fa-phone me-2"></i>Call Vendor (<%= product.seller.phone %>)
+                        <% if (product.contactUnlocked) { %>
+                            <% 
+                                const sellerPhone = product.seller ? product.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                const waClean = sellerPhone.startsWith('0') ? '254' + sellerPhone.slice(1) : sellerPhone;
+                                const waMsg = encodeURIComponent('Hi ' + (product.seller ? product.seller.name : 'Vendor') + ', I am inquiring about "' + product.title + '" (Ksh ' + Number(product.price).toLocaleString() + '/' + product.unit + ') listed on TopLineHub.');
+                            %>
+                            <a href="https://wa.me/<%= waClean %>?text=<%= waMsg %>" target="_blank" class="btn btn-whatsapp py-3 fw-bold">
+                                <i class="fab fa-whatsapp me-2"></i>Inquire on WhatsApp
                             </a>
+                            <% if (product.seller && product.seller.phone) { %>
+                                <a href="tel:<%= product.seller.phone %>" class="btn btn-outline-dark py-2">
+                                    <i class="fa fa-phone me-2"></i>Call Vendor (<%= product.seller.phone %>)
+                                </a>
+                            <% } %>
+                        <% } else { %>
+                            <div class="card bg-light border p-3 text-center">
+                                <div class="text-muted small mb-2">
+                                    <i class="fa fa-lock text-warning me-1"></i>Direct vendor phone & WhatsApp are protected.
+                                </div>
+                                <form action="/unlock/material/<%= product.id %>" method="POST">
+                                    <button type="submit" class="btn btn-warning py-2 w-100 fw-bold text-dark shadow-sm">
+                                        <i class="fa fa-unlock-alt me-1"></i>Unlock WhatsApp & Direct Phone (Ksh <%= product.unlockPrice %>)
+                                    </button>
+                                </form>
+                            </div>
                         <% } %>
                     </div>
 

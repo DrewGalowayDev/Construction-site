@@ -113,16 +113,33 @@
                                 <div class="product-price mb-3 mt-auto">
                                     Ksh <%= Number(rental.price).toLocaleString() %> <span class="small">/ <%= rental.unit %></span>
                                 </div>
-                                <div class="d-flex gap-2">
+                                <div class="mb-2 small">
+                                    <span class="text-muted"><i class="fa fa-phone text-secondary me-1"></i>Owner: </span>
+                                    <% if (rental.contactUnlocked) { %>
+                                        <strong class="text-dark"><%= rental.seller ? rental.seller.phone : 'Verified Owner' %></strong>
+                                    <% } else { %>
+                                        <span class="badge bg-light text-muted border"><i class="fa fa-lock text-warning me-1"></i><%= rental.maskedPhone %></span>
+                                    <% } %>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2 align-items-center">
                                     <a href="/materials/<%= rental.id %>" class="btn btn-outline-primary btn-sm fw-bold">Details</a>
                                     <a href="/orders/request/<%= rental.id %>" class="btn btn-primary text-white flex-grow-1 fw-bold btn-sm">Book Hire</a>
-                                    <% 
-                                        const vendorPhone = rental.seller ? rental.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
-                                        const waRentUrl = 'https://wa.me/' + (vendorPhone.startsWith('0') ? '254' + vendorPhone.slice(1) : vendorPhone) + '?text=' + encodeURIComponent('Hi, inquiring about hiring ' + rental.title + ' at Ksh ' + Number(rental.price).toLocaleString() + '/' + rental.unit + ' on TopLineHub.');
-                                    %>
-                                    <a href="<%= waRentUrl %>" class="btn btn-whatsapp btn-sm" target="_blank" title="WhatsApp Machinery Owner">
-                                        <i class="fab fa-whatsapp"></i>
-                                    </a>
+                                    <% if (rental.contactUnlocked) { %>
+                                        <% 
+                                            const vendorPhone = rental.seller ? rental.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                            const waClean = vendorPhone.startsWith('0') ? '254' + vendorPhone.slice(1) : vendorPhone;
+                                            const waRentUrl = 'https://wa.me/' + waClean + '?text=' + encodeURIComponent('Hi, inquiring about hiring ' + rental.title + ' at Ksh ' + Number(rental.price).toLocaleString() + '/' + rental.unit + ' on TopLineHub.');
+                                        %>
+                                        <a href="<%= waRentUrl %>" class="btn btn-whatsapp btn-sm" target="_blank" title="WhatsApp Machinery Owner">
+                                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                        </a>
+                                    <% } else { %>
+                                        <form action="/unlock/material/<%= rental.id %>" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-warning btn-sm text-dark fw-bold" title="Unlock Owner Direct WhatsApp & Phone Number">
+                                                <i class="fa fa-lock me-1"></i>Unlock WhatsApp (Ksh <%= rental.unlockPrice %>)
+                                            </button>
+                                        </form>
+                                    <% } %>
                                 </div>
                             </div>
                         </div>

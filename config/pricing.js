@@ -5,6 +5,7 @@ module.exports = {
   UNLOCK_JOB_CLIENT_CONTACT: 50.00,        // Ksh 50 to see job poster's contact
   UNLOCK_MATERIAL_SUPPLIER_CONTACT: 30.00, // Ksh 30 to see material supplier's contact
   UNLOCK_ARTISAN_CONTACT: 20.00,           // Ksh 20 to see artisan/fundi contact
+  UNLOCK_ORDER_CLIENT_CONTACT: 50.00,      // Ksh 50 platform commission to reveal client phone & WhatsApp on hire/order requests
   
   // Top-up Options (Denominations)
   TOPUP_OPTIONS: [

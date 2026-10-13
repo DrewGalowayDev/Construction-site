@@ -120,18 +120,34 @@
 
                     <!-- Quick Contact Buttons -->
                     <div class="d-grid gap-2 mb-4">
-                        <% 
-                            const artisanPhone = artisan.user ? artisan.user.phone.replace(/[^0-9]/g, '') : '254711000000';
-                            const waClean = artisanPhone.startsWith('0') ? '254' + artisanPhone.slice(1) : artisanPhone;
-                            const waDirectMsg = encodeURIComponent('Hi ' + (artisan.user ? artisan.user.name : 'Fundi') + ', I found your ' + artisan.trade + ' profile on TopLineHub Kenya. Are you available for site work?');
-                        %>
-                        <a href="https://wa.me/<%= waClean %>?text=<%= waDirectMsg %>" target="_blank" class="btn btn-whatsapp py-3 fw-bold">
-                            <i class="fab fa-whatsapp me-2"></i>Chat on WhatsApp Directly
-                        </a>
-                        <% if (artisan.user && artisan.user.phone) { %>
-                            <a href="tel:<%= artisan.user.phone %>" class="btn btn-outline-dark py-2">
-                                <i class="fa fa-phone me-2"></i>Call Directly (<%= artisan.user.phone %>)
+                        <% if (artisan.contactUnlocked) { %>
+                            <% 
+                                const artisanPhone = artisan.user ? artisan.user.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                const waClean = artisanPhone.startsWith('0') ? '254' + artisanPhone.slice(1) : artisanPhone;
+                                const waDirectMsg = encodeURIComponent('Hi ' + (artisan.user ? artisan.user.name : 'Fundi') + ', I found your ' + artisan.trade + ' profile on TopLineHub Kenya. Are you available for site work?');
+                            %>
+                            <a href="https://wa.me/<%= waClean %>?text=<%= waDirectMsg %>" target="_blank" class="btn btn-whatsapp py-3 fw-bold">
+                                <i class="fab fa-whatsapp me-2"></i>Chat on WhatsApp Directly
                             </a>
+                            <% if (artisan.user && artisan.user.phone) { %>
+                                <a href="tel:<%= artisan.user.phone %>" class="btn btn-outline-dark py-2">
+                                    <i class="fa fa-phone me-2"></i>Call Directly (<%= artisan.user.phone %>)
+                                </a>
+                            <% } %>
+                        <% } else { %>
+                            <div class="card bg-light border p-3 text-center">
+                                <div class="text-muted small mb-2">
+                                    <i class="fa fa-lock text-warning me-1"></i>Fundi direct phone & WhatsApp are protected.
+                                </div>
+                                <div class="mb-2">
+                                    <span class="badge bg-white text-muted border py-2 px-3"><%= artisan.maskedPhone %></span>
+                                </div>
+                                <form action="/unlock/artisan/<%= artisan.id %>" method="POST">
+                                    <button type="submit" class="btn btn-warning py-2 w-100 fw-bold text-dark shadow-sm">
+                                        <i class="fa fa-unlock-alt me-1"></i>Unlock WhatsApp & Direct Phone (Ksh <%= artisan.unlockPrice %>)
+                                    </button>
+                                </form>
+                            </div>
                         <% } %>
                     </div>
 

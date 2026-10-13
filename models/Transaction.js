@@ -8,7 +8,7 @@ const Transaction = sequelize.define('Transaction', {
     primaryKey: true
   },
   type: {
-    type: DataTypes.ENUM('topup', 'unlock_job_contact', 'unlock_material_contact', 'unlock_artisan_contact', 'refund'),
+    type: DataTypes.STRING(50),
     allowNull: false
   },
   amount: {
@@ -28,7 +28,7 @@ const Transaction = sequelize.define('Transaction', {
     allowNull: false
   },
   reference_type: {
-    type: DataTypes.ENUM('job', 'product', 'artisan', 'topup'),
+    type: DataTypes.STRING(50),
     allowNull: true
   },
   reference_id: {

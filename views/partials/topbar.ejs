@@ -18,8 +18,12 @@
         <div class="col-lg-5 px-5 text-end">
             <div class="h-100 d-inline-flex align-items-center">
                 <% if (user) { %>
-                    <a class="btn btn-sm btn-primary me-3 text-white" href="/dashboard"><i class="fa fa-tachometer-alt me-1"></i>My Dashboard</a>
-                    <span class="me-3 small text-muted">Welcome, <strong><%= user.name %></strong> (<span class="badge bg-primary text-uppercase"><%= user.role %></span>)</span>
+                    <a class="btn btn-sm btn-warning text-dark fw-bold me-2" href="/dashboard?tab=wallet">
+                        <i class="fa fa-wallet me-1"></i>KES <%= userWallet ? Number(userWallet.balance).toLocaleString() : '100' %>
+                    </a>
+                    <a class="btn btn-sm btn-primary me-2 text-white fw-bold" href="/dashboard">
+                        <i class="fa fa-th-large me-1"></i>Open App Dashboard
+                    </a>
                     <a class="btn btn-sm btn-outline-danger me-2" href="/auth/logout"><i class="fa fa-sign-out-alt me-1"></i>Logout</a>
                 <% } else { %>
                     <a class="btn btn-sm btn-outline-primary me-2" href="/auth/login"><i class="fa fa-user me-1"></i>Login</a>

@@ -102,9 +102,21 @@ exports.getRentals = async (req, res) => {
       order: [['created_at', 'DESC']]
     });
 
+    const rentalsWithUnlock = await Promise.all(
+      rentals.map(async (rental) => {
+        const unlocked = userId ? await hasUnlockedContact(userId, 'material_supplier', rental.id) : false;
+        return {
+          ...rental.get({ plain: true }),
+          contactUnlocked: unlocked,
+          maskedPhone: rental.seller ? maskPhoneNumber(rental.seller.phone) : '🔒 Hidden (Unlock to View)',
+          unlockPrice: PRICING.UNLOCK_MATERIAL_SUPPLIER_CONTACT
+        };
+      })
+    );
+
     res.render('pages/rentals', {
       title: 'Plant & Equipment Hire',
-      rentals,
+      rentals: rentalsWithUnlock,
       categories,
       query: req.query
     });

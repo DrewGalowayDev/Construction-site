@@ -1,4 +1,6 @@
-const { User, Product, Category, ArtisanProfile, JobPost, JobApplication, OrderRequest } = require('../models');
+const { User, Product, Category, ArtisanProfile, JobPost, JobApplication, OrderRequest, Wallet, Transaction, ContactUnlock } = require('../models');
+const PRICING = require('../config/pricing');
+const { maskPhoneNumber, formatWhatsAppUrl } = require('../helpers/contactHelpers');
 
 exports.getDashboard = async (req, res) => {
   try {
@@ -13,6 +15,41 @@ exports.getDashboard = async (req, res) => {
       req.flash('error', 'User account not found.');
       return res.redirect('/auth/logout');
     }
+
+    // 0. Ensure user has a wallet & fetch wallet + transactions
+    let userWallet = await Wallet.findOne({ where: { user_id: userId } });
+    if (!userWallet) {
+      userWallet = await Wallet.create({
+        user_id: userId,
+        balance: PRICING.NEW_USER_FREE_CREDITS || 100.00
+      });
+      await Transaction.create({
+        user_id: userId,
+        type: 'topup',
+        amount: PRICING.NEW_USER_FREE_CREDITS || 100.00,
+        balance_before: 0,
+        balance_after: PRICING.NEW_USER_FREE_CREDITS || 100.00,
+        description: 'Welcome Bonus - Free Platform Credits',
+        reference_type: 'topup',
+        payment_method: 'bonus',
+        status: 'completed'
+      });
+    }
+
+    const transactions = await Transaction.findAll({
+      where: { user_id: userId },
+      order: [['created_at', 'DESC']],
+      limit: 25
+    });
+
+    // Fetch all unlocked contact records for this user
+    const userUnlocks = await ContactUnlock.findAll({
+      where: { user_id: userId }
+    });
+    const unlockedJobIds = new Set(userUnlocks.filter(u => u.unlock_type === 'job_client').map(u => u.target_id));
+    const unlockedOrderIds = new Set(userUnlocks.filter(u => u.unlock_type === 'order_client').map(u => u.target_id));
+    const unlockedProductIds = new Set(userUnlocks.filter(u => u.unlock_type === 'material_supplier').map(u => u.target_id));
+    const unlockedArtisanIds = new Set(userUnlocks.filter(u => u.unlock_type === 'artisan_fundi').map(u => u.target_id));
 
     // 1. Client Data: Posted Jobs + Artisan Proposals
     const postedJobs = await JobPost.findAll({
@@ -34,7 +71,7 @@ exports.getDashboard = async (req, res) => {
       order: [['created_at', 'DESC']]
     });
 
-    // 2. Artisan Data: Submitted Bids & Gigs
+    // 2. Artisan Data: Submitted Bids & Gigs with contact gating
     const myApplications = await JobApplication.findAll({
       where: { artisan_id: userId },
       include: [
@@ -49,6 +86,20 @@ exports.getDashboard = async (req, res) => {
       order: [['created_at', 'DESC']]
     });
 
+    const myApplicationsWithUnlock = myApplications.map(app => {
+      const plain = app.get({ plain: true });
+      const isUnlocked = unlockedJobIds.has(plain.job_id);
+      const rawPhone = plain.job && plain.job.client ? plain.job.client.phone : '';
+      return {
+        ...plain,
+        contactUnlocked: isUnlocked,
+        maskedClientPhone: maskPhoneNumber(rawPhone),
+        clientPhone: isUnlocked ? rawPhone : null,
+        waUrl: isUnlocked ? formatWhatsAppUrl(rawPhone, `Hi ${plain.job && plain.job.client ? plain.job.client.name : 'Client'}, regarding my bid of Ksh ${Number(plain.bid_amount).toLocaleString()} on "${plain.job ? plain.job.title : 'Job'}" on TopLineHub, I am available to discuss next steps.`) : null,
+        unlockPrice: PRICING.UNLOCK_JOB_CLIENT_CONTACT
+      };
+    });
+
     // 3. Supplier Data: Listed Products / Heavy Machinery
     const myProducts = await Product.findAll({
       where: { seller_id: userId },
@@ -56,7 +107,7 @@ exports.getDashboard = async (req, res) => {
       order: [['created_at', 'DESC']]
     });
 
-    // Incoming Material Orders for Seller's Products
+    // Incoming Material Orders & Equipment Hire Requests for Seller's Products with commission unlock gating
     const productIds = myProducts.map(p => p.id);
     let incomingInquiries = [];
     if (productIds.length > 0) {
@@ -69,6 +120,20 @@ exports.getDashboard = async (req, res) => {
         order: [['created_at', 'DESC']]
       });
     }
+
+    const incomingInquiriesWithUnlock = incomingInquiries.map(order => {
+      const plain = order.get({ plain: true });
+      const isUnlocked = unlockedOrderIds.has(plain.id);
+      const rawBuyerPhone = plain.contact_phone || (plain.buyer ? plain.buyer.phone : '');
+      return {
+        ...plain,
+        contactUnlocked: isUnlocked,
+        maskedBuyerPhone: maskPhoneNumber(rawBuyerPhone),
+        buyerPhone: isUnlocked ? rawBuyerPhone : null,
+        waOrderUrl: isUnlocked ? formatWhatsAppUrl(rawBuyerPhone, `Hi ${plain.buyer ? plain.buyer.name : 'Client'}, regarding your order/hire request #${plain.id} for "${plain.product ? plain.product.title : 'items'}" on TopLineHub, confirming site delivery details.`) : null,
+        unlockPrice: PRICING.UNLOCK_ORDER_CLIENT_CONTACT || 50.00
+      };
+    });
 
     // 4. Buyer Orders: Quote requests submitted by this user
     const myOrders = await OrderRequest.findAll({
@@ -140,6 +205,63 @@ exports.getDashboard = async (req, res) => {
       };
     }
 
+    // 6. Fetch Embedded Marketplace Data (For seamless internal hub browsing without leaving dashboard)
+    const [rawMaterials, rawRentals, rawFundis, rawJobs, categories] = await Promise.all([
+      Product.findAll({
+        where: { is_rental: false, is_active: true },
+        include: [{ model: Category, as: 'category' }, { model: User, as: 'seller', attributes: ['name', 'phone'] }],
+        limit: 12,
+        order: [['created_at', 'DESC']]
+      }),
+      Product.findAll({
+        where: { is_rental: true, is_active: true },
+        include: [{ model: Category, as: 'category' }, { model: User, as: 'seller', attributes: ['name', 'phone'] }],
+        limit: 12,
+        order: [['created_at', 'DESC']]
+      }),
+      ArtisanProfile.findAll({
+        where: { is_available: true },
+        include: [{ model: User, as: 'user' }],
+        limit: 12,
+        order: [['rating', 'DESC']]
+      }),
+      JobPost.findAll({
+        where: { status: 'open' },
+        include: [{ model: User, as: 'client', attributes: ['name', 'phone'] }],
+        limit: 12,
+        order: [['created_at', 'DESC']]
+      }),
+      Category.findAll({ order: [['name', 'ASC']] })
+    ]);
+
+    const marketplaceMaterials = rawMaterials.map(item => ({
+      ...item.get({ plain: true }),
+      contactUnlocked: unlockedProductIds.has(item.id),
+      maskedPhone: item.seller ? maskPhoneNumber(item.seller.phone) : '🔒 Protected',
+      unlockPrice: PRICING.UNLOCK_MATERIAL_SUPPLIER_CONTACT
+    }));
+
+    const marketplaceRentals = rawRentals.map(item => ({
+      ...item.get({ plain: true }),
+      contactUnlocked: unlockedProductIds.has(item.id),
+      maskedPhone: item.seller ? maskPhoneNumber(item.seller.phone) : '🔒 Protected',
+      unlockPrice: PRICING.UNLOCK_MATERIAL_SUPPLIER_CONTACT
+    }));
+
+    const marketplaceFundis = rawFundis.map(item => ({
+      ...item.get({ plain: true }),
+      contactUnlocked: unlockedArtisanIds.has(item.id),
+      maskedPhone: item.user ? maskPhoneNumber(item.user.phone) : '🔒 Protected',
+      unlockPrice: PRICING.UNLOCK_ARTISAN_CONTACT
+    }));
+
+    const marketplaceJobs = rawJobs.map(item => ({
+      ...item.get({ plain: true }),
+      contactUnlocked: unlockedJobIds.has(item.id),
+      maskedPhone: item.client ? maskPhoneNumber(item.client.phone) : '🔒 Protected',
+      unlockPrice: PRICING.UNLOCK_JOB_CLIENT_CONTACT
+    }));
+
     // Determine Active Tab
     const defaultTab = currentUser.role === 'admin'
       ? 'admin'
@@ -147,19 +269,28 @@ exports.getDashboard = async (req, res) => {
       ? 'artisan'
       : currentUser.role === 'seller'
       ? 'supplier'
-      : (postedJobs.length > 0 ? 'client' : (myOrders.length > 0 ? 'orders' : 'client'));
+      : (postedJobs.length > 0 ? 'client' : (myOrders.length > 0 ? 'orders' : 'overview'));
 
     const activeTab = req.query.tab || defaultTab;
 
     res.render('pages/dashboard', {
-      title: 'Unified User Dashboard',
+      layout: 'layouts/dashboard',
+      title: 'Workstation & Marketplace Hub',
       currentUser,
+      userWallet,
+      transactions,
       postedJobs,
-      myApplications,
+      myApplications: myApplicationsWithUnlock,
       myProducts,
-      incomingInquiries,
+      incomingInquiries: incomingInquiriesWithUnlock,
       myOrders,
       adminData,
+      marketplaceMaterials,
+      marketplaceRentals,
+      marketplaceFundis,
+      marketplaceJobs,
+      categories,
+      pricing: PRICING,
       activeTab
     });
   } catch (err) {

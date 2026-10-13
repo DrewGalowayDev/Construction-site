@@ -134,52 +134,115 @@
                     </div>
 
                     <% if (order.payment_status !== 'paid') { %>
-                        <!-- Lipa na M-Pesa Express Box -->
-                        <div class="border rounded p-4 mb-3" style="background-color: #f7faf8; border-color: #25D366 !important;">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge" style="background-color: #0b9e43; color: #fff; font-size: 0.9rem; padding: 6px 12px;">
-                                        <i class="fa fa-mobile-alt me-1"></i>Lipa na M-PESA
-                                    </span>
+                        <!-- Payment Options Switcher -->
+                        <ul class="nav nav-pills nav-fill mb-3 p-1 bg-light rounded" id="paymentMethodTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold btn-sm py-2" id="tab-paystack-btn" data-bs-toggle="pill" data-bs-target="#tab-paystack" type="button">
+                                    <i class="fa fa-credit-card me-1 text-primary"></i>Paystack (Card / M-Pesa)
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold btn-sm py-2" id="tab-mpesa-btn" data-bs-toggle="pill" data-bs-target="#tab-mpesa" type="button">
+                                    <i class="fa fa-mobile-alt me-1 text-success"></i>Direct M-Pesa STK
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="paymentMethodContent">
+                            <!-- TAB 1: PAYSTACK GATEWAY (Primary) -->
+                            <div class="tab-pane fade show active" id="tab-paystack" role="tabpanel">
+                                <div class="border rounded p-4 mb-3" style="background-color: #f8fafc; border-color: #0ba4db !important;">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge" style="background: linear-gradient(135deg, #0ba4db, #0883af); color: #fff; font-size: 0.9rem; padding: 6px 12px;">
+                                                <i class="fa fa-shield-alt me-1"></i>Paystack Gateway
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-light text-dark border">Currency: KES</span>
+                                    </div>
+
+                                    <p class="small text-muted mb-3">
+                                        Pay securely using <strong>M-Pesa, Debit/Credit Card (Visa, Mastercard), Bank Transfer, or Apple Pay</strong>. Funds land in the TopLineHub platform merchant account.
+                                    </p>
+
+                                    <div class="p-2 mb-3 bg-white rounded border d-flex justify-content-around text-center small text-muted">
+                                        <div><i class="fab fa-cc-visa fa-2x text-primary d-block mb-1"></i>Visa</div>
+                                        <div><i class="fab fa-cc-mastercard fa-2x text-danger d-block mb-1"></i>Mastercard</div>
+                                        <div><i class="fa fa-mobile-alt fa-2x text-success d-block mb-1"></i>M-Pesa</div>
+                                        <div><i class="fa fa-university fa-2x text-secondary d-block mb-1"></i>Bank</div>
+                                    </div>
+
+                                    <form action="/orders/<%= order.id %>/paystack/initialize" method="POST">
+                                        <button type="submit" class="btn w-100 py-3 fw-bold text-white shadow-sm" style="background: linear-gradient(135deg, #0ba4db, #0883af);">
+                                            <i class="fa fa-lock me-2"></i>Pay KES <%= Math.round(grandTotal).toLocaleString() %> via Paystack
+                                        </button>
+                                    </form>
+
+                                    <div class="text-center mt-2 small text-muted" style="font-size: 0.72rem;">
+                                        <i class="fa fa-lock text-success me-1"></i>PCI-DSS Level 1 Certified • 256-Bit Bank Grade Encryption
+                                    </div>
                                 </div>
-                                <span class="badge bg-dark">Paybill: 522522</span>
                             </div>
 
-                            <p class="small text-muted mb-3">
-                                Enter your Safaricom mobile number. You will receive an instant <strong>STK PIN prompt</strong> on your handset to authorize payment.
-                            </p>
-
-                            <form id="mpesaForm" onsubmit="triggerMpesaStk(event)">
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold text-dark">Safaricom M-Pesa Phone Number *</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white fw-bold text-muted">+254</span>
-                                        <input type="tel" id="mpesa_phone_input" class="form-control" placeholder="712345678" value="<%= (order.contact_phone || '').replace(/^(\+?254|0)/, '') %>" required>
+                            <!-- TAB 2: DIRECT M-PESA STK PUSH -->
+                            <div class="tab-pane fade" id="tab-mpesa" role="tabpanel">
+                                <div class="border rounded p-4 mb-3" style="background-color: #f7faf8; border-color: #25D366 !important;">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge" style="background-color: #0b9e43; color: #fff; font-size: 0.9rem; padding: 6px 12px;">
+                                                <i class="fa fa-mobile-alt me-1"></i>Lipa na M-PESA
+                                            </span>
+                                        </div>
+                                        <span class="badge bg-dark">Paybill: 522522</span>
                                     </div>
-                                    <small class="text-muted">Format: 7XX XXX XXX or 1XX XXX XXX</small>
-                                </div>
 
-                                <button type="submit" id="mpesaSubmitBtn" class="btn w-100 py-3 fw-bold text-white shadow-sm" style="background-color: #0b9e43;">
-                                    <i class="fa fa-paper-plane me-2"></i>Send STK Push Prompt (Ksh <%= Math.round(grandTotal).toLocaleString() %>)
-                                </button>
-                            </form>
+                                    <p class="small text-muted mb-3">
+                                        Enter your Safaricom mobile number. You will receive an instant <strong>STK PIN prompt</strong> on your handset to authorize payment.
+                                    </p>
 
-                            <!-- STK Processing Status Card (hidden initially) -->
-                            <div id="stkProcessingBox" class="mt-3 p-3 bg-white border rounded text-center d-none">
-                                <div class="spinner-border text-success mb-2" role="status" style="width: 2.2rem; height: 2.2rem;"></div>
-                                <h6 class="fw-bold text-dark mb-1" id="stkStatusTitle">Prompting Safaricom Daraja...</h6>
-                                <p class="small text-muted mb-2" id="stkStatusMsg">Please check your phone screen and enter your M-Pesa PIN.</p>
-                                <div class="progress" style="height: 6px;">
-                                    <div id="stkProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 25%"></div>
+                                    <form id="mpesaForm" onsubmit="triggerMpesaStk(event)">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-dark">Safaricom M-Pesa Phone Number *</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white fw-bold text-muted">+254</span>
+                                                <input type="tel" id="mpesa_phone_input" class="form-control" placeholder="712345678" value="<%= (order.contact_phone || '').replace(/^(\+?254|0)/, '') %>" required>
+                                            </div>
+                                            <small class="text-muted">Format: 7XX XXX XXX or 1XX XXX XXX</small>
+                                        </div>
+
+                                        <button type="submit" id="mpesaSubmitBtn" class="btn w-100 py-3 fw-bold text-white shadow-sm" style="background-color: #0b9e43;">
+                                            <i class="fa fa-paper-plane me-2"></i>Send STK Push Prompt (Ksh <%= Math.round(grandTotal).toLocaleString() %>)
+                                        </button>
+                                    </form>
+
+                                    <!-- STK Processing Status Card (hidden initially) -->
+                                    <div id="stkProcessingBox" class="mt-3 p-3 bg-white border rounded text-center d-none">
+                                        <div class="spinner-border text-success mb-2" role="status" style="width: 2.2rem; height: 2.2rem;"></div>
+                                        <h6 class="fw-bold text-dark mb-1" id="stkStatusTitle">Prompting Safaricom Daraja...</h6>
+                                        <p class="small text-muted mb-2" id="stkStatusMsg">Please check your phone screen and enter your M-Pesa PIN.</p>
+                                        <div class="progress" style="height: 6px;">
+                                            <div id="stkProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 25%"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     <% } else { %>
                         <!-- Paid Receipt Badge -->
                         <div class="p-3 bg-light rounded text-center mb-3">
-                            <span class="badge bg-success mb-2 px-3 py-2"><i class="fa fa-check me-1"></i>M-Pesa Receipt: <%= order.mpesa_receipt %></span>
-                            <div class="small text-muted">Phone: +<%= order.mpesa_phone %></div>
+                            <span class="badge bg-success mb-2 px-3 py-2">
+                                <i class="fa fa-check-circle me-1"></i>Payment Confirmed via <%= (order.payment_method || 'paystack').toUpperCase() %>
+                            </span>
+                            <% if (order.paystack_reference) { %>
+                                <div class="small text-dark fw-bold">Paystack Ref: <%= order.paystack_reference %></div>
+                            <% } %>
+                            <% if (order.mpesa_receipt) { %>
+                                <div class="small text-dark fw-bold">Receipt: <%= order.mpesa_receipt %></div>
+                            <% } %>
                             <div class="small text-muted">Paid at: <%= new Date(order.paid_at || order.updatedAt).toLocaleString() %></div>
+                            <div class="alert alert-info py-2 px-3 small mt-2 mb-0">
+                                <i class="fa fa-shield-alt text-info me-1"></i>Funds are secured in platform escrow until material delivery and offloading on site.
+                            </div>
                         </div>
                     <% } %>
 

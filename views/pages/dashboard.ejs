@@ -1,360 +1,156 @@
-<!-- Page Header Start -->
-<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
-    <div class="container text-center py-5">
-        <h1 class="display-4 text-white animated slideInDown mb-3">User Activity Dashboard</h1>
-        <nav aria-label="breadcrumb animated slideInDown">
-            <ol class="breadcrumb justify-content-center mb-0">
-                <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
-                <li class="breadcrumb-item text-primary active" aria-current="page">Dashboard</li>
-            </ol>
-        </nav>
+<!-- Top Workspace Status Bar -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <span>Workstation & Marketplace</span>
+            <span class="badge bg-warning text-dark text-uppercase" style="font-size: 0.7rem;"><%= currentUser.role %> portal</span>
+        </h4>
+        <div class="text-muted small">
+            <i class="fa fa-user me-1 text-primary"></i>Logged in as <strong><%= currentUser.name %></strong> &bull;
+            <i class="fa fa-map-marker-alt ms-2 me-1 text-primary"></i><%= currentUser.town %>, <%= currentUser.county %>
+        </div>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-warning text-dark fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#mpesaTopupModal">
+            <i class="fa fa-bolt me-1"></i>Top Up Credits
+        </button>
+        <a href="/jobs/post" class="btn btn-sm btn-outline-dark fw-bold">
+            <i class="fa fa-plus me-1"></i>Post Job
+        </a>
+        <a href="/materials/post" class="btn btn-sm btn-primary text-white fw-bold">
+            <i class="fa fa-plus me-1"></i>List Material/Plant
+        </a>
     </div>
 </div>
-<!-- Page Header End -->
 
-<div class="container-xxl py-4">
-    <div class="container">
-        <!-- Top Profile Banner -->
-        <div class="card card-custom border-0 shadow-sm bg-white p-4 mb-4">
-            <div class="row align-items-center g-3">
-                <div class="col-md-auto text-center">
-                    <div class="position-relative d-inline-block">
-                        <img src="<%= currentUser.avatar || '/img/team-1.jpg' %>" alt="<%= currentUser.name %>" class="rounded-circle border border-3 border-primary" style="width: 85px; height: 85px; object-fit: cover;">
-                        <span class="position-absolute bottom-0 end-0 badge rounded-pill bg-success p-1" title="Active">
-                            <i class="fa fa-check text-white" style="font-size: 10px;"></i>
-                        </span>
-                    </div>
+<!-- ========================================== -->
+<!-- TAB 1: OVERVIEW & REAL-TIME SUMMARY -->
+<!-- ========================================== -->
+<% if (activeTab === 'overview') { %>
+    <!-- Stat Widgets -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-widget">
+                <div class="stat-icon-wrap bg-warning bg-opacity-10 text-warning">
+                    <i class="fa fa-wallet"></i>
                 </div>
-                <div class="col-md">
-                    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                        <h4 class="mb-0 fw-bold text-dark"><%= currentUser.name %></h4>
-                        <span class="badge bg-primary text-uppercase px-2 py-1"><%= currentUser.role %></span>
-                        <% if (currentUser.is_verified) { %>
-                            <span class="badge bg-success"><i class="fa fa-shield-alt me-1"></i>Verified Member</span>
-                        <% } %>
-                    </div>
-                    <div class="text-muted small d-flex flex-wrap gap-3">
-                        <span><i class="fa fa-phone text-primary me-1"></i><%= currentUser.phone %></span>
-                        <span><i class="fa fa-envelope text-primary me-1"></i><%= currentUser.email %></span>
-                        <span><i class="fa fa-map-marker-alt text-primary me-1"></i><%= currentUser.town %>, <%= currentUser.county %></span>
-                    </div>
-                </div>
-                <div class="col-md-auto text-md-end">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="/jobs/post" class="btn btn-outline-primary btn-sm"><i class="fa fa-tools me-1"></i>Post Job</a>
-                        <a href="/materials/post" class="btn btn-primary btn-sm text-white"><i class="fa fa-plus-circle me-1"></i>List Material</a>
-                    </div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">Wallet Balance</div>
+                    <div class="fs-4 fw-bold text-dark">KES <%= userWallet ? Number(userWallet.balance).toLocaleString() : '100' %></div>
+                    <a href="/dashboard?tab=wallet" class="small text-warning fw-bold text-decoration-none">View ledger &rarr;</a>
                 </div>
             </div>
         </div>
-
-        <!-- Quick Metrics Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm bg-light p-3 text-center">
-                    <div class="text-primary fs-3 fw-bold"><%= postedJobs.length %></div>
-                    <div class="text-muted small">Posted Projects</div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-widget">
+                <div class="stat-icon-wrap bg-primary bg-opacity-10 text-primary">
+                    <i class="fa fa-hard-hat"></i>
                 </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm bg-light p-3 text-center">
-                    <div class="text-primary fs-3 fw-bold"><%= myApplications.length %></div>
-                    <div class="text-muted small">Submitted Bids</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm bg-light p-3 text-center">
-                    <div class="text-primary fs-3 fw-bold"><%= myProducts.length %></div>
-                    <div class="text-muted small">Listed Inventory</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm bg-light p-3 text-center">
-                    <div class="text-primary fs-3 fw-bold"><%= incomingInquiries.length + myOrders.length %></div>
-                    <div class="text-muted small">Supply Orders</div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">My Active Bids</div>
+                    <div class="fs-4 fw-bold text-dark"><%= myApplications.length %></div>
+                    <a href="/dashboard?tab=artisan" class="small text-primary fw-bold text-decoration-none">Manage proposals &rarr;</a>
                 </div>
             </div>
         </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-widget">
+                <div class="stat-icon-wrap bg-success bg-opacity-10 text-success">
+                    <i class="fa fa-boxes"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">Listed Inventory</div>
+                    <div class="fs-4 fw-bold text-dark"><%= myProducts.length %></div>
+                    <a href="/dashboard?tab=supplier" class="small text-success fw-bold text-decoration-none">View materials & fleet &rarr;</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-widget">
+                <div class="stat-icon-wrap bg-info bg-opacity-10 text-info">
+                    <i class="fa fa-clipboard-check"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">Hire Enquiries & Orders</div>
+                    <div class="fs-4 fw-bold text-dark"><%= incomingInquiries.length + myOrders.length %></div>
+                    <a href="/dashboard?tab=orders" class="small text-info fw-bold text-decoration-none">Review client requests &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <!-- Navigation Tabs -->
-        <ul class="nav nav-pills mb-4 nav-fill p-2 bg-light rounded shadow-sm gap-2" id="dashboardTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <a class="nav-link fw-bold <%= activeTab === 'client' ? 'active' : '' %>" href="/dashboard?tab=client">
-                    <i class="fa fa-briefcase me-2"></i>My Projects & Bids
-                    <span class="badge bg-secondary ms-1"><%= postedJobs.length %></span>
+    <!-- Monetization Banner -->
+    <div class="dash-card border-warning border-opacity-25 bg-warning bg-opacity-10 p-3 mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="fs-2 text-warning"><i class="fa fa-shield-alt"></i></div>
+                <div>
+                    <h6 class="fw-bold text-dark mb-1">Direct Contact Gating & Platform Monetization Active</h6>
+                    <p class="small text-muted mb-0">Clients' phone numbers and WhatsApp buttons are automatically protected. Job seekers and equipment renters pay platform charges via wallet to reveal contact details and close deals.</p>
+                </div>
+            </div>
+            <div>
+                <a href="/dashboard?tab=wallet" class="btn btn-sm btn-warning text-dark fw-bold">
+                    <i class="fa fa-coins me-1"></i>Wallet & Pricing Details
                 </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link fw-bold <%= activeTab === 'artisan' ? 'active' : '' %>" href="/dashboard?tab=artisan">
-                    <i class="fa fa-hard-hat me-2"></i>Artisan Bids
-                    <span class="badge bg-secondary ms-1"><%= myApplications.length %></span>
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link fw-bold <%= activeTab === 'supplier' ? 'active' : '' %>" href="/dashboard?tab=supplier">
-                    <i class="fa fa-boxes me-2"></i>My Materials & Plant
-                    <span class="badge bg-secondary ms-1"><%= myProducts.length %></span>
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link fw-bold <%= activeTab === 'orders' ? 'active' : '' %>" href="/dashboard?tab=orders">
-                    <i class="fa fa-shopping-cart me-2"></i>Quotes & Orders
-                    <span class="badge bg-secondary ms-1"><%= incomingInquiries.length + myOrders.length %></span>
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link fw-bold <%= activeTab === 'profile' ? 'active' : '' %>" href="/dashboard?tab=profile">
-                    <i class="fa fa-user-cog me-2"></i>Profile Settings
-                </a>
-            </li>
-            <% if (currentUser.role === 'admin') { %>
-                <li class="nav-item" role="presentation">
-                    <a class="nav-link fw-bold <%= activeTab === 'admin' ? 'active' : '' %>" href="/dashboard?tab=admin">
-                        <i class="fa fa-crown text-warning me-2"></i>Admin Console
-                        <span class="badge bg-danger ms-1">Operations</span>
-                    </a>
-                </li>
-            <% } %>
-        </ul>
+            </div>
+        </div>
+    </div>
 
-        <!-- Tab Contents -->
-        <div class="tab-content" id="dashboardTabContent">
-
-            <!-- TAB 1: CLIENT POSTED PROJECTS & BIDS -->
-            <% if (activeTab === 'client') { %>
-                <div class="tab-pane fade show active">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="fw-bold mb-0 text-dark">Posted Construction Projects</h4>
-                        <a href="/jobs/post" class="btn btn-primary btn-sm text-white"><i class="fa fa-plus me-1"></i>Publish New Job</a>
-                    </div>
-
-                    <% if (postedJobs.length === 0) { %>
-                        <div class="card p-5 text-center bg-white shadow-sm border-0">
-                            <i class="fa fa-clipboard-list fa-3x text-secondary mb-3"></i>
-                            <h5 class="text-dark">No Construction Projects Posted Yet</h5>
-                            <p class="text-muted">Need fundis, masonry teams, plumbers, or site electricians? Post your job details to start receiving bids.</p>
-                            <div>
-                                <a href="/jobs/post" class="btn btn-primary text-white"><i class="fa fa-tools me-1"></i>Post a Construction Project</a>
-                            </div>
+    <!-- Overview Content Split -->
+    <div class="row g-4">
+        <!-- Left: Recent Submitted Bids -->
+        <div class="col-lg-6">
+            <div class="dash-card h-100">
+                <div class="dash-card-header">
+                    <h6 class="dash-card-title"><i class="fa fa-paper-plane text-primary"></i>My Recent Bids & Proposals</h6>
+                    <a href="/dashboard?tab=artisan" class="btn btn-sm btn-outline-primary">View All (<%= myApplications.length %>)</a>
+                </div>
+                <div class="dash-card-body p-0">
+                    <% if (myApplications.length === 0) { %>
+                        <div class="p-4 text-center text-muted">
+                            <i class="fa fa-hammer fa-2x mb-2 text-secondary opacity-50"></i>
+                            <p class="small mb-2">You haven't submitted any bids on construction jobs yet.</p>
+                            <a href="/dashboard?tab=marketplace" class="btn btn-sm btn-primary text-white">Find Construction Jobs</a>
                         </div>
                     <% } else { %>
-                        <div class="row g-4">
-                            <% postedJobs.forEach(job => { %>
-                                <div class="col-12">
-                                    <div class="card border-0 shadow-sm bg-white mb-3">
-                                        <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
-                                            <div>
-                                                <span class="badge bg-primary text-uppercase me-2"><%= job.trade_required %></span>
-                                                <span class="badge <%= job.status === 'open' ? 'bg-success' : (job.status === 'in_progress' ? 'bg-warning text-dark' : 'bg-secondary') %> text-uppercase">
-                                                    <%= job.status.replace('_', ' ') %>
+                        <div class="list-group list-group-flush">
+                            <% myApplications.slice(0, 4).forEach(app => { %>
+                                <div class="list-group-item p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="fw-bold text-dark mb-0"><%= app.job ? app.job.title : 'Project' %></h6>
+                                        <span class="badge <%= app.status === 'accepted' ? 'bg-success' : (app.status === 'shortlisted' ? 'bg-warning text-dark' : 'bg-secondary') %> text-uppercase" style="font-size: 0.65rem;">
+                                            <%= app.status %>
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mb-2">
+                                        Your Bid: <strong class="text-primary">Ksh <%= Number(app.bid_amount).toLocaleString() %></strong> &bull;
+                                        Location: <%= app.job ? app.job.location_county : 'Kenya' %>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <% if (app.contactUnlocked) { %>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                                    <i class="fa fa-unlock me-1"></i>Client: <%= app.clientPhone %>
                                                 </span>
-                                                <h5 class="fw-bold mb-0 mt-2 text-dark"><%= job.title %></h5>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <form action="/jobs/<%= job.id %>/status" method="POST" class="d-inline-flex align-items-center gap-1">
-                                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                                        <option value="open" <%= job.status === 'open' ? 'selected' : '' %>>Open for Bids</option>
-                                                        <option value="in_progress" <%= job.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
-                                                        <option value="completed" <%= job.status === 'completed' ? 'selected' : '' %>>Completed</option>
-                                                        <option value="cancelled" <%= job.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                                    </select>
-                                                </form>
-                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editJobModal<%= job.id %>" title="Edit Project">
-                                                    <i class="fa fa-pencil-alt me-1"></i>Edit
-                                                </button>
-                                                <form action="/jobs/<%= job.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Permanently remove project \'<%= job.title %>\' and its bids?')">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Project">
-                                                        <i class="fa fa-trash"></i>
+                                            <% } else { %>
+                                                <span class="badge bg-light text-muted border">
+                                                    <i class="fa fa-lock text-warning me-1"></i>Client: <%= app.maskedClientPhone %>
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                        <div>
+                                            <% if (app.contactUnlocked) { %>
+                                                <a href="<%= app.waUrl %>" target="_blank" class="btn btn-whatsapp btn-sm py-1 px-2" style="font-size: 0.75rem;">
+                                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                                </a>
+                                            <% } else { %>
+                                                <form action="/unlock/job/<%= app.job_id %>" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-unlock-gold btn-sm py-1 px-2" style="font-size: 0.75rem;">
+                                                        <i class="fa fa-lock me-1"></i>Unlock (Ksh <%= app.unlockPrice %>)
                                                     </button>
                                                 </form>
-                                            </div>
-                                        </div>
-
-                                        <!-- Edit Job Modal -->
-                                        <div class="modal fade" id="editJobModal<%= job.id %>" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                <div class="modal-content border-0 shadow">
-                                                    <div class="modal-header bg-dark text-white">
-                                                        <h5 class="modal-title text-white"><i class="fa fa-pencil-alt text-primary me-2"></i>Edit Construction Project</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <form action="/jobs/<%= job.id %>/edit" method="POST">
-                                                        <div class="modal-body p-4">
-                                                            <div class="row g-3">
-                                                                <div class="col-12">
-                                                                    <label class="form-label small fw-bold text-dark">Project Title *</label>
-                                                                    <input type="text" name="title" class="form-control" value="<%= job.title %>" required>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <label class="form-label small fw-bold text-dark">Trade Required *</label>
-                                                                    <input type="text" name="trade_required" class="form-control" value="<%= job.trade_required %>" required>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <label class="form-label small fw-bold text-dark">Estimated Budget (Ksh) *</label>
-                                                                    <input type="number" name="budget_estimate" class="form-control" value="<%= job.budget_estimate %>" required>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label class="form-label small fw-bold text-dark">County *</label>
-                                                                    <select name="location_county" class="form-select" required>
-                                                                        <% counties.forEach(c => { %>
-                                                                            <option value="<%= c %>" <%= job.location_county === c ? 'selected' : '' %>><%= c %></option>
-                                                                        <% }) %>
-                                                                    </select>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label class="form-label small fw-bold text-dark">Town / Area *</label>
-                                                                    <input type="text" name="location_town" class="form-control" value="<%= job.location_town %>" required>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label class="form-label small fw-bold text-dark">Expected Duration</label>
-                                                                    <input type="text" name="duration" class="form-control" value="<%= job.duration %>">
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <label class="form-label small fw-bold text-dark">Project Scope & Specifications *</label>
-                                                                    <textarea name="description" class="form-control" rows="4" required><%= job.description %></textarea>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer bg-light">
-                                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                                            <button type="submit" class="btn btn-primary btn-sm text-white fw-bold"><i class="fa fa-save me-1"></i>Save Project Changes</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row mb-3">
-                                                <div class="col-md-8">
-                                                    <p class="text-muted mb-2"><%= job.description %></p>
-                                                    <div class="small text-secondary">
-                                                        <i class="fa fa-map-marker-alt text-primary me-1"></i><%= job.location_town %>, <%= job.location_county %>
-                                                        <span class="mx-2">•</span>
-                                                        <i class="fa fa-clock text-primary me-1"></i>Duration: <%= job.duration %>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 text-md-end">
-                                                    <div class="small text-muted">Estimated Budget</div>
-                                                    <div class="fs-4 fw-bold text-primary">Ksh <%= Number(job.budget_estimate).toLocaleString() %></div>
-                                                    <small class="text-muted">Posted <%= new Date(job.created_at).toLocaleDateString() %></small>
-                                                </div>
-                                            </div>
-
-                                            <!-- Phase 2: Received Proposals Review Section -->
-                                            <div class="border-top pt-3 mt-3">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <h6 class="fw-bold mb-0 text-dark">
-                                                        <i class="fa fa-users text-primary me-2"></i>Received Artisan Proposals (<%= job.applications ? job.applications.length : 0 %>)
-                                                    </h6>
-                                                </div>
-
-                                                <% if (!job.applications || job.applications.length === 0) { %>
-                                                    <div class="p-3 bg-light rounded text-center small text-muted">
-                                                        <i class="fa fa-hourglass-half me-1 text-primary"></i>No artisan proposals submitted yet. Qualified tradesmen in <%= job.location_county %> are being notified.
-                                                    </div>
-                                                <% } else { %>
-                                                    <div class="table-responsive">
-                                                        <table class="table table-hover align-middle mb-0 bg-white">
-                                                            <thead class="table-light small">
-                                                                <tr>
-                                                                    <th>Artisan / Contractor</th>
-                                                                    <th>Proposed Bid</th>
-                                                                    <th>Proposal Pitch</th>
-                                                                    <th>Status</th>
-                                                                    <th class="text-end">Actions & Connect</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <% job.applications.forEach(app => { %>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <div class="d-flex align-items-center">
-                                                                                <img src="<%= app.artisan && app.artisan.avatar ? app.artisan.avatar : '/img/team-1.jpg' %>" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;" alt="Artisan">
-                                                                                <div>
-                                                                                    <div class="fw-bold text-dark"><%= app.artisan ? app.artisan.name : 'Registered Artisan' %></div>
-                                                                                    <small class="text-muted">
-                                                                                        <%= app.artisan && app.artisan.artisanProfile ? app.artisan.artisanProfile.trade : 'Craftsman' %>
-                                                                                        <% if (app.artisan && app.artisan.artisanProfile && app.artisan.artisanProfile.nca_reg_number) { %>
-                                                                                            <span class="badge bg-dark ms-1">NCA</span>
-                                                                                        <% } %>
-                                                                                    </small>
-                                                                                </div>
-                                                                            </div>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span class="fw-bold text-primary">Ksh <%= Number(app.bid_amount).toLocaleString() %></span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p class="small text-muted mb-0" style="max-width: 280px;"><%= app.pitch_message %></p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <% if (app.status === 'accepted') { %>
-                                                                                <span class="badge bg-success"><i class="fa fa-check me-1"></i>Accepted</span>
-                                                                            <% } else if (app.status === 'shortlisted') { %>
-                                                                                <span class="badge bg-info text-dark"><i class="fa fa-star me-1"></i>Shortlisted</span>
-                                                                            <% } else if (app.status === 'rejected') { %>
-                                                                                <span class="badge bg-danger">Declined</span>
-                                                                            <% } else { %>
-                                                                                <span class="badge bg-secondary">Pending</span>
-                                                                            <% } %>
-                                                                        </td>
-                                                                        <td class="text-end">
-                                                                            <div class="d-inline-flex gap-1 align-items-center">
-                                                                                <!-- WhatsApp Button -->
-                                                                                <% 
-                                                                                    const artisanPhone = app.artisan ? app.artisan.phone.replace(/[^0-9]/g, '') : '254711000000';
-                                                                                    const waUrl = 'https://wa.me/' + (artisanPhone.startsWith('0') ? '254' + artisanPhone.slice(1) : artisanPhone) + '?text=' + encodeURIComponent('Hi ' + (app.artisan ? app.artisan.name : 'Fundi') + ', regarding your bid of Ksh ' + Number(app.bid_amount).toLocaleString() + ' on "' + job.title + '" on TopLineHub, let us discuss next steps.');
-                                                                                %>
-                                                                                <a href="<%= waUrl %>" target="_blank" class="btn btn-whatsapp btn-sm" title="Chat on WhatsApp">
-                                                                                    <i class="fab fa-whatsapp"></i>
-                                                                                </a>
-                                                                                <% if (app.artisan && app.artisan.phone) { %>
-                                                                                    <a href="tel:<%= app.artisan.phone %>" class="btn btn-outline-secondary btn-sm" title="Call">
-                                                                                        <i class="fa fa-phone"></i>
-                                                                                    </a>
-                                                                                <% } %>
-
-                                                                                <!-- Status Workflow dropdown -->
-                                                                                <div class="dropdown">
-                                                                                    <button class="btn btn-sm btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                                                        Update
-                                                                                    </button>
-                                                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                                                        <li>
-                                                                                            <form action="/jobs/<%= job.id %>/bids/<%= app.id %>/status" method="POST">
-                                                                                                <input type="hidden" name="status" value="shortlisted">
-                                                                                                <button type="submit" class="dropdown-item text-primary"><i class="fa fa-star me-2"></i>Shortlist Bid</button>
-                                                                                            </form>
-                                                                                        </li>
-                                                                                        <li>
-                                                                                            <form action="/jobs/<%= job.id %>/bids/<%= app.id %>/status" method="POST">
-                                                                                                <input type="hidden" name="status" value="accepted">
-                                                                                                <button type="submit" class="dropdown-item text-success"><i class="fa fa-check-circle me-2"></i>Accept & Award</button>
-                                                                                            </form>
-                                                                                        </li>
-                                                                                        <li>
-                                                                                            <form action="/jobs/<%= job.id %>/bids/<%= app.id %>/status" method="POST">
-                                                                                                <input type="hidden" name="status" value="rejected">
-                                                                                                <button type="submit" class="dropdown-item text-danger"><i class="fa fa-times-circle me-2"></i>Decline Proposal</button>
-                                                                                            </form>
-                                                                                        </li>
-                                                                                        <li>
-                                                                                            <form action="/jobs/<%= job.id %>/bids/<%= app.id %>/status" method="POST">
-                                                                                                <input type="hidden" name="status" value="pending">
-                                                                                                <button type="submit" class="dropdown-item text-secondary"><i class="fa fa-undo me-2"></i>Set Pending</button>
-                                                                                            </form>
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                <% }) %>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                <% } %>
-                                            </div>
+                                            <% } %>
                                         </div>
                                     </div>
                                 </div>
@@ -362,803 +158,990 @@
                         </div>
                     <% } %>
                 </div>
-            <% } %>
+            </div>
+        </div>
 
-            <!-- TAB 2: ARTISAN SUBMITTED BIDS -->
-            <% if (activeTab === 'artisan') { %>
-                <div class="tab-pane fade show active">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="fw-bold mb-0 text-dark">My Submitted Project Proposals</h4>
-                        <a href="/jobs" class="btn btn-primary btn-sm text-white"><i class="fa fa-search me-1"></i>Find More Construction Gigs</a>
-                    </div>
-
-                    <% if (myApplications.length === 0) { %>
-                        <div class="card p-5 text-center bg-white shadow-sm border-0">
-                            <i class="fa fa-hard-hat fa-3x text-secondary mb-3"></i>
-                            <h5 class="text-dark">No Bids Submitted Yet</h5>
-                            <p class="text-muted">Browse open construction gigs across Kenya and pitch your trade skills directly to site owners.</p>
-                            <div>
-                                <a href="/jobs" class="btn btn-primary text-white"><i class="fa fa-briefcase me-1"></i>Browse Job Board</a>
-                            </div>
+        <!-- Right: Recent Incoming Enquiries & Hire Requests -->
+        <div class="col-lg-6">
+            <div class="dash-card h-100">
+                <div class="dash-card-header">
+                    <h6 class="dash-card-title"><i class="fa fa-truck-loading text-success"></i>Incoming Material Orders & Plant Hire</h6>
+                    <a href="/dashboard?tab=orders" class="btn btn-sm btn-outline-success">View All (<%= incomingInquiries.length %>)</a>
+                </div>
+                <div class="dash-card-body p-0">
+                    <% if (incomingInquiries.length === 0) { %>
+                        <div class="p-4 text-center text-muted">
+                            <i class="fa fa-dolly fa-2x mb-2 text-secondary opacity-50"></i>
+                            <p class="small mb-2">No incoming material orders or equipment hire inquiries yet.</p>
+                            <a href="/materials/post" class="btn btn-sm btn-success text-white">List Materials or Equipment</a>
                         </div>
                     <% } else { %>
-                        <div class="row g-3">
-                            <% myApplications.forEach(app => { %>
-                                <div class="col-12">
-                                    <div class="card border-0 shadow-sm bg-white p-4">
-                                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                                            <div>
-                                                <h5 class="fw-bold mb-1 text-dark"><%= app.job ? app.job.title : 'Project' %></h5>
-                                                <div class="small text-muted">
-                                                    <i class="fa fa-map-marker-alt text-primary me-1"></i>
-                                                    <%= app.job ? app.job.location_town + ', ' + app.job.location_county : 'Kenya' %>
-                                                    <span class="mx-2">•</span>
-                                                    Client: <strong><%= app.job && app.job.client ? app.job.client.name : 'Site Client' %></strong>
-                                                </div>
-                                            </div>
-                                            <div class="text-md-end">
-                                                <% if (app.status === 'accepted') { %>
-                                                    <span class="badge bg-success fs-6"><i class="fa fa-check-circle me-1"></i>Proposal Accepted</span>
-                                                <% } else if (app.status === 'shortlisted') { %>
-                                                    <span class="badge bg-info text-dark fs-6"><i class="fa fa-star me-1"></i>You are Shortlisted!</span>
-                                                <% } else if (app.status === 'rejected') { %>
-                                                    <span class="badge bg-danger fs-6">Declined</span>
-                                                <% } else { %>
-                                                    <span class="badge bg-secondary fs-6">Pending Review</span>
-                                                <% } %>
-                                            </div>
+                        <div class="list-group list-group-flush">
+                            <% incomingInquiries.slice(0, 4).forEach(order => { %>
+                                <div class="list-group-item p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="fw-bold text-dark mb-0"><%= order.product ? order.product.title : 'Supply Order' %></h6>
+                                        <span class="badge bg-secondary text-uppercase" style="font-size: 0.65rem;"><%= order.status %></span>
+                                    </div>
+                                    <div class="text-muted small mb-2">
+                                        <%= order.quantity %> units &bull; <strong class="text-success">Ksh <%= Number(order.total_price).toLocaleString() %></strong> &bull;
+                                        Buyer: <%= order.buyer ? order.buyer.name : 'Client' %>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <% if (order.contactUnlocked) { %>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                                    <i class="fa fa-phone me-1"></i><%= order.buyerPhone %>
+                                                </span>
+                                            <% } else { %>
+                                                <span class="badge bg-light text-muted border">
+                                                    <i class="fa fa-lock text-warning me-1"></i><%= order.maskedBuyerPhone %>
+                                                </span>
+                                            <% } %>
                                         </div>
-
-                                        <div class="p-3 bg-light rounded my-3">
-                                            <div class="row g-2 align-items-center">
-                                                <div class="col-sm-4">
-                                                    <small class="text-muted d-block">Your Proposed Bid</small>
-                                                    <span class="fw-bold fs-5 text-primary">Ksh <%= Number(app.bid_amount).toLocaleString() %></span>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <small class="text-muted d-block">Client's Estimated Budget</small>
-                                                    <span class="fw-bold text-dark">Ksh <%= app.job ? Number(app.job.budget_estimate).toLocaleString() : 'N/A' %></span>
-                                                </div>
-                                                <div class="col-sm-4 text-sm-end">
-                                                    <small class="text-muted d-block">Submitted On</small>
-                                                    <span><%= new Date(app.created_at).toLocaleDateString() %></span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <p class="small text-muted mb-3"><strong>Your Pitch:</strong> <%= app.pitch_message %></p>
-
-                                        <% if (app.status === 'pending') { %>
-                                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top flex-wrap gap-2">
-                                                <small class="text-muted"><i class="fa fa-info-circle me-1 text-primary"></i>You can modify or withdraw your proposal while it is pending client review.</small>
-                                                <div class="d-flex gap-2">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBidModal<%= app.id %>">
-                                                        <i class="fa fa-pencil-alt me-1"></i>Edit Bid
+                                        <div>
+                                            <% if (order.contactUnlocked) { %>
+                                                <a href="<%= order.waOrderUrl %>" target="_blank" class="btn btn-whatsapp btn-sm py-1 px-2" style="font-size: 0.75rem;">
+                                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp Client
+                                                </a>
+                                            <% } else { %>
+                                                <form action="/unlock/order/<%= order.id %>" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-unlock-gold btn-sm py-1 px-2" style="font-size: 0.75rem;" title="Pay platform commission charge to reveal client phone & WhatsApp">
+                                                        <i class="fa fa-coins me-1"></i>Unlock Contact (Ksh <%= order.unlockPrice %>)
                                                     </button>
-                                                    <form action="/bids/<%= app.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Withdraw your bid proposal for this project?')">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                            <i class="fa fa-trash me-1"></i>Withdraw
+                                                </form>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<!-- ========================================== -->
+<!-- TAB 2: JOB SEEKER & ARTISAN BIDS -->
+<!-- ========================================== -->
+<% if (activeTab === 'artisan') { %>
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <div>
+                <h5 class="dash-card-title"><i class="fa fa-hard-hat text-primary"></i>My Submitted Proposals & Site Bids</h5>
+                <small class="text-muted">Track your job applications. WhatsApp and client phone numbers are revealed when unlocked.</small>
+            </div>
+            <a href="/dashboard?tab=marketplace" class="btn btn-sm btn-primary text-white fw-bold">
+                <i class="fa fa-search me-1"></i>Find More Jobs
+            </a>
+        </div>
+        <div class="dash-card-body">
+            <% if (myApplications.length === 0) { %>
+                <div class="text-center py-5">
+                    <i class="fa fa-briefcase fa-3x text-muted mb-3 opacity-50"></i>
+                    <h5 class="text-dark">No Submitted Proposals</h5>
+                    <p class="text-muted small">You haven't applied for any site jobs yet. Browse open projects and submit your pitches.</p>
+                    <a href="/dashboard?tab=marketplace" class="btn btn-primary text-white">Browse Project Board</a>
+                </div>
+            <% } else { %>
+                <div class="row g-3">
+                    <% myApplications.forEach(app => { %>
+                        <div class="col-12">
+                            <div class="border rounded p-3 bg-white">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-7">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <span class="badge <%= app.status === 'accepted' ? 'bg-success' : (app.status === 'shortlisted' ? 'bg-warning text-dark' : (app.status === 'rejected' ? 'bg-danger' : 'bg-secondary')) %> text-uppercase">
+                                                Status: <%= app.status %>
+                                            </span>
+                                            <span class="badge bg-light text-dark border">
+                                                Trade: <%= app.job ? app.job.trade_required : 'Artisan' %>
+                                            </span>
+                                            <span class="text-muted small">
+                                                <i class="fa fa-calendar-alt me-1"></i><%= new Date(app.created_at).toLocaleDateString() %>
+                                            </span>
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-1"><%= app.job ? app.job.title : 'Project' %></h5>
+                                        <p class="text-muted small mb-2">"<%= app.pitch_message %>"</p>
+                                        <div class="small text-secondary">
+                                            <i class="fa fa-map-marker-alt text-primary me-1"></i><%= app.job ? app.job.location_town + ', ' + app.job.location_county : 'Kenya' %> &bull;
+                                            Client: <strong><%= app.job && app.job.client ? app.job.client.name : 'Site Client' %></strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-5 text-lg-end mt-3 mt-lg-0 border-start ps-lg-4">
+                                        <div class="mb-2">
+                                            <span class="text-muted small">Your Quoted Bid:</span>
+                                            <div class="fs-4 fw-bold text-primary">Ksh <%= Number(app.bid_amount).toLocaleString() %></div>
+                                            <small class="text-muted">Client Budget: Ksh <%= app.job ? Number(app.job.budget_estimate).toLocaleString() : '0' %></small>
+                                        </div>
+
+                                        <!-- CONTACT & WHATSAPP GATING -->
+                                        <div class="d-flex flex-wrap gap-2 justify-content-lg-end align-items-center mt-3">
+                                            <% if (app.contactUnlocked) { %>
+                                                <div class="alert alert-success d-flex align-items-center gap-2 py-1 px-3 mb-0 w-100 justify-content-lg-end">
+                                                    <i class="fa fa-check-circle text-success"></i>
+                                                    <span class="fw-bold small text-dark"><%= app.clientPhone %></span>
+                                                    <a href="tel:<%= app.clientPhone %>" class="btn btn-sm btn-dark py-1 px-2" title="Call Client">
+                                                        <i class="fa fa-phone me-1"></i>Call
+                                                    </a>
+                                                    <!-- WhatsApp button ONLY appears when unlocked! -->
+                                                    <a href="<%= app.waUrl %>" target="_blank" class="btn btn-sm btn-whatsapp py-1 px-2" title="Chat on WhatsApp">
+                                                        <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                                    </a>
+                                                </div>
+                                            <% } else { %>
+                                                <div class="d-flex flex-column align-items-lg-end gap-1 w-100">
+                                                    <div class="text-muted small">
+                                                        <i class="fa fa-lock text-warning me-1"></i>Client Phone: <strong><%= app.maskedClientPhone %></strong>
+                                                    </div>
+                                                    <form action="/unlock/job/<%= app.job_id %>" method="POST">
+                                                        <button type="submit" class="btn btn-unlock-gold btn-sm fw-bold shadow-sm" title="Pay Ksh <%= app.unlockPrice %> to reveal client phone & WhatsApp">
+                                                            <i class="fa fa-unlock-alt me-1"></i>Unlock WhatsApp & Phone (Ksh <%= app.unlockPrice %>)
                                                         </button>
                                                     </form>
                                                 </div>
-                                            </div>
-
-                                            <!-- Edit Bid Modal -->
-                                            <div class="modal fade" id="editBidModal<%= app.id %>" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content border-0 shadow">
-                                                        <div class="modal-header bg-dark text-white">
-                                                            <h5 class="modal-title text-white"><i class="fa fa-pencil-alt text-primary me-2"></i>Modify Proposal</h5>
-                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <form action="/bids/<%= app.id %>/edit" method="POST">
-                                                            <div class="modal-body p-4">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label small fw-bold text-dark">Proposed Bid Amount (Ksh) *</label>
-                                                                    <input type="number" name="bid_amount" class="form-control" value="<%= app.bid_amount %>" required>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label class="form-label small fw-bold text-dark">Your Pitch & Experience Notes *</label>
-                                                                    <textarea name="pitch_message" rows="4" class="form-control" required><%= app.pitch_message %></textarea>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer bg-light">
-                                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                                                <button type="submit" class="btn btn-primary btn-sm text-white fw-bold"><i class="fa fa-save me-1"></i>Update Proposal</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <% } %>
-
-                                        <% if (app.status === 'shortlisted' || app.status === 'accepted') { %>
-                                            <div class="alert alert-success d-flex align-items-center justify-content-between mb-0 py-2">
-                                                <div>
-                                                    <i class="fa fa-thumbs-up me-2"></i>Great news! The client is interested in your proposal.
-                                                </div>
-                                                <% if (app.job && app.job.client && app.job.client.phone) { %>
-                                                    <div class="d-flex gap-2">
-                                                        <a href="tel:<%= app.job.client.phone %>" class="btn btn-sm btn-dark"><i class="fa fa-phone me-1"></i>Call Client</a>
-                                                        <a href="https://wa.me/<%= app.job.client.phone.replace(/[^0-9]/g, '') %>" target="_blank" class="btn btn-sm btn-whatsapp"><i class="fab fa-whatsapp me-1"></i>WhatsApp</a>
-                                                    </div>
-                                                <% } %>
-                                            </div>
-                                        <% } %>
+                                            <% } %>
+                                        </div>
                                     </div>
                                 </div>
-                            <% }) %>
+                            </div>
                         </div>
-                    <% } %>
+                    <% }) %>
                 </div>
             <% } %>
-
-            <!-- TAB 3: SUPPLIER / SELLER MATERIALS & RENTALS -->
-            <% if (activeTab === 'supplier') { %>
-                <div class="tab-pane fade show active">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="fw-bold mb-0 text-dark">My Listed Materials & Plant Equipment</h4>
-                        <a href="/materials/post" class="btn btn-primary btn-sm text-white"><i class="fa fa-plus me-1"></i>Add New Listing</a>
-                    </div>
-
-                    <% if (myProducts.length === 0) { %>
-                        <div class="card p-5 text-center bg-white shadow-sm border-0">
-                            <i class="fa fa-cubes fa-3x text-secondary mb-3"></i>
-                            <h5 class="text-dark">No Materials or Equipment Listed</h5>
-                            <p class="text-muted">Start listing cement, sand ballast, steel, tippers, or concrete mixers for Kenyan construction sites.</p>
-                            <div>
-                                <a href="/materials/post" class="btn btn-primary text-white"><i class="fa fa-plus-circle me-1"></i>List Material or Equipment</a>
-                            </div>
-                        </div>
-                    <% } else { %>
-                        <div class="row g-3">
-                            <% myProducts.forEach(prod => { %>
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card card-custom h-100 bg-white border-0 shadow-sm">
-                                        <div style="height: 170px; overflow: hidden;" class="position-relative">
-                                            <img src="<%= prod.image_url %>" class="w-100 h-100" style="object-fit: cover;" alt="<%= prod.title %>">
-                                            <span class="badge <%= prod.is_rental ? 'bg-primary' : 'bg-dark' %> position-absolute top-0 start-0 m-2">
-                                                <%= prod.is_rental ? 'Equipment Hire' : 'Building Material' %>
-                                            </span>
-                                            <span class="badge <%= prod.is_active ? 'bg-success' : 'bg-secondary' %> position-absolute top-0 end-0 m-2">
-                                                <%= prod.is_active ? 'Active' : 'Paused' %>
-                                            </span>
-                                        </div>
-                                        <div class="card-body p-3 d-flex flex-column">
-                                            <div class="small text-primary fw-bold text-uppercase mb-1"><%= prod.category ? prod.category.name : 'General' %></div>
-                                            <h6 class="card-title fw-bold text-dark mb-1"><%= prod.title %></h6>
-                                            <div class="text-primary fw-bold mb-2">
-                                                Ksh <%= Number(prod.price).toLocaleString() %> <span class="small text-muted">/ <%= prod.unit %></span>
-                                            </div>
-                                            <div class="small text-muted mb-3 mt-auto">
-                                                <i class="fa fa-map-marker-alt text-primary me-1"></i><%= prod.location_county %>
-                                                <span class="mx-1">•</span> Stock: <%= prod.stock_quantity %>
-                                            </div>
-                                            <div class="d-flex gap-1 flex-wrap">
-                                                <form action="/products/<%= prod.id %>/toggle-status" method="POST" class="flex-grow-1">
-                                                    <button type="submit" class="btn btn-sm <%= prod.is_active ? 'btn-outline-warning' : 'btn-outline-success' %> w-100" title="Toggle active status">
-                                                        <%= prod.is_active ? 'Pause' : 'Activate' %>
-                                                    </button>
-                                                </form>
-                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProductModal<%= prod.id %>" title="Edit Listing">
-                                                    <i class="fa fa-pencil-alt"></i>
-                                                </button>
-                                                <a href="/materials/<%= prod.id %>" class="btn btn-sm btn-outline-secondary" title="View Listing">
-                                                    <i class="fa fa-external-link-alt"></i>
-                                                </a>
-                                                <form action="/products/<%= prod.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Permanently delete \'<%= prod.title %>\'?')">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Listing">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-
-                                            <!-- Edit Product Modal -->
-                                            <div class="modal fade" id="editProductModal<%= prod.id %>" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                    <div class="modal-content border-0 shadow">
-                                                        <div class="modal-header bg-dark text-white">
-                                                            <h5 class="modal-title text-white"><i class="fa fa-pencil-alt text-primary me-2"></i>Edit <%= prod.is_rental ? 'Equipment Hire' : 'Material' %> Listing</h5>
-                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <form action="/products/<%= prod.id %>/edit" method="POST">
-                                                            <div class="modal-body p-4">
-                                                                <div class="row g-3">
-                                                                    <div class="col-12">
-                                                                        <label class="form-label small fw-bold text-dark">Listing Title *</label>
-                                                                        <input type="text" name="title" class="form-control" value="<%= prod.title %>" required>
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <label class="form-label small fw-bold text-dark">Price / Rate (Ksh) *</label>
-                                                                        <input type="number" name="price" class="form-control" value="<%= prod.price %>" step="0.01" required>
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <label class="form-label small fw-bold text-dark">Unit *</label>
-                                                                        <input type="text" name="unit" class="form-control" value="<%= prod.unit %>" required>
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <label class="form-label small fw-bold text-dark">Available Stock / Fleet Count *</label>
-                                                                        <input type="number" name="stock_quantity" class="form-control" value="<%= prod.stock_quantity %>" required>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label class="form-label small fw-bold text-dark">County Location *</label>
-                                                                        <select name="location_county" class="form-select" required>
-                                                                            <% counties.forEach(c => { %>
-                                                                                <option value="<%= c %>" <%= prod.location_county === c ? 'selected' : '' %>><%= c %></option>
-                                                                            <% }) %>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label class="form-label small fw-bold text-dark">Category</label>
-                                                                        <input type="text" class="form-control bg-light" value="<%= prod.category ? prod.category.name : 'General' %>" disabled>
-                                                                    </div>
-                                                                    <div class="col-12">
-                                                                        <label class="form-label small fw-bold text-dark">Description & Technical Details *</label>
-                                                                        <textarea name="description" class="form-control" rows="4" required><%= prod.description %></textarea>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer bg-light">
-                                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                                                <button type="submit" class="btn btn-primary btn-sm text-white fw-bold"><i class="fa fa-save me-1"></i>Save Changes</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            <% }) %>
-                        </div>
-                    <% } %>
-                </div>
-            <% } %>
-
-            <!-- TAB 4: ORDERS & QUOTES (INCOMING + OUTGOING) -->
-            <% if (activeTab === 'orders') { %>
-                <div class="tab-pane fade show active">
-                    <!-- Incoming Material Inquiries for Sellers -->
-                    <% if (myProducts.length > 0) { %>
-                        <div class="mb-5">
-                            <h4 class="fw-bold mb-3 text-dark"><i class="fa fa-inbox text-primary me-2"></i>Incoming Material Orders & Quote Requests</h4>
-                            <% if (incomingInquiries.length === 0) { %>
-                                <div class="card p-4 text-center bg-white shadow-sm border-0">
-                                    <p class="text-muted mb-0">No quote requests received yet on your listed inventory.</p>
-                                </div>
-                            <% } else { %>
-                                <div class="table-responsive bg-white rounded shadow-sm">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="table-light small">
-                                            <tr>
-                                                <th>Material / Plant</th>
-                                                <th>Buyer & Contact</th>
-                                                <th>Qty & Total</th>
-                                                <th>Delivery Location</th>
-                                                <th>Status</th>
-                                                <th class="text-end">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <% incomingInquiries.forEach(order => { %>
-                                                <tr>
-                                                    <td>
-                                                        <div class="fw-bold text-dark"><%= order.product ? order.product.title : 'Product' %></div>
-                                                        <small class="text-muted"><%= new Date(order.created_at).toLocaleDateString() %></small>
-                                                    </td>
-                                                    <td>
-                                                        <div><%= order.buyer ? order.buyer.name : 'Buyer' %></div>
-                                                        <small class="text-muted"><%= order.contact_phone %></small>
-                                                    </td>
-                                                    <td>
-                                                        <div><%= order.quantity %> units</div>
-                                                        <span class="fw-bold text-primary">Ksh <%= Number(order.total_price).toLocaleString() %></span>
-                                                    </td>
-                                                    <td>
-                                                        <small class="text-muted"><%= order.delivery_address %></small>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-secondary text-uppercase"><%= order.status.replace('_', ' ') %></span>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <div class="d-inline-flex gap-1 align-items-center">
-                                                            <% 
-                                                                const buyerPhone = (order.contact_phone || '').replace(/[^0-9]/g, '');
-                                                                const waOrderUrl = 'https://wa.me/' + (buyerPhone.startsWith('0') ? '254' + buyerPhone.slice(1) : buyerPhone) + '?text=' + encodeURIComponent('Hi, regarding your order for ' + (order.product ? order.product.title : 'materials') + ' on TopLineHub, confirming site delivery details.');
-                                                            %>
-                                                            <a href="<%= waOrderUrl %>" target="_blank" class="btn btn-whatsapp btn-sm" title="WhatsApp Buyer">
-                                                                <i class="fab fa-whatsapp"></i>
-                                                            </a>
-                                                            <form action="/orders/<%= order.id %>/status" method="POST" class="d-inline">
-                                                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto; display: inline-block;">
-                                                                    <option value="inquiry" <%= order.status === 'inquiry' ? 'selected' : '' %>>Inquiry</option>
-                                                                    <option value="quote_provided" <%= order.status === 'quote_provided' ? 'selected' : '' %>>Quote Sent</option>
-                                                                    <option value="confirmed" <%= order.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
-                                                                    <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
-                                                                    <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                                                </select>
-                                                            </form>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            <% }) %>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <% } %>
-                        </div>
-                    <% } %>
-
-                    <!-- Outgoing Orders (Buyer's Own Orders) -->
-                    <div>
-                        <h4 class="fw-bold mb-3 text-dark"><i class="fa fa-shopping-bag text-primary me-2"></i>My Requested Quotes & Orders</h4>
-                        <% if (myOrders.length === 0) { %>
-                            <div class="card p-4 text-center bg-white shadow-sm border-0">
-                                <p class="text-muted mb-3">You have not submitted any material quote requests yet.</p>
-                                <div>
-                                    <a href="/materials" class="btn btn-primary btn-sm text-white"><i class="fa fa-search me-1"></i>Browse Materials</a>
-                                </div>
-                            </div>
-                        <% } else { %>
-                            <div class="table-responsive bg-white rounded shadow-sm">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light small">
-                                        <tr>
-                                            <th>Requested Item</th>
-                                            <th>Supplier</th>
-                                            <th>Quantity</th>
-                                            <th>Total (Ksh)</th>
-                                            <th>Payment</th>
-                                            <th>Status</th>
-                                            <th class="text-end">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% myOrders.forEach(ord => { %>
-                                            <tr>
-                                                <td>
-                                                    <div class="fw-bold text-dark"><%= ord.product ? ord.product.title : 'Material' %></div>
-                                                    <small class="text-muted">Order #<%= ord.id %> • <%= new Date(ord.created_at).toLocaleDateString() %></small>
-                                                </td>
-                                                <td><%= ord.product && ord.product.seller ? ord.product.seller.name : 'Hardware Supplier' %></td>
-                                                <td><%= ord.quantity %> <%= ord.product ? ord.product.unit : 'units' %></td>
-                                                <td class="fw-bold text-primary">Ksh <%= Number(ord.total_price).toLocaleString() %></td>
-                                                <td>
-                                                    <% if (ord.payment_status === 'paid') { %>
-                                                        <span class="badge bg-success" title="M-Pesa Receipt: <%= ord.mpesa_receipt %>">
-                                                            <i class="fa fa-check-circle me-1"></i>Paid: <%= ord.mpesa_receipt %>
-                                                        </span>
-                                                    <% } else { %>
-                                                        <a href="/orders/<%= ord.id %>/checkout" class="btn btn-sm btn-outline-success py-0 px-2 fw-bold" style="font-size: 0.75rem;">
-                                                            <i class="fa fa-mobile-alt me-1"></i>Pay M-Pesa
-                                                        </a>
-                                                    <% } %>
-                                                </td>
-                                                <td><span class="badge bg-secondary text-uppercase"><%= ord.status.replace('_', ' ') %></span></td>
-                                                <td class="text-end">
-                                                    <div class="d-inline-flex gap-1 align-items-center">
-                                                        <a href="/orders/<%= ord.id %>/checkout" class="btn btn-sm btn-outline-primary" title="Checkout & Payment Details">
-                                                            <i class="fa fa-credit-card"></i>
-                                                        </a>
-                                                        <a href="/orders/<%= ord.id %>/invoice" class="btn btn-sm btn-outline-dark" title="View & Print Official Tax Invoice">
-                                                            <i class="fa fa-file-invoice"></i>
-                                                        </a>
-                                                        <% if (ord.product && ord.product.seller && ord.product.seller.phone) { %>
-                                                            <a href="tel:<%= ord.product.seller.phone %>" class="btn btn-sm btn-outline-secondary" title="Call Supplier">
-                                                                <i class="fa fa-phone"></i>
-                                                            </a>
-                                                        <% } %>
-                                                        <% if (ord.status === 'inquiry' || ord.status === 'quote_provided') { %>
-                                                            <form action="/orders/<%= ord.id %>/cancel" method="POST" class="d-inline" onsubmit="return confirm('Cancel this quote request?')">
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel Request">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            </form>
-                                                        <% } %>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <% }) %>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <% } %>
-                    </div>
-                </div>
-            <% } %>
-
-            <!-- TAB 5: PROFILE & CREDENTIALS SETTINGS -->
-            <% if (activeTab === 'profile') { %>
-                <div class="tab-pane fade show active">
-                    <div class="row g-4">
-                        <div class="col-lg-8">
-                            <div class="card border-0 shadow-sm bg-white p-4">
-                                <h4 class="fw-bold text-dark mb-4"><i class="fa fa-user-edit text-primary me-2"></i>Edit Profile & Account Information</h4>
-                                <form action="/dashboard/profile" method="POST" enctype="multipart/form-data">
-                                    <div class="row g-3">
-                                        <!-- Avatar Upload -->
-                                        <div class="col-12 text-center mb-2">
-                                            <div class="position-relative d-inline-block">
-                                                <img src="<%= currentUser.avatar || '/img/team-1.jpg' %>" id="avatarPreview" 
-                                                     class="rounded-circle border border-3 border-primary" 
-                                                     style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;"
-                                                     alt="Profile Photo" onclick="document.getElementById('avatarInput').click()">
-                                                <label for="avatarInput" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
-                                                       style="width: 32px; height: 32px; cursor: pointer; border: 2px solid #fff;">
-                                                    <i class="fa fa-camera" style="font-size: 14px;"></i>
-                                                </label>
-                                                <input type="file" name="avatar_file" id="avatarInput" class="d-none" accept="image/jpeg,image/png,image/webp">
-                                            </div>
-                                            <p class="text-muted small mt-2 mb-0">Click to change profile photo <span class="text-secondary">(Max 3MB)</span></p>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                <input type="text" name="name" class="form-control bg-light border-0" id="prof_name" value="<%= currentUser.name %>" required>
-                                                <label for="prof_name">Full Name / Company Name</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                <input type="tel" name="phone" class="form-control bg-light border-0" id="prof_phone" value="<%= currentUser.phone %>" required>
-                                                <label for="prof_phone">Phone / WhatsApp Number</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                <select name="county" class="form-select bg-light border-0" id="prof_county" required>
-                                                    <% counties.forEach(c => { %>
-                                                        <option value="<%= c %>" <%= currentUser.county === c ? 'selected' : '' %>><%= c %></option>
-                                                    <% }) %>
-                                                </select>
-                                                <label for="prof_county">Base County</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                <input type="text" name="town" class="form-control bg-light border-0" id="prof_town" value="<%= currentUser.town %>" required>
-                                                <label for="prof_town">Town / Area (e.g. Westlands, Ruiru, Kitengela)</label>
-                                            </div>
-                                        </div>
-
-                                        <!-- Artisan specific settings -->
-                                        <% if (currentUser.role === 'artisan') { %>
-                                            <div class="col-12 mt-4">
-                                                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">
-                                                    <i class="fa fa-hard-hat text-primary me-2"></i>Artisan Trade & NCA Accreditation
-                                                </h5>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    <input type="text" name="trade" class="form-control bg-light border-0" id="prof_trade" value="<%= currentUser.artisanProfile ? currentUser.artisanProfile.trade : 'General Artisan' %>">
-                                                    <label for="prof_trade">Primary Trade (e.g. Master Mason, Electrician)</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    <input type="number" name="daily_rate" class="form-control bg-light border-0" id="prof_rate" value="<%= currentUser.artisanProfile ? currentUser.artisanProfile.daily_rate : 2000 %>">
-                                                    <label for="prof_rate">Daily Rate (Ksh)</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    <input type="number" name="experience_years" class="form-control bg-light border-0" id="prof_exp" value="<%= currentUser.artisanProfile ? currentUser.artisanProfile.experience_years : 3 %>">
-                                                    <label for="prof_exp">Years of Experience</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    <input type="text" name="nca_reg_number" class="form-control bg-light border-0" id="prof_nca" placeholder="NCA-ART-12345" value="<%= currentUser.artisanProfile ? currentUser.artisanProfile.nca_reg_number || '' : '' %>">
-                                                    <label for="prof_nca">NCA Registration Number (Optional)</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="form-floating">
-                                                    <textarea name="bio" class="form-control bg-light border-0" id="prof_bio" style="height: 100px;"><%= currentUser.artisanProfile ? currentUser.artisanProfile.bio || '' : '' %></textarea>
-                                                    <label for="prof_bio">Professional Bio & Experience Summary</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input" type="checkbox" name="is_available" id="avail_switch" <%= (currentUser.artisanProfile && currentUser.artisanProfile.is_available) ? 'checked' : '' %>>
-                                                    <label class="form-check-label fw-bold text-dark" for="avail_switch">Currently Available for New Site Work</label>
-                                                </div>
-                                            </div>
-                                        <% } %>
-
-                                        <div class="col-12 pt-3">
-                                            <button type="submit" class="btn btn-primary px-4 py-2 text-white fw-bold">
-                                                <i class="fa fa-save me-2"></i>Save Changes
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Right Info Card -->
-                        <div class="col-lg-4">
-                            <div class="card border-0 shadow-sm bg-light p-4 mb-3">
-                                <h5 class="fw-bold text-dark mb-3"><i class="fa fa-shield-alt text-primary me-2"></i>Account Security</h5>
-                                <p class="small text-muted mb-2">Registered Email: <strong><%= currentUser.email %></strong></p>
-                                <p class="small text-muted mb-3">Role: <span class="badge bg-primary text-uppercase"><%= currentUser.role %></span></p>
-                                <div class="alert alert-info py-2 px-3 small mb-0">
-                                    <i class="fa fa-info-circle me-1"></i>To update password or registered email, contact platform administration.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <% } %>
-
-            <!-- TAB 6: ADMIN OPERATIONS CONSOLE (Only for Admin Role) -->
-            <% if (currentUser.role === 'admin' && activeTab === 'admin') { %>
-                <div class="tab-pane fade show active">
-                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                        <div>
-                            <h4 class="fw-bold mb-0 text-dark"><i class="fa fa-shield-alt text-primary me-2"></i>Platform Administration & Operations</h4>
-                            <small class="text-muted">Master control panel for user verification, listings oversight, and Kenyan trade analytics.</small>
-                        </div>
-                        <span class="badge bg-danger px-3 py-2 fs-6"><i class="fa fa-lock me-1"></i>Administrator Mode</span>
-                    </div>
-
-                    <!-- Admin KPI Analytics Grid -->
-                    <div class="row g-3 mb-4">
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-primary">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <small class="text-muted d-block">Total Users</small>
-                                        <h3 class="fw-bold text-dark mb-0"><%= adminData.stats.totalUsers %></h3>
-                                    </div>
-                                    <div class="p-3 bg-light rounded text-primary"><i class="fa fa-users fa-2x"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-success">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <small class="text-muted d-block">Total Listings</small>
-                                        <h3 class="fw-bold text-success mb-0"><%= adminData.stats.totalProducts %></h3>
-                                    </div>
-                                    <div class="p-3 bg-light rounded text-success"><i class="fa fa-boxes fa-2x"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-warning">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <small class="text-muted d-block">Jobs & Tenders</small>
-                                        <h3 class="fw-bold text-dark mb-0"><%= adminData.stats.totalJobs %> <span class="fs-6 text-muted">(<%= adminData.stats.totalBids %> bids)</span></h3>
-                                    </div>
-                                    <div class="p-3 bg-light rounded text-warning"><i class="fa fa-briefcase fa-2x"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-info">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <small class="text-muted d-block">Order Requests</small>
-                                        <h3 class="fw-bold text-info mb-0">Ksh <%= Number(adminData.stats.totalVolume).toLocaleString() %></h3>
-                                    </div>
-                                    <div class="p-3 bg-light rounded text-info"><i class="fa fa-receipt fa-2x"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- User Verification & Moderation Table -->
-                    <div class="card border-0 shadow-sm bg-white p-4 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold text-dark mb-0">
-                                <i class="fa fa-user-check text-primary me-2"></i>User Management & NCA Verification (<%= adminData.users.length %>)
-                            </h5>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light small">
-                                    <tr>
-                                        <th>User Details</th>
-                                        <th>Role</th>
-                                        <th>Location</th>
-                                        <th>Phone / Contact</th>
-                                        <th>NCA / Verification</th>
-                                        <th class="text-end">Verification Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% adminData.users.forEach(u => { %>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="<%= u.avatar || '/img/team-1.jpg' %>" class="rounded-circle me-2 border" style="width: 38px; height: 38px; object-fit: cover;" alt="Avatar">
-                                                    <div>
-                                                        <div class="fw-bold text-dark"><%= u.name %></div>
-                                                        <small class="text-muted"><%= u.email %></small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <form action="/admin/users/<%= u.id %>/role" method="POST" class="d-inline">
-                                                    <select name="role" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
-                                                        <option value="buyer" <%= u.role === 'buyer' ? 'selected' : '' %>>Buyer / Client</option>
-                                                        <option value="seller" <%= u.role === 'seller' ? 'selected' : '' %>>Seller / Vendor</option>
-                                                        <option value="artisan" <%= u.role === 'artisan' ? 'selected' : '' %>>Artisan / Fundi</option>
-                                                        <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Administrator</option>
-                                                    </select>
-                                                </form>
-                                            </td>
-                                            <td>
-                                                <small class="text-muted"><%= u.town %>, <%= u.county %></small>
-                                            </td>
-                                            <td>
-                                                <small class="text-dark fw-bold"><%= u.phone %></small>
-                                            </td>
-                                            <td>
-                                                <% if (u.is_verified) { %>
-                                                    <span class="badge bg-success"><i class="fa fa-check-circle me-1"></i>Verified</span>
-                                                <% } else { %>
-                                                    <span class="badge bg-secondary"><i class="fa fa-clock me-1"></i>Pending Review</span>
-                                                <% } %>
-                                                <% if (u.artisanProfile && u.artisanProfile.nca_reg_number) { %>
-                                                    <div class="small text-primary mt-1">NCA: <%= u.artisanProfile.nca_reg_number %></div>
-                                                <% } %>
-                                            </td>
-                                            <td class="text-end">
-                                                <form action="/admin/users/<%= u.id %>/toggle-verify" method="POST" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm <%= u.is_verified ? 'btn-outline-danger' : 'btn-outline-success' %>">
-                                                        <%= u.is_verified ? 'Revoke Verification' : 'Verify Credentials' %>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Listings Moderation Table -->
-                    <div class="card border-0 shadow-sm bg-white p-4 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold text-dark mb-0">
-                                <i class="fa fa-boxes text-primary me-2"></i>Catalog Listings Oversight (<%= adminData.products.length %>)
-                            </h5>
-                            <a href="/materials/post" class="btn btn-primary btn-sm text-white"><i class="fa fa-plus me-1"></i>Add Listing</a>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light small">
-                                    <tr>
-                                        <th>Listing</th>
-                                        <th>Type</th>
-                                        <th>Rate / Price</th>
-                                        <th>Seller</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% adminData.products.forEach(p => { %>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="<%= p.image_url %>" class="rounded me-2 border" style="width: 45px; height: 45px; object-fit: cover;" alt="Thumb">
-                                                    <div>
-                                                        <a href="/materials/<%= p.id %>" class="fw-bold text-dark text-decoration-none"><%= p.title %></a>
-                                                        <small class="text-muted d-block"><%= p.category ? p.category.name : 'General' %> • <%= p.location_county %></small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge <%= p.is_rental ? 'bg-primary' : 'bg-dark' %>">
-                                                    <%= p.is_rental ? 'Equipment Hire' : 'Material' %>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="fw-bold text-primary">Ksh <%= Number(p.price).toLocaleString() %></span> / <%= p.unit %>
-                                            </td>
-                                            <td>
-                                                <small><%= p.seller ? p.seller.name : 'Vendor' %></small>
-                                            </td>
-                                            <td>
-                                                <span class="badge <%= p.is_active ? 'bg-success' : 'bg-secondary' %>">
-                                                    <%= p.is_active ? 'Active' : 'Paused' %>
-                                                </span>
-                                            </td>
-                                            <td class="text-end">
-                                                <form action="/admin/products/<%= p.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Permanently remove this listing?')">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Listing">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Client Projects Moderation Table -->
-                    <div class="card border-0 shadow-sm bg-white p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold text-dark mb-0">
-                                <i class="fa fa-briefcase text-primary me-2"></i>Project Tenders Moderation (<%= adminData.jobs.length %>)
-                            </h5>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light small">
-                                    <tr>
-                                        <th>Project Scope</th>
-                                        <th>Trade Required</th>
-                                        <th>Client</th>
-                                        <th>Budget</th>
-                                        <th>Bids Count</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% adminData.jobs.forEach(j => { %>
-                                        <tr>
-                                            <td>
-                                                <div class="fw-bold text-dark"><%= j.title %></div>
-                                                <small class="text-muted"><%= j.location_town %>, <%= j.location_county %></small>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-primary text-uppercase"><%= j.trade_required %></span>
-                                            </td>
-                                            <td>
-                                                <small><%= j.client ? j.client.name : 'Client' %></small>
-                                            </td>
-                                            <td>
-                                                <span class="fw-bold text-primary">Ksh <%= Number(j.budget_estimate).toLocaleString() %></span>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-secondary"><%= j.applications ? j.applications.length : 0 %> bids</span>
-                                            </td>
-                                            <td>
-                                                <span class="badge <%= j.status === 'open' ? 'bg-success' : 'bg-secondary' %> text-uppercase"><%= j.status %></span>
-                                            </td>
-                                            <td class="text-end">
-                                                <form action="/admin/jobs/<%= j.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this project?')">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Job">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            <% } %>
-
         </div>
     </div>
-</div>
+<% } %>
+
+<!-- ========================================== -->
+<!-- TAB 3: CLIENT PROJECTS & RECEIVED BIDS -->
+<!-- ========================================== -->
+<% if (activeTab === 'client') { %>
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <div>
+                <h5 class="dash-card-title"><i class="fa fa-briefcase text-primary"></i>My Posted Construction Projects</h5>
+                <small class="text-muted">Review proposals submitted by fundis, shortlist candidates, and call or WhatsApp selected artisans.</small>
+            </div>
+            <a href="/jobs/post" class="btn btn-sm btn-primary text-white fw-bold">
+                <i class="fa fa-plus me-1"></i>Post New Project
+            </a>
+        </div>
+        <div class="dash-card-body">
+            <% if (postedJobs.length === 0) { %>
+                <div class="text-center py-5">
+                    <i class="fa fa-clipboard fa-3x text-muted mb-3 opacity-50"></i>
+                    <h5 class="text-dark">No Projects Posted Yet</h5>
+                    <p class="text-muted small">Post your construction job or renovation task and receive proposals from vetted fundis.</p>
+                    <a href="/jobs/post" class="btn btn-primary text-white">Post Construction Project</a>
+                </div>
+            <% } else { %>
+                <div class="accordion" id="postedJobsAccordion">
+                    <% postedJobs.forEach((job, idx) => { %>
+                        <div class="accordion-item mb-3 border rounded shadow-sm overflow-hidden">
+                            <h2 class="accordion-header" id="headingJob<%= job.id %>">
+                                <button class="accordion-button <%= idx !== 0 ? 'collapsed' : '' %> bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseJob<%= job.id %>">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between w-100 pe-3 gap-2">
+                                        <div>
+                                            <span class="badge bg-primary text-uppercase me-2"><%= job.trade_required %></span>
+                                            <strong class="text-dark"><%= job.title %></strong>
+                                            <span class="badge <%= job.status === 'open' ? 'bg-success' : 'bg-secondary' %> ms-2 text-uppercase"><%= job.status %></span>
+                                        </div>
+                                        <div class="text-muted small">
+                                            Budget: <strong class="text-primary">Ksh <%= Number(job.budget_estimate).toLocaleString() %></strong> &bull;
+                                            Proposals: <span class="badge bg-secondary"><%= job.applications ? job.applications.length : 0 %></span>
+                                        </div>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapseJob<%= job.id %>" class="accordion-collapse collapse <%= idx === 0 ? 'show' : '' %>" data-bs-parent="#postedJobsAccordion">
+                                <div class="accordion-body p-4">
+                                    <p class="text-muted small mb-3"><%= job.description %></p>
+                                    
+                                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                                        <i class="fa fa-users me-1 text-primary"></i>Artisan Proposals (<%= job.applications ? job.applications.length : 0 %>)
+                                    </h6>
+
+                                    <% if (!job.applications || job.applications.length === 0) { %>
+                                        <p class="text-muted small mb-0">No proposals submitted yet. Artisans across <%= job.location_county %> are being notified.</p>
+                                    <% } else { %>
+                                        <div class="table-responsive">
+                                            <table class="table align-middle">
+                                                <thead class="table-light small">
+                                                    <tr>
+                                                        <th>Artisan</th>
+                                                        <th>Quoted Bid</th>
+                                                        <th>Pitch Note</th>
+                                                        <th>Status</th>
+                                                        <th class="text-end">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% job.applications.forEach(bid => { %>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="fw-bold text-dark"><%= bid.artisan ? bid.artisan.name : 'Fundi' %></div>
+                                                                <small class="text-muted"><%= bid.artisan ? bid.artisan.county : '' %></small>
+                                                            </td>
+                                                            <td>
+                                                                <strong class="text-primary">Ksh <%= Number(bid.bid_amount).toLocaleString() %></strong>
+                                                            </td>
+                                                            <td>
+                                                                <small class="text-muted"><%= bid.pitch_message %></small>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge <%= bid.status === 'accepted' ? 'bg-success' : (bid.status === 'shortlisted' ? 'bg-warning text-dark' : 'bg-secondary') %> text-uppercase">
+                                                                    <%= bid.status %>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <div class="d-inline-flex gap-1 align-items-center">
+                                                                    <% 
+                                                                        const aPhone = bid.artisan ? bid.artisan.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                                                        const waClean = aPhone.startsWith('0') ? '254' + aPhone.slice(1) : aPhone;
+                                                                        const waUrl = 'https://wa.me/' + waClean + '?text=' + encodeURIComponent('Hi ' + (bid.artisan ? bid.artisan.name : 'Fundi') + ', regarding your bid of Ksh ' + Number(bid.bid_amount).toLocaleString() + ' on "' + job.title + '" on TopLineHub, let us discuss site start.');
+                                                                    %>
+                                                                    <a href="<%= waUrl %>" target="_blank" class="btn btn-whatsapp btn-sm" title="WhatsApp Fundi">
+                                                                        <i class="fab fa-whatsapp"></i>
+                                                                    </a>
+                                                                    <% if (bid.artisan && bid.artisan.phone) { %>
+                                                                        <a href="tel:<%= bid.artisan.phone %>" class="btn btn-outline-dark btn-sm" title="Call Fundi">
+                                                                            <i class="fa fa-phone"></i>
+                                                                        </a>
+                                                                    <% } %>
+                                                                    <!-- Workflow Status Dropdown -->
+                                                                    <div class="dropdown">
+                                                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                                            Update
+                                                                        </button>
+                                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                                            <li>
+                                                                                <form action="/jobs/<%= job.id %>/bids/<%= bid.id %>/status" method="POST">
+                                                                                    <input type="hidden" name="status" value="shortlisted">
+                                                                                    <button type="submit" class="dropdown-item">⭐ Shortlist</button>
+                                                                                </form>
+                                                                            </li>
+                                                                            <li>
+                                                                                <form action="/jobs/<%= job.id %>/bids/<%= bid.id %>/status" method="POST">
+                                                                                    <input type="hidden" name="status" value="accepted">
+                                                                                    <button type="submit" class="dropdown-item text-success fw-bold">✅ Accept Proposal</button>
+                                                                                </form>
+                                                                            </li>
+                                                                            <li>
+                                                                                <form action="/jobs/<%= job.id %>/bids/<%= bid.id %>/status" method="POST">
+                                                                                    <input type="hidden" name="status" value="rejected">
+                                                                                    <button type="submit" class="dropdown-item text-danger">❌ Decline</button>
+                                                                                </form>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+<% } %>
+
+<!-- ========================================== -->
+<!-- TAB 4: MATERIALS & PLANT HIRE FLEET -->
+<!-- ========================================== -->
+<% if (activeTab === 'supplier') { %>
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <div>
+                <h5 class="dash-card-title"><i class="fa fa-boxes text-success"></i>My Listed Materials & Plant Machinery</h5>
+                <small class="text-muted">Manage your stock, hire fleets, prices, and county coverage.</small>
+            </div>
+            <a href="/materials/post" class="btn btn-sm btn-success text-white fw-bold">
+                <i class="fa fa-plus me-1"></i>Add Material or Plant Hire
+            </a>
+        </div>
+        <div class="dash-card-body">
+            <% if (myProducts.length === 0) { %>
+                <div class="text-center py-5">
+                    <i class="fa fa-truck fa-3x text-muted mb-3 opacity-50"></i>
+                    <h5 class="text-dark">No Listings Available</h5>
+                    <p class="text-muted small">List cement, steel, timber, or site machinery for hire across Kenya.</p>
+                    <a href="/materials/post" class="btn btn-success text-white">List Materials or Equipment</a>
+                </div>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Listing Item</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Price (KES)</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% myProducts.forEach(product => { %>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="<%= product.image_url || '/img/service-1.jpg' %>" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover;" alt="">
+                                            <div>
+                                                <a href="/materials/<%= product.id %>" class="fw-bold text-dark text-decoration-none"><%= product.title %></a>
+                                                <small class="text-muted d-block"><%= product.location_county %></small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border"><%= product.category ? product.category.name : 'General' %></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= product.is_rental ? 'bg-primary' : 'bg-secondary' %> text-uppercase">
+                                            <%= product.is_rental ? 'Plant Hire' : 'Material' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong class="text-dark">Ksh <%= Number(product.price).toLocaleString() %></strong>
+                                        <small class="text-muted">/ <%= product.unit %></small>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= product.is_active ? 'bg-success' : 'bg-danger' %>">
+                                            <%= product.is_active ? 'Active' : 'Paused' %>
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <form action="/products/<%= product.id %>/toggle-status" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Toggle Active">
+                                                <i class="fa fa-power-off"></i>
+                                            </button>
+                                        </form>
+                                        <form action="/products/<%= product.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Remove listing?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+<% } %>
+
+<!-- ========================================== -->
+<!-- TAB 5: ORDERS & HIRE ENQUIRIES -->
+<!-- ========================================== -->
+<% if (activeTab === 'orders') { %>
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <div>
+                <h5 class="dash-card-title"><i class="fa fa-clipboard-list text-warning"></i>Incoming Equipment Hire & Material Orders</h5>
+                <small class="text-muted">Clients submit requests for your listings. Unlock client contact details by paying the platform commission charge.</small>
+            </div>
+            <button type="button" class="btn btn-sm btn-warning text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#mpesaTopupModal">
+                <i class="fa fa-wallet me-1"></i>Wallet: KES <%= userWallet ? Number(userWallet.balance).toLocaleString() : '100' %>
+            </button>
+        </div>
+        <div class="dash-card-body">
+            <% if (incomingInquiries.length === 0) { %>
+                <div class="text-center py-5">
+                    <i class="fa fa-inbox fa-3x text-muted mb-3 opacity-50"></i>
+                    <h5 class="text-dark">No Client Orders Yet</h5>
+                    <p class="text-muted small">Incoming equipment hire requests and material quotes will appear here.</p>
+                </div>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Order Item</th>
+                                <th>Client Delivery Address</th>
+                                <th>Total Value</th>
+                                <th>Client Contact & WhatsApp</th>
+                                <th>Order Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% incomingInquiries.forEach(order => { %>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark"><%= order.product ? order.product.title : 'Materials' %></div>
+                                        <small class="text-muted"><%= order.quantity %> units &bull; Placed: <%= new Date(order.created_at).toLocaleDateString() %></small>
+                                    </td>
+                                    <td>
+                                        <div class="small text-dark fw-bold"><%= order.buyer ? order.buyer.name : 'Client' %></div>
+                                        <small class="text-muted"><%= order.delivery_address %></small>
+                                    </td>
+                                    <td>
+                                        <strong class="text-primary">Ksh <%= Number(order.total_price).toLocaleString() %></strong>
+                                    </td>
+                                    <td>
+                                        <!-- PLATFORM COMMISSION CONTACT GATING FOR RENTALS & ORDERS -->
+                                        <% if (order.contactUnlocked) { %>
+                                            <div class="d-inline-flex flex-wrap gap-2 align-items-center">
+                                                <a href="tel:<%= order.buyerPhone %>" class="btn btn-sm btn-dark py-1 px-2">
+                                                    <i class="fa fa-phone me-1"></i><%= order.buyerPhone %>
+                                                </a>
+                                                <!-- WhatsApp button ONLY appears when unlocked! -->
+                                                <a href="<%= order.waOrderUrl %>" target="_blank" class="btn btn-sm btn-whatsapp py-1 px-2" title="WhatsApp Client">
+                                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                                </a>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="d-flex flex-column gap-1">
+                                                <span class="badge bg-light text-muted border text-start">
+                                                    <i class="fa fa-lock text-warning me-1"></i><%= order.maskedBuyerPhone %>
+                                                </span>
+                                                <form action="/unlock/order/<%= order.id %>" method="POST">
+                                                    <button type="submit" class="btn btn-unlock-gold btn-sm py-1 px-2" style="font-size: 0.75rem;" title="Pay platform commission charge to reveal client phone & WhatsApp">
+                                                        <i class="fa fa-coins me-1"></i>Unlock Contact (Ksh <%= order.unlockPrice %>)
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <form action="/orders/<%= order.id %>/status" method="POST" class="d-inline">
+                                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                                                <option value="inquiry" <%= order.status === 'inquiry' ? 'selected' : '' %>>Inquiry</option>
+                                                <option value="quote_provided" <%= order.status === 'quote_provided' ? 'selected' : '' %>>Quote Sent</option>
+                                                <option value="confirmed" <%= order.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                                                <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                                <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+<% } %>
+
+<!-- ========================================== -->
+<!-- TAB 6: WALLET & MONETIZATION LEDGER -->
+<!-- ========================================== -->
+<% if (activeTab === 'wallet') { %>
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="dash-card bg-dark text-white p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-white-50 small text-uppercase fw-bold">Platform Credits Balance</span>
+                    <span class="badge bg-success">Active</span>
+                </div>
+                <div class="display-5 fw-bold text-warning mb-2">
+                    KES <%= userWallet ? Number(userWallet.balance).toLocaleString() : '100' %>
+                </div>
+                <p class="text-white-50 small mb-4">Top up via M-Pesa to unlock client WhatsApp numbers and phone lines instantly.</p>
+                <button type="button" class="btn btn-warning fw-bold text-dark w-100 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#mpesaTopupModal">
+                    <i class="fa fa-bolt me-1"></i>Top Up Credits (M-Pesa)
+                </button>
+            </div>
+
+            <!-- Platform Pricing Policy -->
+            <div class="dash-card p-4">
+                <h6 class="fw-bold text-dark mb-3"><i class="fa fa-tag text-primary me-2"></i>Monetization Fees</h6>
+                <div class="d-flex justify-content-between py-2 border-bottom small">
+                    <span class="text-muted">Job Client Phone & WhatsApp:</span>
+                    <strong class="text-dark">Ksh <%= pricing.UNLOCK_JOB_CLIENT_CONTACT %></strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom small">
+                    <span class="text-muted">Hire & Order Client Platform Fee:</span>
+                    <strong class="text-dark">Ksh <%= pricing.UNLOCK_ORDER_CLIENT_CONTACT %></strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom small">
+                    <span class="text-muted">Building Material Supplier Contact:</span>
+                    <strong class="text-dark">Ksh <%= pricing.UNLOCK_MATERIAL_SUPPLIER_CONTACT %></strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 small">
+                    <span class="text-muted">Verified Fundi Direct Contact:</span>
+                    <strong class="text-dark">Ksh <%= pricing.UNLOCK_ARTISAN_CONTACT %></strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h5 class="dash-card-title"><i class="fa fa-history text-primary"></i>Wallet Transaction Ledger</h5>
+                    <span class="badge bg-light text-dark border">Recent 25 items</span>
+                </div>
+                <div class="dash-card-body p-0">
+                    <% if (transactions.length === 0) { %>
+                        <div class="p-4 text-center text-muted">
+                            <i class="fa fa-receipt fa-2x mb-2 text-secondary opacity-50"></i>
+                            <p class="small mb-0">No transactions recorded yet.</p>
+                        </div>
+                    <% } else { %>
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead class="table-light small">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Balance</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% transactions.forEach(tx => { %>
+                                        <tr>
+                                            <td class="small text-muted">
+                                                <%= new Date(tx.created_at).toLocaleDateString() %>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold text-dark small"><%= tx.description %></div>
+                                                <small class="text-muted"><%= tx.payment_method %></small>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold <%= tx.type === 'topup' ? 'text-success' : 'text-danger' %>">
+                                                    <%= tx.type === 'topup' ? '+' : '-' %> Ksh <%= Number(tx.amount).toLocaleString() %>
+                                                </span>
+                                            </td>
+                                            <td class="small text-dark fw-bold">
+                                                Ksh <%= Number(tx.balance_after).toLocaleString() %>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success-subtle text-success py-1 px-2" style="font-size: 0.65rem;">
+                                                    <%= tx.status %>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<!-- ========================================== -->
+<!-- TAB 7: EMBEDDED MARKETPLACE HUB -->
+<!-- ========================================== -->
+<% if (activeTab === 'marketplace') { %>
+    <div class="dash-card">
+        <div class="dash-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h5 class="dash-card-title"><i class="fa fa-store text-primary"></i>Live Construction Marketplace</h5>
+                <small class="text-muted">Browse building supplies, plant machinery hire, fundis, and open jobs right inside your dashboard.</small>
+            </div>
+            <!-- Marketplace Navigation Pills -->
+            <ul class="nav nav-pills gap-1" id="mktSubTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active btn-sm" id="pills-mats-tab" data-bs-toggle="pill" data-bs-target="#pills-mats" type="button">
+                        <i class="fa fa-cubes me-1"></i>Materials (<%= marketplaceMaterials.length %>)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link btn-sm" id="pills-rentals-tab" data-bs-toggle="pill" data-bs-target="#pills-rentals" type="button">
+                        <i class="fa fa-tools me-1"></i>Equipment Hire (<%= marketplaceRentals.length %>)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link btn-sm" id="pills-fundis-tab" data-bs-toggle="pill" data-bs-target="#pills-fundis" type="button">
+                        <i class="fa fa-hard-hat me-1"></i>Fundis (<%= marketplaceFundis.length %>)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link btn-sm" id="pills-jobs-tab" data-bs-toggle="pill" data-bs-target="#pills-jobs" type="button">
+                        <i class="fa fa-briefcase me-1"></i>Jobs (<%= marketplaceJobs.length %>)
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="dash-card-body">
+            <div class="tab-content" id="mktSubTabsContent">
+                <!-- 1. MATERIALS -->
+                <div class="tab-pane fade show active" id="pills-mats">
+                    <div class="row g-3">
+                        <% marketplaceMaterials.forEach(item => { %>
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card h-100 border shadow-sm rounded overflow-hidden">
+                                    <img src="<%= item.image_url || '/img/service-1.jpg' %>" style="height: 160px; object-fit: cover;" alt="">
+                                    <div class="card-body p-3 d-flex flex-column">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="badge bg-light text-dark border"><%= item.category ? item.category.name : 'Supplies' %></span>
+                                            <span class="small text-muted"><i class="fa fa-map-marker-alt me-1 text-primary"></i><%= item.location_county %></span>
+                                        </div>
+                                        <h6 class="fw-bold text-dark mb-1"><%= item.title %></h6>
+                                        <div class="fs-5 fw-bold text-dark mb-2">Ksh <%= Number(item.price).toLocaleString() %> <small class="text-muted fw-normal" style="font-size: 0.75rem;">/ <%= item.unit %></small></div>
+                                        <div class="mb-2 small">
+                                            <span class="text-muted">Vendor: </span>
+                                            <% if (item.contactUnlocked) { %>
+                                                <strong class="text-dark"><%= item.seller ? item.seller.phone : 'Verified' %></strong>
+                                            <% } else { %>
+                                                <span class="badge bg-light text-muted border"><i class="fa fa-lock text-warning me-1"></i><%= item.maskedPhone %></span>
+                                            <% } %>
+                                        </div>
+                                        <div class="mt-auto d-flex gap-2">
+                                            <a href="/materials/<%= item.id %>" class="btn btn-outline-primary btn-sm fw-bold">View</a>
+                                            <a href="/orders/request/<%= item.id %>" class="btn btn-primary text-white btn-sm flex-grow-1 fw-bold">Order Quote</a>
+                                            <% if (item.contactUnlocked) { %>
+                                                <% 
+                                                    const sPhone = item.seller ? item.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                                    const waClean = sPhone.startsWith('0') ? '254' + sPhone.slice(1) : sPhone;
+                                                %>
+                                                <a href="https://wa.me/<%= waClean %>?text=Hi,%20inquiring%20about%20<%= encodeURIComponent(item.title) %>" target="_blank" class="btn btn-whatsapp btn-sm">
+                                                    <i class="fab fa-whatsapp"></i>
+                                                </a>
+                                            <% } else { %>
+                                                <form action="/unlock/material/<%= item.id %>" method="POST">
+                                                    <button type="submit" class="btn btn-unlock-gold btn-sm" title="Unlock WhatsApp">
+                                                        <i class="fa fa-lock me-1"></i>Ksh <%= item.unlockPrice %>
+                                                    </button>
+                                                </form>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- 2. PLANT & EQUIPMENT HIRE -->
+                <div class="tab-pane fade" id="pills-rentals">
+                    <div class="row g-3">
+                        <% marketplaceRentals.forEach(rental => { %>
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card h-100 border shadow-sm rounded overflow-hidden">
+                                    <img src="<%= rental.image_url || '/img/service-2.jpg' %>" style="height: 160px; object-fit: cover;" alt="">
+                                    <div class="card-body p-3 d-flex flex-column">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="badge bg-primary text-white">Hire Plant</span>
+                                            <span class="small text-muted"><i class="fa fa-map-marker-alt me-1 text-primary"></i><%= rental.location_county %></span>
+                                        </div>
+                                        <h6 class="fw-bold text-dark mb-1"><%= rental.title %></h6>
+                                        <div class="fs-5 fw-bold text-primary mb-2">Ksh <%= Number(rental.price).toLocaleString() %> <small class="text-muted fw-normal" style="font-size: 0.75rem;">/ <%= rental.unit %></small></div>
+                                        <div class="mb-2 small">
+                                            <span class="text-muted">Owner: </span>
+                                            <% if (rental.contactUnlocked) { %>
+                                                <strong class="text-dark"><%= rental.seller ? rental.seller.phone : 'Verified' %></strong>
+                                            <% } else { %>
+                                                <span class="badge bg-light text-muted border"><i class="fa fa-lock text-warning me-1"></i><%= rental.maskedPhone %></span>
+                                            <% } %>
+                                        </div>
+                                        <div class="mt-auto d-flex gap-2">
+                                            <a href="/materials/<%= rental.id %>" class="btn btn-outline-primary btn-sm fw-bold">View</a>
+                                            <a href="/orders/request/<%= rental.id %>" class="btn btn-primary text-white btn-sm flex-grow-1 fw-bold">Book Hire</a>
+                                            <% if (rental.contactUnlocked) { %>
+                                                <% 
+                                                    const rPhone = rental.seller ? rental.seller.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                                    const waClean = rPhone.startsWith('0') ? '254' + rPhone.slice(1) : rPhone;
+                                                %>
+                                                <a href="https://wa.me/<%= waClean %>?text=Hi,%20inquiring%20about%20hiring%20<%= encodeURIComponent(rental.title) %>" target="_blank" class="btn btn-whatsapp btn-sm">
+                                                    <i class="fab fa-whatsapp"></i>
+                                                </a>
+                                            <% } else { %>
+                                                <form action="/unlock/material/<%= rental.id %>" method="POST">
+                                                    <button type="submit" class="btn btn-unlock-gold btn-sm" title="Unlock WhatsApp">
+                                                        <i class="fa fa-lock me-1"></i>Ksh <%= rental.unlockPrice %>
+                                                    </button>
+                                                </form>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- 3. FUNDIS & ARTISANS -->
+                <div class="tab-pane fade" id="pills-fundis">
+                    <div class="row g-3">
+                        <% marketplaceFundis.forEach(artisan => { %>
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card h-100 border shadow-sm p-3 rounded">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <img src="<%= artisan.user && artisan.user.avatar ? artisan.user.avatar : '/img/team-1.jpg' %>" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover;" alt="">
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-0"><%= artisan.user ? artisan.user.name : 'Artisan' %></h6>
+                                            <span class="badge bg-warning text-dark py-0 px-2" style="font-size: 0.65rem;"><%= artisan.trade %></span>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small mb-2"><%= artisan.bio ? artisan.bio.substring(0, 75) + '...' : '' %></p>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 small">
+                                        <span class="text-muted">Rate: <strong class="text-dark">Ksh <%= Number(artisan.daily_rate).toLocaleString() %>/day</strong></span>
+                                        <span class="text-muted"><i class="fa fa-map-marker-alt me-1 text-primary"></i><%= artisan.user ? artisan.user.town : 'Kenya' %></span>
+                                    </div>
+                                    <div class="mt-auto d-flex gap-2">
+                                        <a href="/fundis/<%= artisan.id %>" class="btn btn-outline-primary btn-sm flex-grow-1 fw-bold">Profile</a>
+                                        <% if (artisan.contactUnlocked) { %>
+                                            <% 
+                                                const aPhone = artisan.user ? artisan.user.phone.replace(/[^0-9]/g, '') : '254711000000';
+                                                const waClean = aPhone.startsWith('0') ? '254' + aPhone.slice(1) : aPhone;
+                                            %>
+                                            <a href="https://wa.me/<%= waClean %>" target="_blank" class="btn btn-whatsapp btn-sm">
+                                                <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                            </a>
+                                        <% } else { %>
+                                            <form action="/unlock/artisan/<%= artisan.id %>" method="POST">
+                                                <button type="submit" class="btn btn-unlock-gold btn-sm" title="Unlock WhatsApp">
+                                                    <i class="fa fa-lock me-1"></i>Ksh <%= artisan.unlockPrice %>
+                                                </button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- 4. OPEN JOBS -->
+                <div class="tab-pane fade" id="pills-jobs">
+                    <div class="row g-3">
+                        <% marketplaceJobs.forEach(job => { %>
+                            <div class="col-12">
+                                <div class="border rounded p-3 bg-white d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="badge bg-primary"><%= job.trade_required %></span>
+                                            <span class="text-muted small"><i class="fa fa-map-marker-alt text-primary me-1"></i><%= job.location_town %>, <%= job.location_county %></span>
+                                        </div>
+                                        <h6 class="fw-bold text-dark mb-1"><%= job.title %></h6>
+                                        <div class="small text-muted">Budget: <strong class="text-primary">Ksh <%= Number(job.budget_estimate).toLocaleString() %></strong></div>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                        <% if (job.contactUnlocked && job.client) { %>
+                                            <span class="badge bg-success-subtle text-success py-2 px-3 border border-success-subtle">
+                                                <i class="fa fa-phone me-1"></i><%= job.client.phone %>
+                                            </span>
+                                            <% 
+                                                const clPhone = job.client.phone.replace(/[^0-9]/g, '');
+                                                const waClean = clPhone.startsWith('0') ? '254' + clPhone.slice(1) : clPhone;
+                                            %>
+                                            <a href="https://wa.me/<%= waClean %>" target="_blank" class="btn btn-whatsapp btn-sm">
+                                                <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                            </a>
+                                        <% } else { %>
+                                            <span class="badge bg-light text-muted border py-2 px-3">
+                                                <i class="fa fa-lock text-warning me-1"></i><%= job.maskedPhone %>
+                                            </span>
+                                            <form action="/unlock/job/<%= job.id %>" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-unlock-gold btn-sm fw-bold">
+                                                    <i class="fa fa-lock me-1"></i>Unlock (Ksh <%= job.unlockPrice %>)
+                                                </button>
+                                            </form>
+                                        <% } %>
+                                        <a href="/jobs" class="btn btn-primary btn-sm text-white fw-bold">Apply & Bid</a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<!-- ========================================== -->
+<!-- TAB 8: PROFILE SETTINGS -->
+<!-- ========================================== -->
+<% if (activeTab === 'profile') { %>
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5 class="dash-card-title"><i class="fa fa-user-cog text-primary"></i>Account & Profile Settings</h5>
+            <span class="badge bg-light text-muted border">ID #<%= currentUser.id %></span>
+        </div>
+        <div class="dash-card-body">
+            <form action="/dashboard/profile" method="POST" enctype="multipart/form-data">
+                <div class="row g-4">
+                    <div class="col-md-4 text-center">
+                        <div class="position-relative d-inline-block mb-3">
+                            <img src="<%= currentUser.avatar || '/img/team-1.jpg' %>" id="avatarPreview" alt="Avatar" class="rounded-circle border border-3 border-primary shadow-sm" style="width: 130px; height: 130px; object-fit: cover;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-dark">Change Profile Picture</label>
+                            <input type="file" name="avatar_file" id="avatarInput" class="form-control form-control-sm" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-dark">Full Name</label>
+                                <input type="text" name="name" class="form-control" value="<%= currentUser.name %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-dark">Email Address</label>
+                                <input type="email" class="form-control bg-light" value="<%= currentUser.email %>" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-dark">Phone Number (M-Pesa / Call)</label>
+                                <input type="text" name="phone" class="form-control" value="<%= currentUser.phone %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-dark">Primary County</label>
+                                <select name="county" class="form-select">
+                                    <% counties.forEach(c => { %>
+                                        <option value="<%= c %>" <%= currentUser.county === c ? 'selected' : '' %>><%= c %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-dark">Town / Area</label>
+                                <input type="text" name="town" class="form-control" value="<%= currentUser.town %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-dark">Platform Account Type</label>
+                                <input type="text" class="form-control bg-light text-uppercase fw-bold" value="<%= currentUser.role %>" readonly>
+                            </div>
+
+                            <% if (currentUser.artisanProfile) { %>
+                                <div class="col-12 border-top pt-3">
+                                    <h6 class="fw-bold text-dark mb-2"><i class="fa fa-tools me-1 text-primary"></i>Artisan & Trade Details</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Trade / Specialization</label>
+                                    <input type="text" name="trade" class="form-control" value="<%= currentUser.artisanProfile.trade %>">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Daily Labor Rate (KES)</label>
+                                    <input type="number" name="daily_rate" class="form-control" value="<%= currentUser.artisanProfile.daily_rate %>">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-dark">Professional Bio & Experience</label>
+                                    <textarea name="bio" class="form-control" rows="3"><%= currentUser.artisanProfile.bio %></textarea>
+                                </div>
+                            <% } %>
+
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-primary text-white fw-bold px-4">
+                                    <i class="fa fa-save me-1"></i>Save Profile Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+<% } %>
+
+<!-- ========================================== -->
+<!-- TAB 9: ADMIN CONSOLE -->
+<!-- ========================================== -->
+<% if (activeTab === 'admin' && currentUser.role === 'admin') { %>
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5 class="dash-card-title text-danger"><i class="fa fa-shield-alt me-1"></i>Platform Master Administration</h5>
+            <span class="badge bg-danger text-white">Superadmin Access</span>
+        </div>
+        <div class="dash-card-body">
+            <!-- Platform Counters -->
+            <div class="row g-3 mb-4">
+                <div class="col-4 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-light">
+                        <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalUsers %></div>
+                        <small class="text-muted">Users</small>
+                    </div>
+                </div>
+                <div class="col-4 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-light">
+                        <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalProducts %></div>
+                        <small class="text-muted">Listings</small>
+                    </div>
+                </div>
+                <div class="col-4 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-light">
+                        <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalJobs %></div>
+                        <small class="text-muted">Jobs</small>
+                    </div>
+                </div>
+                <div class="col-4 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-light">
+                        <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalBids %></div>
+                        <small class="text-muted">Bids</small>
+                    </div>
+                </div>
+                <div class="col-4 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-light">
+                        <div class="fs-4 fw-bold text-dark"><%= adminData.stats.totalOrders %></div>
+                        <small class="text-muted">Orders</small>
+                    </div>
+                </div>
+                <div class="col-4 col-lg-2">
+                    <div class="border rounded p-3 text-center bg-light">
+                        <div class="fs-4 fw-bold text-primary">KES <%= Number(adminData.stats.totalVolume).toLocaleString() %></div>
+                        <small class="text-muted">Volume</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Moderation Table -->
+            <h6 class="fw-bold text-dark mb-2">Registered Users Management</h6>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>User Name</th>
+                            <th>Role</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th class="text-end">Verification</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% adminData.users.slice(0, 15).forEach(u => { %>
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark"><%= u.name %></div>
+                                    <small class="text-muted"><%= u.phone %> &bull; <%= u.email %></small>
+                                </td>
+                                <td><span class="badge bg-secondary text-uppercase"><%= u.role %></span></td>
+                                <td class="small text-muted"><%= u.town %>, <%= u.county %></td>
+                                <td>
+                                    <span class="badge <%= u.is_verified ? 'bg-success' : 'bg-warning text-dark' %>">
+                                        <%= u.is_verified ? 'Verified' : 'Unverified' %>
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <form action="/admin/users/<%= u.id %>/toggle-verify" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm <%= u.is_verified ? 'btn-outline-warning' : 'btn-outline-success' %> py-1 px-2" style="font-size: 0.75rem;">
+                                            <%= u.is_verified ? 'Unverify' : 'Verify' %>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+<% } %>
 
 <script>
-// Avatar live preview
 document.addEventListener('DOMContentLoaded', function() {
     const avatarInput = document.getElementById('avatarInput');
     const avatarPreview = document.getElementById('avatarPreview');
     if (avatarInput && avatarPreview) {
         avatarInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
-                if (this.files[0].size > 3 * 1024 * 1024) {
-                    alert('Avatar file must be under 3MB.');
-                    this.value = '';
-                    return;
-                }
                 const reader = new FileReader();
                 reader.onload = (e) => { avatarPreview.src = e.target.result; };
                 reader.readAsDataURL(this.files[0]);

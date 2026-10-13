@@ -90,8 +90,8 @@ exports.postRegister = async (req, res) => {
       town: user.town
     };
 
-    req.flash('success', `Account created successfully! Welcome to TopLineHub, ${user.name}.`);
-    res.redirect('/');
+    req.flash('success', `Account created successfully! Welcome to your workstation, ${user.name}.`);
+    res.redirect('/dashboard');
   } catch (err) {
     console.error('Register error:', err);
     req.flash('error', 'Registration failed. Please check your details.');

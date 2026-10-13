@@ -90,13 +90,33 @@
                                     <strong class="text-primary">Ksh <%= Number(artisan.daily_rate).toLocaleString() %></strong>
                                 </div>
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="mb-2 small">
+                                <span class="text-muted"><i class="fa fa-phone text-secondary me-1"></i>Contact: </span>
+                                <% if (artisan.contactUnlocked) { %>
+                                    <strong class="text-dark"><%= artisan.user.phone %></strong>
+                                <% } else { %>
+                                    <span class="badge bg-light text-muted border"><i class="fa fa-lock text-warning me-1"></i><%= artisan.maskedPhone %></span>
+                                <% } %>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
                                 <a href="/fundis/<%= artisan.id %>" class="btn btn-outline-primary btn-sm fw-bold flex-grow-1">
                                     <i class="fa fa-user me-1"></i>Profile & Hire
                                 </a>
-                                <a href="https://wa.me/<%= artisan.user.phone.replace(/[^0-9]/g, '') %>?text=Hello%20<%= encodeURIComponent(artisan.user.name) %>,%20I%20am%20reaching%20out%20via%20TopLineHub%20for%20a%20site%20job" class="btn btn-whatsapp fw-bold btn-sm flex-grow-1" target="_blank">
-                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
-                                </a>
+                                <% if (artisan.contactUnlocked) { %>
+                                    <% 
+                                        const aPhone = artisan.user.phone.replace(/[^0-9]/g, '');
+                                        const waClean = aPhone.startsWith('0') ? '254' + aPhone.slice(1) : aPhone;
+                                    %>
+                                    <a href="https://wa.me/<%= waClean %>?text=Hello%20<%= encodeURIComponent(artisan.user.name) %>,%20I%20am%20reaching%20out%20via%20TopLineHub%20for%20a%20site%20job" class="btn btn-whatsapp fw-bold btn-sm flex-grow-1" target="_blank">
+                                        <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                    </a>
+                                <% } else { %>
+                                    <form action="/unlock/artisan/<%= artisan.id %>" method="POST" class="flex-grow-1">
+                                        <button type="submit" class="btn btn-outline-warning fw-bold btn-sm text-dark w-100" title="Unlock Fundi WhatsApp & Phone Number">
+                                            <i class="fa fa-lock me-1"></i>Unlock WhatsApp (Ksh <%= artisan.unlockPrice %>)
+                                        </button>
+                                    </form>
+                                <% } %>
                             </div>
                         </div>
                     </div>

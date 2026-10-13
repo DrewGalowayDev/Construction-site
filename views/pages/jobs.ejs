@@ -103,18 +103,44 @@
                                     </div>
                                     <h4 class="fw-bold text-dark mb-2"><%= job.title %></h4>
                                     <p class="text-muted mb-3"><%= job.description %></p>
-                                    <div class="d-flex flex-wrap gap-3 text-secondary small">
+                                    <div class="d-flex flex-wrap gap-3 text-secondary small align-items-center">
                                         <span><i class="fa fa-map-marker-alt text-primary me-1"></i><%= job.location_town %>, <%= job.location_county %></span>
                                         <span><i class="fa fa-user text-primary me-1"></i>Client: <%= job.client ? job.client.name : 'Verified Site Owner' %></span>
                                         <span><i class="fa fa-calendar-alt text-primary me-1"></i>Posted: <%= new Date(job.created_at).toLocaleDateString() %></span>
+                                        <span>
+                                            <i class="fa fa-phone text-primary me-1"></i>
+                                            <% if (job.contactUnlocked && job.client) { %>
+                                                <strong class="text-dark"><%= job.client.phone %></strong>
+                                            <% } else { %>
+                                                <span class="badge bg-light text-muted border"><i class="fa fa-lock text-warning me-1"></i><%= job.maskedPhone %></span>
+                                            <% } %>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="col-lg-4 text-lg-end mt-4 mt-lg-0 border-start ps-lg-4">
                                     <small class="text-muted d-block">Estimated Budget</small>
                                     <h3 class="text-primary fw-bold mb-3">Ksh <%= Number(job.budget_estimate).toLocaleString() %></h3>
-                                    <button type="button" class="btn btn-primary text-white px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#bidModal<%= job.id %>">
-                                        <i class="fa fa-paper-plane me-1"></i>Submit Bid / Pitch
-                                    </button>
+                                    <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                                        <button type="button" class="btn btn-primary text-white px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#bidModal<%= job.id %>">
+                                            <i class="fa fa-paper-plane me-1"></i>Submit Bid
+                                        </button>
+                                        <% if (job.contactUnlocked && job.client) { %>
+                                            <% 
+                                                const clPhone = job.client.phone.replace(/[^0-9]/g, '');
+                                                const waClean = clPhone.startsWith('0') ? '254' + clPhone.slice(1) : clPhone;
+                                                const waMsg = encodeURIComponent('Hi ' + job.client.name + ', I am inquiring about your job "' + job.title + '" on TopLineHub.');
+                                            %>
+                                            <a href="https://wa.me/<%= waClean %>?text=<%= waMsg %>" target="_blank" class="btn btn-whatsapp btn-sm fw-bold">
+                                                <i class="fab fa-whatsapp me-1"></i>WhatsApp Client
+                                            </a>
+                                        <% } else { %>
+                                            <form action="/unlock/job/<%= job.id %>" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-warning btn-sm text-dark fw-bold" title="Unlock Client Direct Phone & WhatsApp">
+                                                    <i class="fa fa-lock me-1"></i>Unlock WhatsApp (Ksh <%= job.unlockPrice %>)
+                                                </button>
+                                            </form>
+                                        <% } %>
+                                    </div>
                                 </div>
                             </div>
                         </div>

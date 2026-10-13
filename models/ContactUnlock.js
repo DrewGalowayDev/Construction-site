@@ -8,7 +8,7 @@ const ContactUnlock = sequelize.define('ContactUnlock', {
     primaryKey: true
   },
   unlock_type: {
-    type: DataTypes.ENUM('job_client', 'material_supplier', 'artisan_fundi'),
+    type: DataTypes.STRING(50),
     allowNull: false
   },
   target_id: {

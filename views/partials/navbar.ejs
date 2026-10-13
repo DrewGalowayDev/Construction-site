@@ -17,7 +17,7 @@
             <a href="/jobs" class="nav-item nav-link <%= currentPath.startsWith('/jobs') ? 'active' : '' %>">Job Board</a>
             <a href="/calculator" class="nav-item nav-link <%= currentPath === '/calculator' ? 'active' : '' %>"><i class="fa fa-calculator me-1 text-primary"></i>Estimator</a>
             <% if (user) { %>
-                <a href="/dashboard" class="nav-item nav-link <%= currentPath === '/dashboard' ? 'active' : '' %>"><i class="fa fa-tachometer-alt me-1 text-primary"></i>Dashboard</a>
+                <a href="/dashboard" class="nav-item nav-link <%= currentPath === '/dashboard' ? 'active' : '' %>"><i class="fa fa-th-large me-1 text-primary"></i>App Dashboard</a>
             <% } %>
             
             <div class="nav-item dropdown">

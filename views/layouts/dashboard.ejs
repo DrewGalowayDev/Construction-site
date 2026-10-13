@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title><%= typeof title !== 'undefined' ? title + ' | TopLineHub App' : 'TopLineHub Kenya | Construction Dashboard' %></title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="TopLineHub Construction Platform Kenya" name="description">
+
+    <!-- Favicon -->
+    <link href="/img/favicon.ico" rel="icon">
+    <link href="/img/favicon.svg" rel="icon" type="image/svg+xml">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"> 
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Real-time Dashboard Design System Stylesheet -->
+    <style>
+        :root {
+            --app-primary: #FDA12B;
+            --app-primary-hover: #e58d19;
+            --app-primary-light: rgba(253, 161, 43, 0.12);
+            --app-sidebar-bg: #111827;
+            --app-sidebar-border: #1f2937;
+            --app-sidebar-text: #9ca3af;
+            --app-sidebar-active-bg: rgba(253, 161, 43, 0.15);
+            --app-sidebar-active-text: #FDA12B;
+            --app-header-bg: #ffffff;
+            --app-body-bg: #f3f4f6;
+            --app-card-bg: #ffffff;
+            --app-dark: #0f172a;
+            --app-success: #10b981;
+            --app-whatsapp: #25D366;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+            background-color: var(--app-body-bg);
+            color: #334155;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* App Layout Shell */
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Sidebar Styling */
+        .app-sidebar {
+            width: 270px;
+            background-color: var(--app-sidebar-bg);
+            border-right: 1px solid var(--app-sidebar-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1040;
+            transition: all 0.25s ease-in-out;
+            overflow-y: auto;
+        }
+
+        .app-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .app-sidebar::-webkit-scrollbar-thumb {
+            background-color: #374151;
+            border-radius: 4px;
+        }
+
+        .sidebar-brand {
+            padding: 1.25rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--app-sidebar-border);
+        }
+
+        .sidebar-brand a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #FDA12B, #f59e0b);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-size: 1.1rem;
+            font-weight: 800;
+            box-shadow: 0 4px 10px rgba(253, 161, 43, 0.3);
+        }
+
+        .brand-text {
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .brand-sub {
+            color: #FDA12B;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 700;
+            display: block;
+        }
+
+        /* Sidebar User Profile */
+        .sidebar-user {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--app-sidebar-border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .user-avatar-wrap {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #374151;
+        }
+
+        .user-online-dot {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--app-success);
+            border: 2px solid var(--app-sidebar-bg);
+            border-radius: 50%;
+        }
+
+        /* Sidebar Wallet Card */
+        .sidebar-wallet-card {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 1.25rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-wallet-card::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, rgba(253, 161, 43, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .wallet-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9ca3af;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .wallet-amount {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 4px 0 8px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .wallet-amount .currency {
+            font-size: 0.85rem;
+            color: #FDA12B;
+            font-weight: 700;
+        }
+
+        .btn-wallet-topup {
+            background: linear-gradient(135deg, #FDA12B, #f59e0b);
+            color: #111827;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-wallet-topup:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(253, 161, 43, 0.3);
+            color: #111827;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            padding: 0.5rem 0.75rem;
+            flex-grow: 1;
+        }
+
+        .nav-section-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6b7280;
+            font-weight: 700;
+            padding: 0.75rem 0.75rem 0.35rem 0.75rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0.85rem;
+            color: var(--app-sidebar-text);
+            text-decoration: none;
+            border-radius: 9px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link .link-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-link i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            color: #9ca3af;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+        }
+
+        .sidebar-link:hover i {
+            color: #FDA12B;
+        }
+
+        .sidebar-link.active {
+            background-color: var(--app-sidebar-active-bg);
+            color: var(--app-sidebar-active-text);
+        }
+
+        .sidebar-link.active i {
+            color: var(--app-sidebar-active-text);
+        }
+
+        .sidebar-link .badge {
+            font-size: 0.7rem;
+            padding: 3px 7px;
+            border-radius: 6px;
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--app-sidebar-border);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-decoration: none;
+            padding: 6px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-footer a:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-footer a.text-danger:hover {
+            color: #f87171 !important;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* App Main Area */
+        .app-main {
+            margin-left: 270px;
+            flex-grow: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s ease-in-out;
+        }
+
+        /* Top App Header */
+        .app-header {
+            height: 68px;
+            background-color: var(--app-header-bg);
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.75rem;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn-sidebar-toggle {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sidebar-toggle:hover {
+            background-color: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .header-status-badge {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-pill {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #b45309;
+            padding: 6px 14px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wallet-pill:hover {
+            background: #fef3c7;
+            color: #92400e;
+            transform: translateY(-1px);
+        }
+
+        /* App Content Wrapper */
+        .app-content {
+            padding: 1.75rem;
+            flex-grow: 1;
+        }
+
+        /* WhatsApp Button styling */
+        .btn-whatsapp {
+            background-color: var(--app-whatsapp);
+            color: #ffffff !important;
+            border: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #1ebe57;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+        }
+
+        /* Unlock Contact Button styling */
+        .btn-unlock-gold {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff !important;
+            border: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25);
+        }
+
+        .btn-unlock-gold:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+        }
+
+        /* Cards and Components */
+        .dash-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .dash-card-header {
+            padding: 1.15rem 1.35rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+        }
+
+        .dash-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dash-card-body {
+            padding: 1.35rem;
+        }
+
+        /* Stat Cards */
+        .stat-widget {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s;
+        }
+
+        .stat-widget:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 991.98px) {
+            .app-sidebar {
+                transform: translateX(-100%);
+            }
+            .app-sidebar.show {
+                transform: translateX(0);
+            }
+            .app-main {
+                margin-left: 0;
+            }
+            .sidebar-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1035;
+                display: none;
+            }
+            .sidebar-backdrop.show {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Sidebar Backdrop for mobile -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- APP SIDEBAR -->
+        <aside class="app-sidebar" id="appSidebar">
+            <!-- Brand -->
+            <div class="sidebar-brand">
+                <a href="/dashboard">
+                    <div class="brand-icon">
+                        <i class="fa fa-hard-hat"></i>
+                    </div>
+                    <div>
+                        <span class="brand-text">TopLineHub</span>
+                        <span class="brand-sub"><i class="fa fa-map-marker-alt me-1"></i>Kenya Hub</span>
+                    </div>
+                </a>
+                <button type="button" class="btn btn-sm btn-link text-white-50 d-lg-none p-0" id="sidebarCloseBtn">
+                    <i class="fa fa-times fs-5"></i>
+                </button>
+            </div>
+
+            <!-- User Summary -->
+            <div class="sidebar-user d-flex align-items-center gap-3">
+                <div class="user-avatar-wrap">
+                    <img src="<%= user && user.avatar ? user.avatar : '/img/team-1.jpg' %>" alt="<%= user ? user.name : 'User' %>" class="user-avatar">
+                    <span class="user-online-dot"></span>
+                </div>
+                <div class="flex-grow-1 overflow-hidden">
+                    <div class="text-white fw-bold text-truncate" style="font-size: 0.9rem;">
+                        <%= user ? user.name : 'Account User' %>
+                    </div>
+                    <div class="d-flex align-items-center gap-1 mt-1">
+                        <span class="badge bg-warning text-dark text-uppercase px-2 py-0" style="font-size: 0.65rem; font-weight: 700;">
+                            <%= user ? user.role : 'member' %>
+                        </span>
+                        <span class="badge bg-success-subtle text-success py-0 px-1" style="font-size: 0.65rem;">
+                            <i class="fa fa-check-circle"></i> Verified
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WALLET WIDGET IN SIDEBAR -->
+            <div class="sidebar-wallet-card">
+                <div class="wallet-label">
+                    <span><i class="fa fa-wallet text-warning me-1"></i>Site Wallet</span>
+                    <span class="badge bg-success py-1 px-2" style="font-size: 0.65rem;">Active</span>
+                </div>
+                <div class="wallet-amount">
+                    <span class="currency">KES</span>
+                    <span><%= typeof userWallet !== 'undefined' && userWallet ? Number(userWallet.balance).toLocaleString() : '100' %></span>
+                </div>
+                <button type="button" class="btn-wallet-topup" data-bs-toggle="modal" data-bs-target="#mpesaTopupModal">
+                    <i class="fa fa-bolt"></i>Top Up Credits (M-Pesa)
+                </button>
+            </div>
+
+            <!-- SIDEBAR NAV -->
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main Workstation</div>
+                <a href="/dashboard?tab=overview" class="sidebar-link <%= (typeof activeTab === 'undefined' || activeTab === 'overview') ? 'active' : '' %>" data-tab-target="overview">
+                    <div class="link-content">
+                        <i class="fa fa-th-large"></i>
+                        <span>Overview</span>
+                    </div>
+                </a>
+                <a href="/dashboard?tab=artisan" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'artisan') ? 'active' : '' %>" data-tab-target="artisan">
+                    <div class="link-content">
+                        <i class="fa fa-hard-hat"></i>
+                        <span>Job Seeker & Bids</span>
+                    </div>
+                    <% if (typeof myApplications !== 'undefined' && myApplications.length > 0) { %>
+                        <span class="badge bg-primary text-white"><%= myApplications.length %></span>
+                    <% } %>
+                </a>
+                <a href="/dashboard?tab=client" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'client') ? 'active' : '' %>" data-tab-target="client">
+                    <div class="link-content">
+                        <i class="fa fa-briefcase"></i>
+                        <span>Client Projects</span>
+                    </div>
+                    <% if (typeof postedJobs !== 'undefined' && postedJobs.length > 0) { %>
+                        <span class="badge bg-secondary text-white"><%= postedJobs.length %></span>
+                    <% } %>
+                </a>
+                <a href="/dashboard?tab=supplier" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'supplier') ? 'active' : '' %>" data-tab-target="supplier">
+                    <div class="link-content">
+                        <i class="fa fa-truck-loading"></i>
+                        <span>Materials & Plant Hire</span>
+                    </div>
+                    <% if (typeof myProducts !== 'undefined' && myProducts.length > 0) { %>
+                        <span class="badge bg-secondary text-white"><%= myProducts.length %></span>
+                    <% } %>
+                </a>
+                <a href="/dashboard?tab=orders" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'orders') ? 'active' : '' %>" data-tab-target="orders">
+                    <div class="link-content">
+                        <i class="fa fa-clipboard-list"></i>
+                        <span>Hire Enquiries & Orders</span>
+                    </div>
+                    <% if (typeof incomingInquiries !== 'undefined' && incomingInquiries.length > 0) { %>
+                        <span class="badge bg-warning text-dark"><%= incomingInquiries.length %></span>
+                    <% } %>
+                </a>
+
+                <div class="nav-section-title">Finances & Monetization</div>
+                <a href="/dashboard?tab=wallet" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'wallet') ? 'active' : '' %>" data-tab-target="wallet">
+                    <div class="link-content">
+                        <i class="fa fa-coins"></i>
+                        <span>Wallet & Transactions</span>
+                    </div>
+                </a>
+
+                <div class="nav-section-title">Embedded Marketplace Hub</div>
+                <a href="/dashboard?tab=marketplace" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'marketplace') ? 'active' : '' %>" data-tab-target="marketplace">
+                    <div class="link-content">
+                        <i class="fa fa-store"></i>
+                        <span>Browse Marketplace</span>
+                    </div>
+                    <span class="badge bg-success text-white">Live</span>
+                </a>
+                <a href="/calculator" class="sidebar-link">
+                    <div class="link-content">
+                        <i class="fa fa-calculator"></i>
+                        <span>BOQ Cost Estimator</span>
+                    </div>
+                </a>
+
+                <div class="nav-section-title">Settings</div>
+                <a href="/dashboard?tab=profile" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'profile') ? 'active' : '' %>" data-tab-target="profile">
+                    <div class="link-content">
+                        <i class="fa fa-user-cog"></i>
+                        <span>Profile Settings</span>
+                    </div>
+                </a>
+
+                <% if (user && user.role === 'admin') { %>
+                    <div class="nav-section-title text-danger">Platform Administration</div>
+                    <a href="/dashboard?tab=admin" class="sidebar-link <%= (typeof activeTab !== 'undefined' && activeTab === 'admin') ? 'active' : '' %>" data-tab-target="admin">
+                        <div class="link-content">
+                            <i class="fa fa-shield-alt text-danger"></i>
+                            <span class="text-danger fw-bold">Admin Console</span>
+                        </div>
+                    </a>
+                <% } %>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <a href="/" target="_blank">
+                    <i class="fa fa-external-link-alt"></i>
+                    <span>View Public Website</span>
+                </a>
+                <a href="/auth/logout" class="text-danger">
+                    <i class="fa fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- APP MAIN CONTENT WRAPPER -->
+        <div class="app-main">
+            <!-- App Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button type="button" class="btn-sidebar-toggle" id="sidebarToggleBtn" aria-label="Toggle Sidebar">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div>
+                        <div class="header-status-badge d-none d-sm-flex">
+                            <span class="pulse-dot"></span>
+                            <span>TopLineHub Live System</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <!-- Quick Wallet Chip with M-Pesa Topup trigger -->
+                    <button type="button" class="wallet-pill" data-bs-toggle="modal" data-bs-target="#mpesaTopupModal" title="Click to Top Up Credits via M-Pesa">
+                        <i class="fa fa-wallet text-warning"></i>
+                        <span>KES <%= typeof userWallet !== 'undefined' && userWallet ? Number(userWallet.balance).toLocaleString() : '100' %></span>
+                        <span class="badge bg-warning text-dark py-1 px-1 ms-1" style="font-size: 0.65rem;">+ Top Up</span>
+                    </button>
+
+                    <!-- Quick Action: Post Job -->
+                    <a href="/jobs/post" class="btn btn-sm btn-outline-dark fw-bold d-none d-md-inline-flex align-items-center gap-1">
+                        <i class="fa fa-plus-circle text-primary"></i> Post Job
+                    </a>
+
+                    <!-- Quick Action: List Material/Plant -->
+                    <a href="/materials/post" class="btn btn-sm btn-primary text-white fw-bold d-none d-md-inline-flex align-items-center gap-1">
+                        <i class="fa fa-cube"></i> List Item
+                    </a>
+
+                    <!-- User Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light border dropdown-toggle d-flex align-items-center gap-2 p-1 pe-2" type="button" data-bs-toggle="dropdown">
+                            <img src="<%= user && user.avatar ? user.avatar : '/img/team-1.jpg' %>" alt="avatar" style="width: 30px; height: 30px; border-radius: 6px; object-fit: cover;">
+                            <span class="d-none d-lg-inline small fw-bold text-dark"><%= user ? user.name.split(' ')[0] : 'Account' %></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li class="px-3 py-2 border-bottom">
+                                <div class="fw-bold text-dark"><%= user ? user.name : 'User' %></div>
+                                <div class="small text-muted"><%= user ? user.phone : '' %></div>
+                            </li>
+                            <li><a class="dropdown-item py-2" href="/dashboard?tab=overview"><i class="fa fa-th-large me-2 text-primary"></i>Workstation</a></li>
+                            <li><a class="dropdown-item py-2" href="/dashboard?tab=wallet"><i class="fa fa-wallet me-2 text-warning"></i>Wallet & Credits</a></li>
+                            <li><a class="dropdown-item py-2" href="/dashboard?tab=profile"><i class="fa fa-user-cog me-2 text-secondary"></i>Account Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2" href="/" target="_blank"><i class="fa fa-globe me-2 text-muted"></i>Public Landing</a></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="/auth/logout"><i class="fa fa-sign-out-alt me-2"></i>Sign Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Flash Messages -->
+            <div class="px-4 pt-3">
+                <%- include('../partials/flash') %>
+            </div>
+
+            <!-- Main App Content (Injected by body) -->
+            <main class="app-content">
+                <%- body %>
+            </main>
+        </div>
+    </div>
+
+    <!-- M-PESA INSTANT TOP-UP MODAL -->
+    <div class="modal fade" id="mpesaTopupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <div class="modal-header bg-dark text-white p-4">
+                    <div>
+                        <h5 class="modal-title fw-bold text-white mb-1"><i class="fa fa-bolt text-warning me-2"></i>Top Up Credits via M-Pesa</h5>
+                        <p class="small text-white-50 mb-0">Credits unlock client WhatsApp & phone numbers and pay platform commission charges.</p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/wallet/paystack/initialize" method="POST" id="topupForm">
+                    <div class="modal-body p-4">
+                        <div class="alert alert-success d-flex align-items-center gap-3 py-2 px-3 mb-3">
+                            <i class="fab fa-whatsapp fs-3 text-success"></i>
+                            <div class="small">
+                                <strong>Why Top Up?</strong> Unlocking contacts lets job seekers and equipment owners call & WhatsApp clients directly to close deals!
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Option -->
+                        <label class="form-label fw-bold text-dark small mb-2">Payment Method:</label>
+                        <div class="d-flex gap-2 mb-3">
+                            <label class="flex-grow-1 border rounded p-2 d-flex align-items-center gap-2 cursor-pointer bg-light" id="topupMethodPaystackLabel">
+                                <input type="radio" name="topup_gateway" value="paystack" checked onchange="switchTopupGateway('paystack')">
+                                <div>
+                                    <strong class="text-dark d-block small"><i class="fa fa-shield-alt text-primary me-1"></i>Paystack Gateway</strong>
+                                    <small class="text-muted" style="font-size: 0.68rem;">Card, M-Pesa, Bank, Apple Pay</small>
+                                </div>
+                            </label>
+                            <label class="flex-grow-1 border rounded p-2 d-flex align-items-center gap-2 cursor-pointer" id="topupMethodMpesaLabel">
+                                <input type="radio" name="topup_gateway" value="mpesa" onchange="switchTopupGateway('mpesa')">
+                                <div>
+                                    <strong class="text-dark d-block small"><i class="fa fa-mobile-alt text-success me-1"></i>Direct M-Pesa STK</strong>
+                                    <small class="text-muted" style="font-size: 0.68rem;">Instant phone PIN prompt</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <label class="form-label fw-bold text-dark small mb-2">Select Top-Up Package (KES):</label>
+                        <div class="row g-2 mb-3">
+                            <div class="col-4">
+                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
+                                    <input type="radio" name="amount" value="100" class="d-none" checked onchange="updateTopupSelect(100)">
+                                    <div class="fw-bold text-dark">Ksh 100</div>
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Starter</small>
+                                </label>
+                            </div>
+                            <div class="col-4">
+                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
+                                    <input type="radio" name="amount" value="200" class="d-none" onchange="updateTopupSelect(200)">
+                                    <div class="fw-bold text-dark">Ksh 200</div>
+                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+10 Bonus</small>
+                                </label>
+                            </div>
+                            <div class="col-4">
+                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
+                                    <input type="radio" name="amount" value="500" class="d-none" onchange="updateTopupSelect(500)">
+                                    <div class="fw-bold text-dark">Ksh 500</div>
+                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+50 Bonus</small>
+                                </label>
+                            </div>
+                            <div class="col-4">
+                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
+                                    <input type="radio" name="amount" value="1000" class="d-none" onchange="updateTopupSelect(1000)">
+                                    <div class="fw-bold text-dark">Ksh 1,000</div>
+                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+150 Bonus</small>
+                                </label>
+                            </div>
+                            <div class="col-4">
+                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
+                                    <input type="radio" name="amount" value="2000" class="d-none" onchange="updateTopupSelect(2000)">
+                                    <div class="fw-bold text-dark">Ksh 2,000</div>
+                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+400 Bonus</small>
+                                </label>
+                            </div>
+                            <div class="col-4">
+                                <label class="w-100 border rounded p-2 text-center package-card cursor-pointer">
+                                    <input type="radio" name="amount" value="5000" class="d-none" onchange="updateTopupSelect(5000)">
+                                    <div class="fw-bold text-dark">Ksh 5,000</div>
+                                    <small class="text-success fw-bold d-block" style="font-size: 0.7rem;">+1,250 Bonus</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 d-none" id="mpesaPhoneField">
+                            <label class="form-label fw-bold text-dark small">M-Pesa Mobile Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light fw-bold text-success"><i class="fa fa-mobile-alt me-1"></i>+254</span>
+                                <input type="text" name="mpesa_phone" id="topup_mpesa_phone" class="form-control" placeholder="712345678" value="<%= user && user.phone ? user.phone.replace(/[^0-9]/g, '').slice(-9) : '' %>">
+                            </div>
+                            <small class="text-muted" style="font-size: 0.75rem;">An M-Pesa SIM prompt will trigger on your handset.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light p-3">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="topupSubmitBtn" class="btn btn-warning fw-bold text-dark px-4 shadow-sm">
+                            <i class="fa fa-lock me-1"></i>Pay via Paystack
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sidebar & App Client Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('appSidebar');
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            const closeBtn = document.getElementById('sidebarCloseBtn');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                backdrop.classList.toggle('show');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                backdrop.classList.remove('show');
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+            // Gateway switcher (Paystack vs M-Pesa)
+            window.switchTopupGateway = function (gw) {
+                const form = document.getElementById('topupForm');
+                const mpesaField = document.getElementById('mpesaPhoneField');
+                const submitBtn = document.getElementById('topupSubmitBtn');
+                const paystackLabel = document.getElementById('topupMethodPaystackLabel');
+                const mpesaLabel = document.getElementById('topupMethodMpesaLabel');
+
+                if (gw === 'paystack') {
+                    if (form) form.action = '/wallet/paystack/initialize';
+                    if (mpesaField) mpesaField.classList.add('d-none');
+                    if (submitBtn) {
+                        submitBtn.className = 'btn btn-warning fw-bold text-dark px-4 shadow-sm';
+                        submitBtn.innerHTML = '<i class="fa fa-lock me-1"></i>Pay via Paystack';
+                    }
+                    if (paystackLabel) {
+                        paystackLabel.classList.add('bg-light');
+                        paystackLabel.style.borderColor = '#FDA12B';
+                    }
+                    if (mpesaLabel) {
+                        mpesaLabel.classList.remove('bg-light');
+                        mpesaLabel.style.borderColor = '#dee2e6';
+                    }
+                } else {
+                    if (form) form.action = '/wallet/topup';
+                    if (mpesaField) mpesaField.classList.remove('d-none');
+                    if (submitBtn) {
+                        submitBtn.className = 'btn btn-success fw-bold text-white px-4 shadow-sm';
+                        submitBtn.innerHTML = '<i class="fa fa-mobile-alt me-1"></i>Send M-Pesa PIN Prompt';
+                    }
+                    if (mpesaLabel) {
+                        mpesaLabel.classList.add('bg-light');
+                        mpesaLabel.style.borderColor = '#198754';
+                    }
+                    if (paystackLabel) {
+                        paystackLabel.classList.remove('bg-light');
+                        paystackLabel.style.borderColor = '#dee2e6';
+                    }
+                }
+            };
+
+            // Package card selector styling
+            window.updateTopupSelect = function (val) {
+                document.querySelectorAll('.package-card').forEach(card => {
+                    const input = card.querySelector('input');
+                    if (input && input.checked) {
+                        card.style.borderColor = '#FDA12B';
+                        card.style.backgroundColor = '#fffbeb';
+                    } else {
+                        card.style.borderColor = '#e2e8f0';
+                        card.style.backgroundColor = '#ffffff';
+                    }
+                });
+            };
+            updateTopupSelect(100);
+        });
+    </script>
+</body>
+</html>
