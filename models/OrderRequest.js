@@ -61,6 +61,22 @@ const OrderRequest = sequelize.define('OrderRequest', {
   seller_payout_amount: {
     type: DataTypes.DECIMAL(10, 2),
     defaultValue: 0.00
+  },
+  escrow_status: {
+    type: DataTypes.ENUM('none', 'held', 'released', 'disbursed'),
+    defaultValue: 'none'
+  },
+  buyer_confirmed_at: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  disbursement_date: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  order_type: {
+    type: DataTypes.ENUM('quote', 'purchase'),
+    defaultValue: 'quote'
   }
 }, {
   tableName: 'order_requests'

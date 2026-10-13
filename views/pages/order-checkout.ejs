@@ -16,16 +16,74 @@
 <div class="container-xxl py-4">
     <div class="container">
         <!-- Top Status Alert -->
-        <% if (order.payment_status === 'paid') { %>
+        <% if (order.payment_status === 'paid' && order.escrow_status === 'held') { %>
+            <!-- Escrow Held Status -->
+            <div class="alert alert-warning d-flex align-items-center justify-content-between p-4 mb-4 shadow-sm border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-warning text-dark rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fa fa-shield-alt fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="alert-heading mb-1 text-dark fw-bold">Payment Secured in Escrow</h5>
+                        <p class="mb-0 text-muted small">
+                            KES <%= Number(order.total_price).toLocaleString() %> is securely held via Paystack (Ref: <strong class="text-dark"><%= order.paystack_reference %></strong>). 
+                            Funds will be released to the supplier once you confirm delivery & satisfaction.
+                        </p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <form action="/orders/<%= order.id %>/confirm-delivery" method="POST" onsubmit="return confirm('Are you satisfied with the products received? This will release payment to the supplier.')">
+                        <button type="submit" class="btn btn-success btn-sm fw-bold shadow-sm px-3">
+                            <i class="fa fa-check-circle me-1"></i>Confirm Delivery & Release Payment
+                        </button>
+                    </form>
+                    <a href="/orders/<%= order.id %>/invoice" class="btn btn-outline-dark btn-sm"><i class="fa fa-file-invoice me-1"></i>Invoice</a>
+                </div>
+            </div>
+        <% } else if (order.payment_status === 'paid' && order.escrow_status === 'released') { %>
+            <!-- Escrow Released Status -->
+            <div class="alert alert-info d-flex align-items-center justify-content-between p-4 mb-4 shadow-sm border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-info text-white rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fa fa-hand-holding-usd fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="alert-heading mb-1 text-info fw-bold">Delivery Confirmed — Payment Released</h5>
+                        <p class="mb-0 text-muted small">
+                            You confirmed delivery on <%= order.buyer_confirmed_at ? new Date(order.buyer_confirmed_at).toLocaleString() : 'recently' %>. 
+                            KES <%= Number(order.seller_payout_amount).toLocaleString() %> is pending disbursement to the supplier.
+                        </p>
+                    </div>
+                </div>
+                <a href="/orders/<%= order.id %>/invoice" class="btn btn-outline-info btn-sm"><i class="fa fa-file-invoice me-1"></i>Invoice</a>
+            </div>
+        <% } else if (order.payment_status === 'paid' && order.escrow_status === 'disbursed') { %>
+            <!-- Funds Disbursed -->
             <div class="alert alert-success d-flex align-items-center justify-content-between p-4 mb-4 shadow-sm border-0">
                 <div class="d-flex align-items-center gap-3">
                     <div class="bg-success text-white rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                         <i class="fa fa-check-double fa-lg"></i>
                     </div>
                     <div>
-                        <h5 class="alert-heading mb-1 text-success fw-bold">Payment Confirmed via Lipa na M-Pesa!</h5>
+                        <h5 class="alert-heading mb-1 text-success fw-bold">Order Complete — Payment Disbursed</h5>
                         <p class="mb-0 text-muted small">
-                            Transaction Reference: <strong class="text-dark"><%= order.mpesa_receipt %></strong> • Paid at <%= new Date(order.paid_at || order.updatedAt).toLocaleString() %>
+                            KES <%= Number(order.seller_payout_amount).toLocaleString() %> has been disbursed to the supplier.
+                            <% if (order.disbursement_date) { %>Disbursed on <%= new Date(order.disbursement_date).toLocaleString() %>.<% } %>
+                        </p>
+                    </div>
+                </div>
+                <a href="/orders/<%= order.id %>/invoice" class="btn btn-outline-success btn-sm"><i class="fa fa-file-invoice me-1"></i>Invoice</a>
+            </div>
+        <% } else if (order.payment_status === 'paid') { %>
+            <div class="alert alert-success d-flex align-items-center justify-content-between p-4 mb-4 shadow-sm border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-success text-white rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fa fa-check-double fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="alert-heading mb-1 text-success fw-bold">Payment Confirmed!</h5>
+                        <p class="mb-0 text-muted small">
+                            Transaction Reference: <strong class="text-dark"><%= order.paystack_reference || order.mpesa_receipt %></strong> • Paid at <%= new Date(order.paid_at || order.updatedAt).toLocaleString() %>
                         </p>
                     </div>
                 </div>
@@ -228,21 +286,52 @@
                             </div>
                         </div>
                     <% } else { %>
-                        <!-- Paid Receipt Badge -->
+                        <!-- Paid Receipt Badge / Escrow Status -->
                         <div class="p-3 bg-light rounded text-center mb-3">
-                            <span class="badge bg-success mb-2 px-3 py-2">
-                                <i class="fa fa-check-circle me-1"></i>Payment Confirmed via <%= (order.payment_method || 'paystack').toUpperCase() %>
-                            </span>
-                            <% if (order.paystack_reference) { %>
+                            <% if (order.escrow_status === 'held') { %>
+                                <span class="badge bg-warning text-dark mb-2 px-3 py-2">
+                                    <i class="fa fa-shield-alt me-1"></i>Payment Held in Escrow
+                                </span>
                                 <div class="small text-dark fw-bold">Paystack Ref: <%= order.paystack_reference %></div>
+                                <div class="small text-muted">Paid at: <%= new Date(order.paid_at || order.updatedAt).toLocaleString() %></div>
+                                <div class="alert alert-warning py-2 px-3 small mt-2 mb-2">
+                                    <i class="fa fa-shield-alt text-warning me-1"></i>Funds secured in Paystack escrow. Awaiting your delivery confirmation before releasing to supplier.
+                                </div>
+                                <form action="/orders/<%= order.id %>/confirm-delivery" method="POST" class="mt-2" onsubmit="return confirm('Are you satisfied with the products received? This will release payment to the supplier.')">
+                                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
+                                        <i class="fa fa-check-circle me-1"></i>I've Received the Products — Release Payment
+                                    </button>
+                                </form>
+                            <% } else if (order.escrow_status === 'released') { %>
+                                <span class="badge bg-info mb-2 px-3 py-2">
+                                    <i class="fa fa-hand-holding-usd me-1"></i>Escrow Released — Pending Disbursement
+                                </span>
+                                <div class="small text-dark fw-bold">Paystack Ref: <%= order.paystack_reference %></div>
+                                <div class="small text-muted">Confirmed at: <%= order.buyer_confirmed_at ? new Date(order.buyer_confirmed_at).toLocaleString() : 'Recently' %></div>
+                                <div class="alert alert-info py-2 px-3 small mt-2 mb-0">
+                                    <i class="fa fa-info-circle text-info me-1"></i>You confirmed delivery. KES <%= Number(order.seller_payout_amount).toLocaleString() %> will be disbursed to the supplier shortly.
+                                </div>
+                            <% } else if (order.escrow_status === 'disbursed') { %>
+                                <span class="badge bg-success mb-2 px-3 py-2">
+                                    <i class="fa fa-check-double me-1"></i>Complete — Funds Disbursed
+                                </span>
+                                <div class="small text-dark fw-bold">Paystack Ref: <%= order.paystack_reference %></div>
+                                <div class="small text-muted">Disbursed: <%= order.disbursement_date ? new Date(order.disbursement_date).toLocaleString() : 'Completed' %></div>
+                            <% } else { %>
+                                <span class="badge bg-success mb-2 px-3 py-2">
+                                    <i class="fa fa-check-circle me-1"></i>Payment Confirmed via <%= (order.payment_method || 'paystack').toUpperCase() %>
+                                </span>
+                                <% if (order.paystack_reference) { %>
+                                    <div class="small text-dark fw-bold">Paystack Ref: <%= order.paystack_reference %></div>
+                                <% } %>
+                                <% if (order.mpesa_receipt) { %>
+                                    <div class="small text-dark fw-bold">Receipt: <%= order.mpesa_receipt %></div>
+                                <% } %>
+                                <div class="small text-muted">Paid at: <%= new Date(order.paid_at || order.updatedAt).toLocaleString() %></div>
+                                <div class="alert alert-info py-2 px-3 small mt-2 mb-0">
+                                    <i class="fa fa-shield-alt text-info me-1"></i>Funds are secured in platform escrow until material delivery and offloading on site.
+                                </div>
                             <% } %>
-                            <% if (order.mpesa_receipt) { %>
-                                <div class="small text-dark fw-bold">Receipt: <%= order.mpesa_receipt %></div>
-                            <% } %>
-                            <div class="small text-muted">Paid at: <%= new Date(order.paid_at || order.updatedAt).toLocaleString() %></div>
-                            <div class="alert alert-info py-2 px-3 small mt-2 mb-0">
-                                <i class="fa fa-shield-alt text-info me-1"></i>Funds are secured in platform escrow until material delivery and offloading on site.
-                            </div>
                         </div>
                     <% } %>
 

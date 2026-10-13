@@ -124,9 +124,14 @@
 
                     <!-- Direct Order Action -->
                     <div class="d-grid gap-2 mb-4">
-                        <a href="/orders/request/<%= product.id %>" class="btn btn-primary py-3 text-white fw-bold shadow-sm">
-                            <i class="fa fa-shopping-cart me-2"></i>
-                            <%= product.is_rental ? 'Book Equipment Hire' : 'Request Order / Quote' %>
+                        <!-- Buy Now Button (Direct Purchase via Paystack) -->
+                        <button type="button" class="btn py-3 fw-bold shadow-sm text-white" style="background: linear-gradient(135deg, #0ba4db, #0883af);" data-bs-toggle="modal" data-bs-target="#buyNowModal">
+                            <i class="fa fa-bolt me-2"></i>Buy Now & Pay via Paystack
+                        </button>
+
+                        <a href="/orders/request/<%= product.id %>" class="btn btn-outline-primary py-3 fw-bold">
+                            <i class="fa fa-clipboard-list me-2"></i>
+                            <%= product.is_rental ? 'Book Equipment Hire (Quote)' : 'Request Quote Only' %>
                         </a>
                         <% if (product.contactUnlocked) { %>
                             <% 
@@ -154,6 +159,14 @@
                                 </form>
                             </div>
                         <% } %>
+
+                        <!-- Escrow Trust Badge -->
+                        <div class="d-flex align-items-center gap-2 p-2 bg-light rounded border mt-1">
+                            <i class="fa fa-shield-alt text-success"></i>
+                            <small class="text-muted">
+                                <strong class="text-dark">Buyer Protection:</strong> Payments are held securely until you confirm delivery & satisfaction.
+                            </small>
+                        </div>
                     </div>
 
                     <!-- Vendor Profile Card -->
@@ -209,6 +222,83 @@
     </div>
 </div>
 
+<!-- Buy Now Modal -->
+<div class="modal fade" id="buyNowModal" tabindex="-1" aria-labelledby="buyNowModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #0ba4db, #0883af);">
+                <h5 class="modal-title fw-bold" id="buyNowModalLabel">
+                    <i class="fa fa-bolt me-2"></i>Buy Now — Direct Purchase
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Product Summary Row -->
+                <div class="d-flex align-items-center gap-3 p-3 bg-light rounded mb-4">
+                    <img src="<%= product.image_url %>" class="rounded" style="width: 70px; height: 70px; object-fit: cover;" alt="<%= product.title %>">
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold text-dark mb-0"><%= product.title %></h6>
+                        <small class="text-muted"><%= product.category ? product.category.name : 'Construction Supply' %></small>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-primary">Ksh <%= Number(product.price).toLocaleString() %></div>
+                        <small class="text-muted">per <%= product.unit %></small>
+                    </div>
+                </div>
+
+                <form action="/orders/quick-purchase" method="POST" id="buyNowForm">
+                    <input type="hidden" name="product_id" value="<%= product.id %>">
+
+                    <div class="row g-3">
+                        <div class="col-sm-4">
+                            <label class="form-label fw-bold small">Quantity (<%= product.unit %>s)</label>
+                            <input type="number" name="quantity" id="buyNowQty" class="form-control form-control-lg" value="1" min="1" required>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label fw-bold small">Subtotal</label>
+                            <input type="text" id="buyNowSubtotal" class="form-control form-control-lg bg-light" value="Ksh <%= Number(product.price).toLocaleString() %>" readonly>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label fw-bold small">Total (incl. 16% VAT)</label>
+                            <input type="text" id="buyNowTotal" class="form-control form-control-lg bg-light fw-bold text-primary" value="Ksh <%= (Number(product.price) * 1.16).toLocaleString(undefined, {minimumFractionDigits: 2}) %>" readonly>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">Full Name *</label>
+                            <input type="text" name="full_name" class="form-control" value="<%= typeof user !== 'undefined' && user ? user.name : '' %>" placeholder="Your full name" required>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">Phone / WhatsApp *</label>
+                            <input type="tel" name="contact_phone" class="form-control" placeholder="0712345678" value="<%= typeof user !== 'undefined' && user ? user.phone : '' %>" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small">Site Delivery Address *</label>
+                            <input type="text" name="delivery_address" class="form-control" placeholder="e.g. Ruiru Mugutha, near Deliverance Church" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small">Notes (optional)</label>
+                            <textarea name="notes" rows="2" class="form-control" placeholder="Special delivery instructions, offloading crew needed..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Escrow Info -->
+                    <div class="alert alert-info d-flex align-items-start gap-2 mt-3 mb-0 py-2">
+                        <i class="fa fa-shield-alt text-info mt-1"></i>
+                        <small>
+                            <strong>Buyer Protection:</strong> Your payment will be securely held in escrow via Paystack. The supplier will deliver your order, and funds are only released to them once you confirm you are satisfied with the products.
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light border-0 p-3">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="buyNowForm" class="btn text-white fw-bold px-4 py-2 shadow-sm" style="background: linear-gradient(135deg, #0ba4db, #0883af);">
+                    <i class="fa fa-lock me-2"></i>Pay <span id="buyNowPayAmount">Ksh <%= (Number(product.price) * 1.16).toLocaleString(undefined, {minimumFractionDigits: 2}) %></span> via Paystack
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function switchMainImage(thumbEl, imageUrl) {
     const mainImg = document.getElementById('mainProductImage');
@@ -227,4 +317,27 @@ function switchMainImage(thumbEl, imageUrl) {
     thumbEl.classList.remove('border-secondary');
     thumbEl.classList.add('border-primary', 'border-2');
 }
+
+// Buy Now modal dynamic total calculation
+document.addEventListener('DOMContentLoaded', () => {
+    const qtyInput = document.getElementById('buyNowQty');
+    const subtotalEl = document.getElementById('buyNowSubtotal');
+    const totalEl = document.getElementById('buyNowTotal');
+    const payAmountEl = document.getElementById('buyNowPayAmount');
+    const unitPrice = <%= Number(product.price) %>;
+
+    if (qtyInput) {
+        qtyInput.addEventListener('input', () => {
+            const qty = Math.max(1, parseInt(qtyInput.value) || 1);
+            const subtotal = qty * unitPrice;
+            const vat = subtotal * 0.16;
+            const total = subtotal + vat;
+
+            subtotalEl.value = 'Ksh ' + subtotal.toLocaleString();
+            totalEl.value = 'Ksh ' + total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            payAmountEl.textContent = 'Ksh ' + total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        });
+    }
+});
 </script>
+

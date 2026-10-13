@@ -1,4 +1,4 @@
-const { Product, OrderRequest, User } = require('../models');
+const { Product, OrderRequest, User, Wallet, Transaction } = require('../models');
 
 exports.getOrderRequest = async (req, res) => {
   try {
@@ -229,6 +229,9 @@ exports.paystackCallback = async (req, res) => {
         const platformFee = Math.round(orderAmount * commissionRate * 100) / 100;
         const sellerPayout = Math.round((orderAmount - platformFee) * 100) / 100;
 
+        // For purchase orders, set escrow to 'held' so funds are retained until buyer confirms satisfaction
+        const isPurchase = order.order_type === 'purchase';
+
         await order.update({
           payment_status: 'paid',
           status: 'confirmed',
@@ -236,18 +239,20 @@ exports.paystackCallback = async (req, res) => {
           paystack_reference: paymentRef,
           platform_fee: platformFee,
           seller_payout_amount: sellerPayout,
-          paid_at: new Date()
+          paid_at: new Date(),
+          escrow_status: isPurchase ? 'held' : 'none'
         });
 
         // Record Transaction
-        const { Transaction } = require('../models');
         await Transaction.create({
           user_id: order.buyer_id,
-          type: 'topup',
+          type: isPurchase ? 'product_purchase' : 'topup',
           amount: Number(order.total_price),
           balance_before: 0,
           balance_after: 0,
-          description: `Paystack Payment for Order #${order.id} (${order.product ? order.product.title : 'Materials'})`,
+          description: isPurchase
+            ? `Product Purchase (Escrow) — Order #${order.id} (${order.product ? order.product.title : 'Materials'})`
+            : `Paystack Payment for Order #${order.id} (${order.product ? order.product.title : 'Materials'})`,
           reference_type: 'product',
           reference_id: order.product_id,
           payment_method: 'paystack',
@@ -255,7 +260,11 @@ exports.paystackCallback = async (req, res) => {
           status: 'completed'
         });
 
-        req.flash('success', `Payment of KES ${Number(order.total_price).toLocaleString()} confirmed via Paystack! Reference: ${paymentRef}. Your order is confirmed and queued for site dispatch.`);
+        if (isPurchase) {
+          req.flash('success', `Payment of KES ${Number(order.total_price).toLocaleString()} confirmed! Funds are securely held in escrow. The supplier will now deliver your order. Once satisfied, confirm delivery to release payment.`);
+        } else {
+          req.flash('success', `Payment of KES ${Number(order.total_price).toLocaleString()} confirmed via Paystack! Reference: ${paymentRef}. Your order is confirmed and queued for site dispatch.`);
+        }
         return res.redirect(`/orders/${order.id}/checkout`);
       }
     }
@@ -290,6 +299,8 @@ exports.paystackWebhook = async (req, res) => {
           const platformFee = Math.round(orderAmount * (PRICING.PLATFORM_COMMISSION_RATE || 0.10) * 100) / 100;
           const sellerPayout = Math.round((orderAmount - platformFee) * 100) / 100;
 
+          const isPurchase = order.order_type === 'purchase';
+
           await order.update({
             payment_status: 'paid',
             status: 'confirmed',
@@ -297,8 +308,29 @@ exports.paystackWebhook = async (req, res) => {
             paystack_reference: reference,
             platform_fee: platformFee,
             seller_payout_amount: sellerPayout,
-            paid_at: new Date()
+            paid_at: new Date(),
+            escrow_status: isPurchase ? 'held' : 'none'
           });
+
+          // Ensure transaction record exists
+          const existingTx = await Transaction.findOne({ where: { mpesa_receipt: reference } });
+          if (!existingTx) {
+            await Transaction.create({
+              user_id: order.buyer_id,
+              type: isPurchase ? 'product_purchase' : 'topup',
+              amount: Number(order.total_price),
+              balance_before: 0,
+              balance_after: 0,
+              description: isPurchase
+                ? `Product Purchase (Escrow) — Order #${order.id} (${order.product ? order.product.title : 'Materials'})`
+                : `Paystack Payment for Order #${order.id} (${order.product ? order.product.title : 'Materials'})`,
+              reference_type: 'product',
+              reference_id: order.product_id,
+              payment_method: 'paystack',
+              mpesa_receipt: reference,
+              status: 'completed'
+            });
+          }
           console.log(`✅ [Paystack Webhook] Order #${order.id} confirmed paid via Paystack webhook.`);
         }
       } else if (metadata.wallet_user_id) {
@@ -430,6 +462,160 @@ exports.getOrderInvoice = async (req, res) => {
     console.error('Invoice view error:', err);
     req.flash('error', 'Unable to generate invoice.');
     res.redirect('/materials');
+  }
+};
+
+// Quick Purchase — Create order + immediately redirect to Paystack
+exports.quickPurchase = async (req, res) => {
+  try {
+    const { product_id, quantity, full_name, contact_phone, delivery_address, notes } = req.body;
+    const product = await Product.findByPk(product_id);
+
+    if (!product) {
+      req.flash('error', 'Product not found.');
+      return res.redirect('/materials');
+    }
+
+    const qty = Math.max(1, parseInt(quantity) || 1);
+    const totalPrice = Number(product.price) * qty;
+
+    let buyerId = req.session.user ? req.session.user.id : null;
+    if (!buyerId) {
+      let buyer = await User.findOne({ where: { phone: contact_phone } });
+      if (!buyer) {
+        buyer = await User.create({
+          name: full_name,
+          email: `buyer_${Date.now()}@toplinehub.co.ke`,
+          phone: contact_phone,
+          password: 'GuestPassword123!',
+          role: 'buyer'
+        });
+      }
+      buyerId = buyer.id;
+    }
+
+    // Create the order as a 'purchase' type
+    const newOrder = await OrderRequest.create({
+      buyer_id: buyerId,
+      product_id: product.id,
+      quantity: qty,
+      total_price: totalPrice,
+      delivery_address,
+      contact_phone,
+      notes,
+      status: 'inquiry',
+      payment_status: 'unpaid',
+      order_type: 'purchase',
+      escrow_status: 'none'
+    });
+
+    // Calculate totals (same as checkout)
+    const subtotal = totalPrice;
+    const vat = subtotal * 0.16;
+    const grandTotal = subtotal + vat;
+
+    // Initialize Paystack payment immediately
+    const rawEmail = req.session.user && req.session.user.email ? req.session.user.email : '';
+    const buyerEmail = rawEmail.includes('@') ? rawEmail : `buyer_${buyerId}@toplinehub.co.ke`;
+    const reference = `TL_PUR_${newOrder.id}_${Date.now()}`;
+
+    const host = req.get('host');
+    const protocol = req.protocol;
+    const callbackUrl = `${protocol}://${host}/orders/paystack/callback`;
+
+    const paystack = require('../helpers/paystackHelper');
+    const paystackRes = await paystack.initializeTransaction({
+      email: buyerEmail,
+      amount: grandTotal,
+      reference,
+      callbackUrl,
+      metadata: {
+        order_id: newOrder.id,
+        product_id: product.id,
+        buyer_id: buyerId,
+        contact_phone,
+        product_title: product.title,
+        order_type: 'purchase'
+      }
+    });
+
+    // Save reference on order
+    await newOrder.update({
+      paystack_reference: reference,
+      payment_method: 'paystack'
+    });
+
+    // Redirect to Paystack payment page
+    return res.redirect(paystackRes.data.authorization_url);
+  } catch (err) {
+    console.error('Quick purchase error:', err);
+    req.flash('error', `Failed to process purchase: ${err.message}`);
+    return res.redirect('/materials');
+  }
+};
+
+// Confirm Delivery — Buyer confirms satisfaction, releases escrow
+exports.confirmDelivery = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await OrderRequest.findByPk(id, {
+      include: [
+        { model: Product, as: 'product', include: [{ model: User, as: 'seller' }] },
+        { model: User, as: 'buyer' }
+      ]
+    });
+
+    if (!order) {
+      req.flash('error', 'Order not found.');
+      return res.redirect('/materials');
+    }
+
+    // Security: only the buyer can confirm
+    const userId = req.session.user ? req.session.user.id : null;
+    if (!userId || userId !== order.buyer_id) {
+      req.flash('error', 'Only the buyer can confirm delivery.');
+      return res.redirect(`/orders/${id}/checkout`);
+    }
+
+    if (order.payment_status !== 'paid') {
+      req.flash('error', 'This order has not been paid yet.');
+      return res.redirect(`/orders/${id}/checkout`);
+    }
+
+    if (order.escrow_status === 'released' || order.escrow_status === 'disbursed') {
+      req.flash('info', 'Payment has already been released for this order.');
+      return res.redirect(`/orders/${id}/checkout`);
+    }
+
+    // Release escrow — mark as released so admin can disburse to supplier
+    await order.update({
+      escrow_status: 'released',
+      status: 'delivered',
+      buyer_confirmed_at: new Date()
+    });
+
+    // Log the escrow release transaction
+    await Transaction.create({
+      user_id: order.buyer_id,
+      type: 'escrow_release',
+      amount: Number(order.total_price),
+      balance_before: 0,
+      balance_after: 0,
+      description: `Escrow Released — Buyer confirmed delivery for Order #${order.id} (${order.product ? order.product.title : 'Materials'}). Funds pending disbursement to supplier.`,
+      reference_type: 'product',
+      reference_id: order.product_id,
+      payment_method: 'paystack',
+      mpesa_receipt: order.paystack_reference,
+      status: 'completed'
+    });
+
+    const sellerName = order.product && order.product.seller ? order.product.seller.name : 'the supplier';
+    req.flash('success', `Thank you! You've confirmed delivery for Order #${id}. Payment of KES ${Number(order.seller_payout_amount).toLocaleString()} will be disbursed to ${sellerName}.`);
+    return res.redirect(`/orders/${id}/checkout`);
+  } catch (err) {
+    console.error('Confirm delivery error:', err);
+    req.flash('error', 'Failed to confirm delivery.');
+    return res.redirect(`/orders/${req.params.id}/checkout`);
   }
 };
 
