@@ -1,0 +1,315 @@
+<!-- Wallet & Credits Page -->
+<div class="container-fluid py-5 bg-light" style="min-height: 100vh;">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="fw-bold text-dark mb-1">
+                            <i class="fas fa-wallet text-primary me-2"></i>My Wallet & Credits
+                        </h2>
+                        <p class="text-muted mb-0">Manage your TopLineHub credits and unlock contacts</p>
+                    </div>
+                    <a href="/dashboard" class="btn btn-outline-dark">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balance Cards -->
+        <div class="row g-4 mb-4">
+            <!-- Current Balance -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-body text-white p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <p class="mb-1 opacity-75">Available Balance</p>
+                                <h2 class="fw-bold mb-0">Ksh <%= parseFloat(wallet.balance).toLocaleString() %></h2>
+                            </div>
+                            <div class="bg-white bg-opacity-25 rounded-circle p-3">
+                                <i class="fas fa-coins fa-2x"></i>
+                            </div>
+                        </div>
+                        <button class="btn btn-light btn-sm w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#topupModal">
+                            <i class="fas fa-plus me-2"></i>Top Up Credits
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Spent -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <p class="text-muted mb-1">Total Spent</p>
+                                <h3 class="fw-bold text-dark mb-0">Ksh <%= parseFloat(wallet.total_spent).toLocaleString() %></h3>
+                            </div>
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-arrow-down text-danger fa-lg"></i>
+                            </div>
+                        </div>
+                        <small class="text-muted">Lifetime contact unlocks</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Topped Up -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <p class="text-muted mb-1">Total Topped Up</p>
+                                <h3 class="fw-bold text-dark mb-0">Ksh <%= parseFloat(wallet.total_topped_up).toLocaleString() %></h3>
+                            </div>
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-arrow-up text-success fa-lg"></i>
+                            </div>
+                        </div>
+                        <small class="text-muted">Lifetime deposits</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Info -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-tag text-primary me-2"></i>Contact Unlock Pricing
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                    <div class="bg-primary bg-opacity-10 rounded p-3 me-3">
+                                        <i class="fas fa-briefcase text-primary fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 small text-muted">Job Client Contact</p>
+                                        <h5 class="fw-bold mb-0 text-dark">Ksh <%= pricing.UNLOCK_JOB_CLIENT_CONTACT %></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                    <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                                        <i class="fas fa-box text-success fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 small text-muted">Material Supplier</p>
+                                        <h5 class="fw-bold mb-0 text-dark">Ksh <%= pricing.UNLOCK_MATERIAL_SUPPLIER_CONTACT %></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                    <div class="bg-warning bg-opacity-10 rounded p-3 me-3">
+                                        <i class="fas fa-hard-hat text-warning fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 small text-muted">Artisan / Fundi</p>
+                                        <h5 class="fw-bold mb-0 text-dark">Ksh <%= pricing.UNLOCK_ARTISAN_CONTACT %></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs: Transactions & Unlocked Contacts -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <ul class="nav nav-tabs border-bottom px-4 pt-3" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active fw-bold" data-bs-toggle="tab" href="#transactions">
+                                    <i class="fas fa-history me-2"></i>Transaction History
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold" data-bs-toggle="tab" href="#unlocked">
+                                    <i class="fas fa-unlock me-2"></i>Unlocked Contacts
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content p-4">
+                            <!-- Transactions Tab -->
+                            <div id="transactions" class="tab-pane fade show active">
+                                <% if (transactions.length === 0) { %>
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No transactions yet</p>
+                                    </div>
+                                <% } else { %>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Description</th>
+                                                    <th>Type</th>
+                                                    <th class="text-end">Amount</th>
+                                                    <th class="text-end">Balance</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% transactions.forEach(txn => { %>
+                                                    <tr>
+                                                        <td class="text-muted small">
+                                                            <%= new Date(txn.created_at).toLocaleDateString() %>
+                                                            <br>
+                                                            <small><%= new Date(txn.created_at).toLocaleTimeString() %></small>
+                                                        </td>
+                                                        <td><%= txn.description %></td>
+                                                        <td>
+                                                            <% if (txn.type === 'topup') { %>
+                                                                <span class="badge bg-success">Top Up</span>
+                                                            <% } else { %>
+                                                                <span class="badge bg-primary">Unlock</span>
+                                                            <% } %>
+                                                        </td>
+                                                        <td class="text-end fw-bold <%= txn.type === 'topup' ? 'text-success' : 'text-danger' %>">
+                                                            <%= txn.type === 'topup' ? '+' : '-' %> Ksh <%= parseFloat(txn.amount).toLocaleString() %>
+                                                        </td>
+                                                        <td class="text-end text-muted">
+                                                            Ksh <%= parseFloat(txn.balance_after).toLocaleString() %>
+                                                        </td>
+                                                        <td>
+                                                            <% if (txn.status === 'completed') { %>
+                                                                <i class="fas fa-check-circle text-success"></i>
+                                                            <% } else if (txn.status === 'pending') { %>
+                                                                <i class="fas fa-clock text-warning"></i>
+                                                            <% } else { %>
+                                                                <i class="fas fa-times-circle text-danger"></i>
+                                                            <% } %>
+                                                        </td>
+                                                    </tr>
+                                                <% }) %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <!-- Unlocked Contacts Tab -->
+                            <div id="unlocked" class="tab-pane fade">
+                                <% if (unlockedContacts.length === 0) { %>
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-lock-open fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No contacts unlocked yet</p>
+                                    </div>
+                                <% } else { %>
+                                    <div class="list-group list-group-flush">
+                                        <% unlockedContacts.forEach(unlock => { %>
+                                            <div class="list-group-item">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold">
+                                                            <% if (unlock.unlock_type === 'job_client') { %>
+                                                                <i class="fas fa-briefcase text-primary me-2"></i>Job Client
+                                                            <% } else if (unlock.unlock_type === 'material_supplier') { %>
+                                                                <i class="fas fa-box text-success me-2"></i>Material Supplier
+                                                            <% } else { %>
+                                                                <i class="fas fa-hard-hat text-warning me-2"></i>Artisan / Fundi
+                                                            <% } %>
+                                                        </h6>
+                                                        <p class="mb-0 small text-muted">
+                                                            Unlocked <%= new Date(unlock.unlocked_at).toLocaleDateString() %> at <%= new Date(unlock.unlocked_at).toLocaleTimeString() %>
+                                                        </p>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <p class="mb-0 fw-bold text-danger">-Ksh <%= parseFloat(unlock.amount_paid).toFixed(2) %></p>
+                                                        <small class="text-muted">ID: #<%= unlock.target_id %></small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top-Up Modal -->
+<div class="modal fade" id="topupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-plus-circle text-primary me-2"></i>Top Up Credits
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form action="/wallet/topup" method="POST">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Select Amount</label>
+                        <div class="row g-2">
+                            <% pricing.TOPUP_OPTIONS.forEach(option => { %>
+                                <div class="col-md-6">
+                                    <input type="radio" class="btn-check" name="amount" id="topup_<%= option.amount %>" value="<%= option.amount %>" required>
+                                    <label class="btn btn-outline-primary w-100 text-start" for="topup_<%= option.amount %>">
+                                        <div class="fw-bold">Ksh <%= option.amount.toLocaleString() %></div>
+                                        <% if (option.bonus > 0) { %>
+                                            <small class="text-success">+ Ksh <%= option.bonus %> Bonus</small>
+                                        <% } %>
+                                    </label>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Payment Method</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="mpesa" value="mpesa" checked>
+                            <label class="form-check-label" for="mpesa">
+                                <i class="fas fa-mobile-alt text-success me-2"></i>M-Pesa
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="card" value="card">
+                            <label class="form-check-label" for="card">
+                                <i class="fas fa-credit-card text-primary me-2"></i>Credit/Debit Card
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">M-Pesa Phone Number</label>
+                        <input type="tel" name="mpesa_phone" class="form-control" placeholder="0711000000" value="<%= user ? user.phone : '' %>">
+                        <small class="text-muted">You'll receive an STK push to confirm payment</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">
+                        <i class="fas fa-check me-2"></i>Confirm Top-Up
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-check:checked + .btn-outline-primary {
+    background-color: #0d6efd;
+    color: white;
+}
+</style>

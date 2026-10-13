@@ -1,9 +1,12 @@
 const { ArtisanProfile, User } = require('../models');
 const { Op } = require('sequelize');
+const { hasUnlockedContact, maskPhoneNumber, getUnlockPrice } = require('../helpers/contactHelpers');
+const PRICING = require('../config/pricing');
 
 exports.getArtisans = async (req, res) => {
   try {
     const { q, trade, county } = req.query;
+    const userId = req.session.user ? req.session.user.id : null;
 
     const whereClause = {
       is_available: true
@@ -36,10 +39,23 @@ exports.getArtisans = async (req, res) => {
       ],
       order: [['rating', 'DESC']]
     });
+    
+    // Check unlock status for each artisan
+    const artisansWithUnlock = await Promise.all(
+      artisans.map(async (artisan) => {
+        const unlocked = userId ? await hasUnlockedContact(userId, 'artisan_fundi', artisan.id) : false;
+        return {
+          ...artisan.get({ plain: true }),
+          contactUnlocked: unlocked,
+          maskedPhone: maskPhoneNumber(artisan.user ? artisan.user.phone : ''),
+          unlockPrice: PRICING.UNLOCK_ARTISAN_CONTACT
+        };
+      })
+    );
 
     res.render('pages/fundis', {
       title: 'Hire Verified Artisans & Fundis',
-      artisans,
+      artisans: artisansWithUnlock,
       query: req.query
     });
   } catch (err) {
@@ -51,6 +67,8 @@ exports.getArtisans = async (req, res) => {
 exports.getArtisanDetail = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.session.user ? req.session.user.id : null;
+    
     const artisan = await ArtisanProfile.findByPk(id, {
       include: [{ model: User, as: 'user' }]
     });
@@ -59,6 +77,9 @@ exports.getArtisanDetail = async (req, res) => {
       req.flash('error', 'Artisan profile not found.');
       return res.redirect('/fundis');
     }
+    
+    // Check if contact is unlocked
+    const contactUnlocked = userId ? await hasUnlockedContact(userId, 'artisan_fundi', artisan.id) : false;
 
     const similarArtisans = await ArtisanProfile.findAll({
       where: {
@@ -71,7 +92,12 @@ exports.getArtisanDetail = async (req, res) => {
 
     res.render('pages/fundi-detail', {
       title: `${artisan.user ? artisan.user.name : 'Artisan'} - ${artisan.trade} | TopLineHub Kenya`,
-      artisan,
+      artisan: {
+        ...artisan.get({ plain: true }),
+        contactUnlocked,
+        maskedPhone: maskPhoneNumber(artisan.user ? artisan.user.phone : ''),
+        unlockPrice: PRICING.UNLOCK_ARTISAN_CONTACT
+      },
       similarArtisans
     });
   } catch (err) {
@@ -84,6 +110,20 @@ exports.postArtisanInquiry = async (req, res) => {
   try {
     const { id } = req.params;
     const { client_name, client_phone, location, project_scope } = req.body;
+    const userId = req.session.user ? req.session.user.id : null;
+    
+    // Check if contact is unlocked
+    if (!userId) {
+      req.flash('error', 'Please login to contact artisans.');
+      return res.redirect('/auth/login');
+    }
+    
+    const contactUnlocked = await hasUnlockedContact(userId, 'artisan_fundi', id);
+    if (!contactUnlocked) {
+      req.flash('error', 'You need to unlock this contact first.');
+      return res.redirect(`/fundis/${id}`);
+    }
+    
     const artisan = await ArtisanProfile.findByPk(id, {
       include: [{ model: User, as: 'user' }]
     });

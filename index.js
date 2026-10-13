@@ -17,6 +17,7 @@ const jobRoutes = require('./routes/jobs');
 const orderRoutes = require('./routes/orders');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
+const walletRoutes = require('./routes/wallet');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -59,6 +60,20 @@ app.use(async (req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.counties = KENYA_COUNTIES;
   res.locals.kenyaCounties = KENYA_COUNTIES;
+  
+  // Load user's wallet balance
+  if (req.session.user) {
+    try {
+      const { Wallet } = require('./models');
+      const wallet = await Wallet.findOne({ where: { user_id: req.session.user.id } });
+      res.locals.userWallet = wallet;
+    } catch (err) {
+      res.locals.userWallet = null;
+    }
+  } else {
+    res.locals.userWallet = null;
+  }
+  
   try {
     res.locals.categories = await Category.findAll();
   } catch (err) {
@@ -74,6 +89,7 @@ app.use('/', fundisRoutes);
 app.use('/', jobRoutes);
 app.use('/', orderRoutes);
 app.use('/', dashboardRoutes);
+app.use('/', walletRoutes);
 app.use('/auth', authRoutes);
 
 // 404 Handler

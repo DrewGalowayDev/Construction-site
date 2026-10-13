@@ -1,9 +1,12 @@
 const { Product, Category, User } = require('../models');
 const { Op } = require('sequelize');
+const { hasUnlockedContact, maskPhoneNumber } = require('../helpers/contactHelpers');
+const PRICING = require('../config/pricing');
 
 exports.getMaterials = async (req, res) => {
   try {
     const { q, category, county } = req.query;
+    const userId = req.session.user ? req.session.user.id : null;
     const categories = await Category.findAll();
 
     const whereClause = {
@@ -34,11 +37,24 @@ exports.getMaterials = async (req, res) => {
       ],
       order: [['created_at', 'DESC']]
     });
+    
+    // Check unlock status
+    const productsWithUnlock = await Promise.all(
+      products.map(async (product) => {
+        const unlocked = userId ? await hasUnlockedContact(userId, 'material_supplier', product.id) : false;
+        return {
+          ...product.get({ plain: true }),
+          contactUnlocked: unlocked,
+          maskedPhone: product.seller ? maskPhoneNumber(product.seller.phone) : '***-***-***',
+          unlockPrice: PRICING.UNLOCK_MATERIAL_SUPPLIER_CONTACT
+        };
+      })
+    );
 
     res.render('pages/materials', {
       title: 'Building Materials Catalog',
       categories,
-      products,
+      products: productsWithUnlock,
       query: req.query
     });
   } catch (err) {
@@ -217,6 +233,8 @@ exports.postMaterial = async (req, res) => {
 exports.getProductDetail = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.session.user ? req.session.user.id : null;
+    
     const product = await Product.findByPk(id, {
       include: [
         { model: Category, as: 'category' },
@@ -228,6 +246,9 @@ exports.getProductDetail = async (req, res) => {
       req.flash('error', 'The requested material or equipment could not be found.');
       return res.redirect('/materials');
     }
+    
+    // Check if contact is unlocked
+    const contactUnlocked = userId ? await hasUnlockedContact(userId, 'material_supplier', product.id) : false;
 
     const relatedProducts = await Product.findAll({
       where: {
@@ -240,7 +261,12 @@ exports.getProductDetail = async (req, res) => {
 
     res.render('pages/product-detail', {
       title: `${product.title} - TopLineHub Kenya`,
-      product,
+      product: {
+        ...product.get({ plain: true }),
+        contactUnlocked,
+        maskedPhone: product.seller ? maskPhoneNumber(product.seller.phone) : '***-***-***',
+        unlockPrice: PRICING.UNLOCK_MATERIAL_SUPPLIER_CONTACT
+      },
       relatedProducts
     });
   } catch (err) {

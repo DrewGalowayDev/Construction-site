@@ -1,9 +1,12 @@
 const { JobPost, JobApplication, User } = require('../models');
 const { Op } = require('sequelize');
+const { hasUnlockedContact, maskPhoneNumber } = require('../helpers/contactHelpers');
+const PRICING = require('../config/pricing');
 
 exports.getJobs = async (req, res) => {
   try {
     const { q, trade, county, min_budget, max_budget } = req.query;
+    const userId = req.session.user ? req.session.user.id : null;
 
     const whereClause = {
       status: 'open'
@@ -37,6 +40,19 @@ exports.getJobs = async (req, res) => {
       include: [{ model: User, as: 'client', attributes: ['name', 'phone', 'county'] }],
       order: [['created_at', 'DESC']]
     });
+    
+    // Check unlock status
+    const jobsWithUnlock = await Promise.all(
+      jobs.map(async (job) => {
+        const unlocked = userId ? await hasUnlockedContact(userId, 'job_client', job.id) : false;
+        return {
+          ...job.get({ plain: true }),
+          contactUnlocked: unlocked,
+          maskedPhone: job.client ? maskPhoneNumber(job.client.phone) : '***-***-***',
+          unlockPrice: PRICING.UNLOCK_JOB_CLIENT_CONTACT
+        };
+      })
+    );
 
     const tradeList = [
       'Mason / Bricklayer',
@@ -54,7 +70,7 @@ exports.getJobs = async (req, res) => {
 
     res.render('pages/jobs', {
       title: 'Construction Projects & Job Board',
-      jobs,
+      jobs: jobsWithUnlock,
       trades: tradeList,
       counties: countyList,
       query: req.query

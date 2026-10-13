@@ -7,6 +7,9 @@ const ArtisanProfile = require('./ArtisanProfile');
 const JobPost = require('./JobPost');
 const JobApplication = require('./JobApplication');
 const OrderRequest = require('./OrderRequest');
+const Wallet = require('./Wallet');
+const Transaction = require('./Transaction');
+const ContactUnlock = require('./ContactUnlock');
 
 // 1. User <-> ArtisanProfile (1:1)
 User.hasOne(ArtisanProfile, { foreignKey: 'user_id', as: 'artisanProfile' });
@@ -40,6 +43,18 @@ OrderRequest.belongsTo(User, { foreignKey: 'buyer_id', as: 'buyer' });
 Product.hasMany(OrderRequest, { foreignKey: 'product_id', as: 'orders' });
 OrderRequest.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
 
+// 9. User <-> Wallet (1:1)
+User.hasOne(Wallet, { foreignKey: 'user_id', as: 'wallet' });
+Wallet.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+// 10. User <-> Transaction (1:N)
+User.hasMany(Transaction, { foreignKey: 'user_id', as: 'transactions' });
+Transaction.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+// 11. User <-> ContactUnlock (1:N)
+User.hasMany(ContactUnlock, { foreignKey: 'user_id', as: 'unlockedContacts' });
+ContactUnlock.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
 module.exports = {
   sequelize,
   User,
@@ -48,5 +63,8 @@ module.exports = {
   ArtisanProfile,
   JobPost,
   JobApplication,
-  OrderRequest
+  OrderRequest,
+  Wallet,
+  Transaction,
+  ContactUnlock
 };
