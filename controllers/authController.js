@@ -7,10 +7,18 @@ exports.getLogin = (req, res) => {
 exports.postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ where: { email } });
+    
+    // Support both email and username (stored in email field)
+    // Check if input contains @ symbol to determine if it's an email
+    const isEmail = email && email.includes('@');
+    
+    // Find user by email or by exact match on email field (username)
+    const user = await User.findOne({ 
+      where: { email } 
+    });
 
     if (!user || !(await user.validPassword(password))) {
-      req.flash('error', 'Invalid email or password.');
+      req.flash('error', 'Invalid username/email or password.');
       return res.redirect('/auth/login');
     }
 
@@ -21,7 +29,8 @@ exports.postLogin = async (req, res) => {
       phone: user.phone,
       role: user.role,
       county: user.county,
-      town: user.town
+      town: user.town,
+      avatar: user.avatar || '/img/team-1.jpg'
     };
 
     req.flash('success', `Welcome back, ${user.name}!`);

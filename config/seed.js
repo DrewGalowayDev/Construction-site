@@ -7,12 +7,6 @@ const seedDatabase = async () => {
     await sequelize.sync({ alter: true });
     console.log('✅ Tables synced successfully.');
 
-    const categoryCount = await Category.count();
-    if (categoryCount > 0) {
-      console.log('ℹ️ Database already contains data. Skipping initial seeding.');
-      return;
-    }
-
     console.log('🌱 Seeding categories...');
     const categories = await Category.bulkCreate([
       { name: 'Cement & Binding', slug: 'cement-binding', type: 'material', icon: 'fa-cubes', description: 'Portland cement, lime, tile adhesive & grouts' },
@@ -26,28 +20,54 @@ const seedDatabase = async () => {
     ]);
 
     console.log('🌱 Seeding demo users...');
+    
+    // Simple Test Accounts for Easy Access
     const adminUser = await User.create({
-      name: 'TopLineHub Admin',
-      email: 'admin@toplinehub.co.ke',
+      name: 'Admin User',
+      email: 'admin',
       phone: '+254711000000',
-      password: 'AdminPassword123!',
+      password: 'admin2026',
       role: 'admin',
       county: 'Nairobi',
       town: 'CBD',
       is_verified: true
     });
 
-    const vendor1 = await User.create({
-      name: 'Nairobi Builders Hardware',
-      email: 'sales@nairobibuilders.co.ke',
+    const clientUser = await User.create({
+      name: 'Client User',
+      email: 'client',
+      phone: '+254720998877',
+      password: 'client2026',
+      role: 'buyer',
+      county: 'Machakos',
+      town: 'Syokimau',
+      is_verified: true
+    });
+
+    const supplierUser = await User.create({
+      name: 'Supplier User',
+      email: 'supplier',
       phone: '+254722112233',
-      password: 'VendorPassword123!',
+      password: 'supplier2026',
       role: 'seller',
       county: 'Nairobi',
       town: 'Industrial Area',
       is_verified: true
     });
 
+    const artisanUser = await User.create({
+      name: 'Artisan User',
+      email: 'artisan',
+      phone: '+254799887766',
+      password: 'artisan2026',
+      role: 'artisan',
+      county: 'Kiambu',
+      town: 'Thika / Ruiru',
+      avatar: '/img/team-1.jpg',
+      is_verified: true
+    });
+
+    // Additional demo vendor for variety
     const vendor2 = await User.create({
       name: 'Apex Plant & Equipment Hire',
       email: 'rentals@apexplant.co.ke',
@@ -62,13 +82,25 @@ const seedDatabase = async () => {
     const artisanUser1 = await User.create({
       name: 'John Mwangi',
       email: 'john.mason@toplinehub.co.ke',
-      phone: '+254799887766',
+      phone: '+254799887755',
       password: 'ArtisanPassword123!',
       role: 'artisan',
       county: 'Kiambu',
       town: 'Thika / Ruiru',
       avatar: '/img/team-1.jpg',
       is_verified: true
+    });
+
+    // Artisan Profile for test artisan account
+    await ArtisanProfile.create({
+      user_id: artisanUser.id,
+      trade: 'General Contractor',
+      experience_years: 5,
+      daily_rate: 2500.00,
+      bio: 'Skilled artisan with experience in various construction trades including masonry, carpentry, and general site work.',
+      nca_reg_number: 'NCA-ART-12345',
+      rating: 4.8,
+      is_available: true
     });
 
     await ArtisanProfile.create({
@@ -105,21 +137,10 @@ const seedDatabase = async () => {
       is_available: true
     });
 
-    const clientUser = await User.create({
-      name: 'Grace Wambui',
-      email: 'grace.client@toplinehub.co.ke',
-      phone: '+254720998877',
-      password: 'ClientPassword123!',
-      role: 'buyer',
-      county: 'Machakos',
-      town: 'Syokimau',
-      is_verified: true
-    });
-
     console.log('🌱 Seeding materials & hire equipment...');
     await Product.bulkCreate([
       {
-        seller_id: vendor1.id,
+        seller_id: supplierUser.id,
         category_id: categories[0].id,
         title: 'Bamburi Tembo Cement (32.5R)',
         slug: 'bamburi-tembo-cement-50kg',
@@ -133,7 +154,7 @@ const seedDatabase = async () => {
         location_county: 'Nairobi'
       },
       {
-        seller_id: vendor1.id,
+        seller_id: supplierUser.id,
         category_id: categories[1].id,
         title: 'D12 Deformed Steel Rebar (High Yield BS4449)',
         slug: 'd12-deformed-steel-rebar',
@@ -147,7 +168,7 @@ const seedDatabase = async () => {
         location_county: 'Nairobi'
       },
       {
-        seller_id: vendor1.id,
+        seller_id: supplierUser.id,
         category_id: categories[4].id,
         title: 'Box Profile Mabati 30-Gauge (Charcoal Grey)',
         slug: 'box-profile-mabati-30g-charcoal',
@@ -189,7 +210,7 @@ const seedDatabase = async () => {
         location_county: 'Nairobi'
       },
       {
-        seller_id: vendor1.id,
+        seller_id: supplierUser.id,
         category_id: categories[2].id,
         title: 'Clean River Sand (10-Tonne Tipper Lorry)',
         slug: 'clean-river-sand-10-tonne',
@@ -231,6 +252,27 @@ const seedDatabase = async () => {
     ]);
 
     console.log('🎉 Initial seeding completed successfully!');
+    console.log('\n✅ ========== TEST ACCOUNTS CREATED ==========');
+    console.log('📋 Login Credentials (Use "email" field for username):');
+    console.log('');
+    console.log('👨‍💼 ADMIN Account:');
+    console.log('   Username: admin');
+    console.log('   Password: admin2026');
+    console.log('');
+    console.log('🛒 CLIENT Account (Buyer):');
+    console.log('   Username: client');
+    console.log('   Password: client2026');
+    console.log('');
+    console.log('🏪 SUPPLIER Account (Seller):');
+    console.log('   Username: supplier');
+    console.log('   Password: supplier2026');
+    console.log('');
+    console.log('🔨 ARTISAN Account (Fundi):');
+    console.log('   Username: artisan');
+    console.log('   Password: artisan2026');
+    console.log('');
+    console.log('🌐 Access the platform at: http://localhost:3000');
+    console.log('=============================================\n');
   } catch (error) {
     console.error('❌ Error during seeding:', error);
   }
