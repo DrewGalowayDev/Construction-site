@@ -54,16 +54,9 @@ exports.initializeTrainingPayment = async (req, res) => {
       });
     }
 
-    // Require login for training payments
-    if (!req.session.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Please login or register first to pay for training'
-      });
-    }
-
-    let userId = req.session.user.id;
-    let userEmail = req.session.user.email || email || `user_${userId}@toplinehub.co.ke`;
+    // Allow guest payments - use session user if available, otherwise guest
+    let userId = req.session.user ? req.session.user.id : 0;
+    let userEmail = (req.session.user && req.session.user.email) || email || `guest_${phone.replace(/\D/g,'')}@toplinehub.co.ke`;
 
     // Check if already paid - use 'type' not 'transaction_type'
     const existingPayment = await Transaction.findOne({
@@ -175,12 +168,8 @@ exports.paystackCallback = async (req, res) => {
         });
       }
 
-      // Create or update transaction (user_id is required - no guest payments)
+      // Create or update transaction (allow guest user_id = 0)
       let transaction;
-      
-      if (!userId) {
-        throw new Error('User ID is required for training payments');
-      }
 
       // Update existing pending transaction
       transaction = await Transaction.findOne({

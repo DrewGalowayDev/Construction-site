@@ -1,76 +1,351 @@
 <%- include('partials/header') %>
 <%- include('partials/nav') %>
 
-<header class="hero s">
+<style>
+    .training-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: start;
+        padding: 48px 0;
+    }
+
+    .training-hero-compact {
+        background: var(--navy);
+        color: #fff;
+        padding: 28px 0;
+        text-align: center;
+    }
+
+    .training-hero-compact .tag {
+        margin-bottom: 6px;
+    }
+
+    .training-hero-compact h1 {
+        font-size: clamp(22px, 3vw, 34px);
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .training-hero-compact h1 span {
+        color: var(--gold);
+    }
+
+    .training-hero-compact p {
+        color: #cfdcee;
+        margin: 8px 0 0;
+        font-size: 15px;
+    }
+
+    /* Payment form side */
+    .training-payment-card {
+        background: #fff;
+        border: 2px solid var(--ln);
+        border-radius: 18px;
+        padding: 36px;
+        box-shadow: 0 8px 32px rgba(11, 58, 110, 0.08);
+    }
+
+    .training-payment-card h2 {
+        font-size: 24px;
+        margin-bottom: 4px;
+        color: var(--navy);
+    }
+
+    .training-payment-card .price-tag {
+        font-size: 38px;
+        font-weight: 800;
+        color: var(--gold);
+        margin: 12px 0 20px;
+    }
+
+    .training-payment-card .price-tag small {
+        font-size: 15px;
+        color: var(--mu);
+        font-weight: 500;
+    }
+
+    .training-payment-card label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin: 14px 0 4px;
+        color: var(--tx);
+    }
+
+    .training-payment-card input {
+        width: 100%;
+        padding: 13px 16px;
+        border: 1px solid var(--ln);
+        border-radius: 10px;
+        font: inherit;
+        background: var(--card);
+        color: var(--tx);
+        transition: border-color 0.2s;
+    }
+
+    .training-payment-card input:focus {
+        outline: none;
+        border-color: var(--gold);
+    }
+
+    .training-payment-card .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .training-payment-card .pay-btn {
+        width: 100%;
+        margin-top: 20px;
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 700;
+        background: var(--navy);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    .training-payment-card .pay-btn:hover {
+        background: var(--navy2);
+        transform: translateY(-1px);
+    }
+
+    .training-payment-card .pay-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* How it works side */
+    .training-info-card {
+        background: var(--navy);
+        color: #fff;
+        border-radius: 18px;
+        padding: 36px;
+    }
+
+    .training-info-card h2 {
+        color: #fff;
+        font-size: 24px;
+        margin-bottom: 6px;
+    }
+
+    .training-info-card .info-subtitle {
+        color: #b6c7dc;
+        margin-bottom: 28px;
+        font-size: 15px;
+    }
+
+    .training-info-card .info-item {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        align-items: flex-start;
+    }
+
+    .training-info-card .info-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        border-radius: 12px;
+        background: rgba(245, 166, 35, 0.15);
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .training-info-card .info-text h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        color: #fff;
+    }
+
+    .training-info-card .info-text p {
+        font-size: 14px;
+        color: #b6c7dc;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .training-info-card .details-box {
+        background: rgba(255,255,255,0.06);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 24px;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .training-info-card .details-box h3 {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0 0 10px;
+        color: var(--gold);
+    }
+
+    .training-info-card .details-box li {
+        color: #cfdcee;
+        margin: 8px 0 8px 16px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .training-paid-banner {
+        background: #d1fae5;
+        border: 2px solid #10b981;
+        border-radius: 14px;
+        padding: 28px;
+        text-align: center;
+    }
+
+    .training-paid-banner i {
+        font-size: 52px;
+        color: #10b981;
+        margin-bottom: 12px;
+    }
+
+    .training-paid-banner h2 {
+        color: #065f46;
+        margin: 0 0 8px;
+    }
+
+    .training-paid-banner p {
+        color: #047857;
+        font-size: 15px;
+        margin: 0;
+    }
+
+    @media (max-width: 800px) {
+        .training-layout {
+            grid-template-columns: 1fr;
+            gap: 24px;
+            padding: 28px 0;
+        }
+    }
+</style>
+
+<!-- Compact Hero Strip -->
+<div class="training-hero-compact">
     <div class="w">
         <div class="tag">UPCOMING TRAINING</div>
         <h1>Construction Materials <span>Dropshipping Class</span></h1>
         <p>Learn to sell construction materials on TopLine without holding stock.</p>
     </div>
-</header>
+</div>
 
 <section>
     <div class="w">
         <% if (hasPaid) { %>
-        <!-- Already Paid Message -->
-        <div style="background:#d1fae5;border:2px solid#10b981;border-radius:12px;padding:32px;text-align:center;margin-bottom:32px">
-            <div style="font-size:64px;color:#10b981;margin-bottom:16px">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h2 style="color:#065f46;margin:0 0 8px">Payment Confirmed!</h2>
-            <p style="color:#047857;font-size:16px;margin:0">You have successfully paid for the training. We will contact you with the date and venue details.</p>
+        <!-- Already Paid Banner -->
+        <div class="training-paid-banner" style="margin-bottom: 32px;">
+            <i class="fas fa-check-circle"></i>
+            <h2>Payment Confirmed!</h2>
+            <p>You have successfully paid for the training. We will contact you with the date and venue details.</p>
             <% if (userPayment) { %>
-            <p style="color:#059669;font-size:14px;margin:16px 0 0">Payment Reference: <%= userPayment.mpesa_receipt %></p>
+            <p style="color:#059669;font-size:13px;margin:12px 0 0">Payment Reference: <%= userPayment.mpesa_receipt %></p>
             <% } %>
         </div>
         <% } %>
 
-        <div class="train" style="margin-bottom:28px">
-            <ul>
-                <li>How dropshipping works with our supplier back end</li>
-                <li>Product knowledge: cement, steel, roofing, tiles, paint</li>
-                <li>Pricing, margins and finding contractors &amp; homeowners</li>
-                <li>Orders, M-PESA payouts and customer service</li>
-            </ul>
-            <div class="price" style="margin-top:14px">
-                KSh <%= trainingFee.toLocaleString() %> 
-                <small style="font-size:15px;color:#cfdcee">one-off</small>
-            </div>
-            <p style="color:#b6c7dc;font-size:14px">Date and venue to be announced. Limited seats.</p>
-        </div>
-        
-        <% if (!hasPaid) { %>
-        <form id="trainingForm" class="fm">
-            <label>Full name *</label>
-            <input name="name" id="name" type="text" placeholder="Enter your full name" required>
-            
-            <div class="two">
-                <div>
-                    <label>M-PESA / Phone *</label>
-                    <input name="phone" id="phone" type="tel" placeholder="0712345678" required>
+        <div class="training-layout">
+            <!-- LEFT: How It Works / Info -->
+            <div class="training-info-card">
+                <h2>How It Works</h2>
+                <p class="info-subtitle">Everything you need to start earning with construction materials</p>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="info-text">
+                        <h3>Expert-Led Training</h3>
+                        <p>Learn directly from industry professionals who've built successful dropshipping businesses.</p>
+                    </div>
                 </div>
-                <div>
-                    <label>Town / county</label>
-                    <input name="location" id="location" type="text" placeholder="Nairobi">
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-boxes-stacked"></i></div>
+                    <div class="info-text">
+                        <h3>No Stock Needed</h3>
+                        <p>Sell materials from our verified suppliers without holding inventory or warehousing costs.</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-money-bill-trend-up"></i></div>
+                    <div class="info-text">
+                        <h3>Earn Commissions</h3>
+                        <p>Set your own margins and get paid directly via M-PESA for every sale you make.</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-certificate"></i></div>
+                    <div class="info-text">
+                        <h3>Get Certified</h3>
+                        <p>Receive a TopLine Verified Seller certificate upon completion.</p>
+                    </div>
+                </div>
+
+                <div class="details-box">
+                    <h3><i class="fas fa-list-check"></i> What You'll Learn</h3>
+                    <ul>
+                        <li>How dropshipping works with our supplier back end</li>
+                        <li>Product knowledge: cement, steel, roofing, tiles, paint</li>
+                        <li>Pricing, margins and finding contractors & homeowners</li>
+                        <li>Orders, M-PESA payouts and customer service</li>
+                    </ul>
                 </div>
             </div>
 
-            <label>Email (optional)</label>
-            <input name="email" id="email" type="email" placeholder="your@email.com">
-            
-            <div id="alert-message" style="display:none;padding:16px;border-radius:8px;margin:16px 0;font-size:14px"></div>
-            
-            <div style="height:16px"></div>
-            <button type="submit" class="btn n" id="submitBtn" style="width:100%">
-                <i class="fas fa-credit-card"></i> Pay KSh <%= trainingFee.toLocaleString() %> via Paystack
-            </button>
-        </form>
-        <% } else { %>
-        <div style="text-align:center;padding:24px;background:var(--card);border-radius:12px">
-            <p style="color:var(--sub);margin:0">You have already registered and paid for this training.</p>
-            <a href="/dashboard/provider" class="btn" style="margin-top:16px;display:inline-block">Go to Dashboard</a>
+            <!-- RIGHT: Payment Form -->
+            <div>
+                <% if (!hasPaid) { %>
+                <div class="training-payment-card">
+                    <h2>Register & Pay</h2>
+                    <p style="color:var(--mu);margin-bottom:4px">Secure your seat today</p>
+                    <div class="price-tag">
+                        KSh <%= trainingFee.toLocaleString() %> <small>one-off</small>
+                    </div>
+
+                    <form id="trainingForm">
+                        <label>Full name *</label>
+                        <input name="name" id="name" type="text" placeholder="Enter your full name" required>
+
+                        <div class="two">
+                            <div>
+                                <label>M-PESA / Phone *</label>
+                                <input name="phone" id="phone" type="tel" placeholder="0712345678" required>
+                            </div>
+                            <div>
+                                <label>Town / county</label>
+                                <input name="location" id="location" type="text" placeholder="Nairobi">
+                            </div>
+                        </div>
+
+                        <label>Email (optional)</label>
+                        <input name="email" id="email" type="email" placeholder="your@email.com">
+
+                        <div id="alert-message" style="display:none;padding:14px;border-radius:8px;margin:14px 0;font-size:14px"></div>
+
+                        <button type="submit" class="pay-btn" id="submitBtn">
+                            <i class="fas fa-credit-card"></i> Pay KSh <%= trainingFee.toLocaleString() %> via Paystack
+                        </button>
+                    </form>
+                </div>
+                <% } else { %>
+                <div style="text-align:center;padding:32px;background:var(--card);border-radius:14px">
+                    <p style="color:var(--mu);margin:0">You have already registered and paid for this training.</p>
+                    <a href="/dashboard/provider" class="btn" style="margin-top:16px;display:inline-block">Go to Dashboard</a>
+                </div>
+                <% } %>
+            </div>
         </div>
-        <% } %>
     </div>
 </section>
 
@@ -89,8 +364,6 @@
         alertMessage.style.background = type === 'success' ? '#d1fae5' : '#fee2e2';
         alertMessage.style.color = type === 'success' ? '#065f46' : '#991b1b';
         alertMessage.style.border = type === 'success' ? '1px solid #10b981' : '1px solid #ef4444';
-        
-        // Auto hide after 5 seconds
         setTimeout(() => {
             alertMessage.style.display = 'none';
         }, 5000);
@@ -99,15 +372,6 @@
     trainingForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        <% if (!user) { %>
-        // Require login
-        showAlert('Please login or register first to pay for training', 'error');
-        setTimeout(() => {
-            window.location.href = '/auth/login?redirect=/training';
-        }, 2000);
-        return;
-        <% } %>
-        
         const name = document.getElementById('name').value;
         const phone = document.getElementById('phone').value;
         const location = document.getElementById('location').value;
@@ -164,4 +428,3 @@
     });
 </script>
 <% } %>
-

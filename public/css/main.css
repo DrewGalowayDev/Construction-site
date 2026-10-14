@@ -16,17 +16,8 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        --bg: #0a1626;
-        --card: #10233a;
-        --tx: #eaf1f9;
-        --mu: #9fb2c7;
-        --ln: #1f3a58;
-        --ice: #12294a;
-    }
-}
+/* Dark Mode Support - Disabled: always use light theme */
+/* Site uses white background by default */
 
 /* Global Resets */
 * {
@@ -52,9 +43,14 @@ a {
 
 /* Container */
 .w {
-    max-width: 1040px;
+    max-width: 1400px;
     margin: auto;
-    padding: 0 20px;
+    padding: 0 32px;
+}
+
+/* Full-width sections use wider container */
+section .w {
+    max-width: 1400px;
 }
 
 /* Navigation */
@@ -70,11 +66,12 @@ nav .w {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 60px;
+    height: 72px;
 }
 
 nav img {
-    height: 34px;
+    height: 55px;
+    width: auto;
     background: #fff;
     padding: 5px 10px;
     border-radius: 8px;
@@ -121,27 +118,54 @@ nav .l a.on {
 .hero {
     background: var(--navy);
     color: #fff;
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: center;
     padding: 60px 0;
 }
 
 .hero.s {
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: center;
     padding: 44px 0;
 }
 
 .hero h1 {
-    font-size: clamp(28px, 5vw, 46px);
-    line-height: 1.12;
-    margin: 8px 0 14px;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 16px 0 24px;
+    letter-spacing: -0.5px;
 }
 
 .hero h1 span {
     color: var(--gold);
 }
 
+.hero .w {
+    width: 100%;
+}
+
 .hero p {
     color: #cfdcee;
-    max-width: 560px;
-    margin-bottom: 22px;
+    font-size: clamp(16px, 2vw, 22px);
+    line-height: 1.6;
+    max-width: 680px;
+    margin-bottom: 36px;
+}
+
+.hero .tag {
+    font-size: clamp(13px, 1.4vw, 18px);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.hero .btn {
+    padding: 16px 32px;
+    font-size: clamp(15px, 1.5vw, 18px);
+    border-radius: 12px;
 }
 
 /* Tag */
@@ -149,7 +173,7 @@ nav .l a.on {
     color: var(--gold);
     font-weight: 700;
     letter-spacing: 2px;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 /* Sections */
@@ -163,11 +187,7 @@ h2 {
     margin-bottom: 6px;
 }
 
-@media (prefers-color-scheme: dark) {
-    h2 {
-        color: #fff;
-    }
-}
+/* h2 always uses navy color in light theme */
 
 .sub {
     color: var(--mu);
@@ -177,8 +197,8 @@ h2 {
 /* Grid Layout */
 .grid {
     display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 /* Cards */
@@ -186,7 +206,7 @@ h2 {
     background: var(--card);
     border: 1px solid var(--ln);
     border-radius: 14px;
-    padding: 20px;
+    padding: 28px;
 }
 
 a.c {
