@@ -28,30 +28,46 @@ const isAuthenticated = (req, res, next) => {
  */
 router.get('/client', isAuthenticated, async (req, res) => {
     try {
-        // TODO: Get actual user ID from session
-        const userId = req.query.userId || 1;
+        // Get user ID from session
+        const userId = req.session.user ? req.session.user.id : null;
 
-        const myJobs = await JobPost.findAll({
-            where: { client_id: userId },
-            limit: 10,
-            order: [['created_at', 'DESC']],
-            include: [
-                { model: JobApplication, as: 'applications' }
-            ]
-        });
+        if (!userId) {
+            return res.redirect('/auth/login?redirect=/dashboard/client');
+        }
 
-        const myOrders = await OrderRequest.findAll({
-            where: { buyer_id: userId },
-            limit: 10,
-            order: [['created_at', 'DESC']],
-            include: [
-                { model: Product, as: 'product' }
-            ]
-        });
+        let myJobs = [];
+        let myOrders = [];
+
+        try {
+            myJobs = await JobPost.findAll({
+                where: { client_id: userId },
+                limit: 10,
+                order: [['created_at', 'DESC']],
+                include: [
+                    { model: JobApplication, as: 'applications', required: false }
+                ]
+            });
+        } catch (err) {
+            console.error('Error loading jobs:', err.message);
+        }
+
+        try {
+            myOrders = await OrderRequest.findAll({
+                where: { buyer_id: userId },
+                limit: 10,
+                order: [['created_at', 'DESC']],
+                include: [
+                    { model: Product, as: 'product', required: false }
+                ]
+            });
+        } catch (err) {
+            console.error('Error loading orders:', err.message);
+        }
 
         res.render('dashboard/client', {
             title: 'Client Dashboard',
             page: 'dashboard',
+            user: req.session.user,
             myJobs: myJobs || [],
             myOrders: myOrders || []
         });
@@ -60,6 +76,7 @@ router.get('/client', isAuthenticated, async (req, res) => {
         res.render('dashboard/client', {
             title: 'Client Dashboard',
             page: 'dashboard',
+            user: req.session.user || null,
             myJobs: [],
             myOrders: []
         });

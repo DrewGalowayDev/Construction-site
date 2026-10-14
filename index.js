@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Database and models - now in same directory level
@@ -31,9 +32,29 @@ testConnection();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// Session store configuration
+const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: process.env.DB_PORT || 3306,
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASS || 'Hackifyoucan254',
+    database: process.env.DB_NAME || 'construction',
+    createDatabaseTable: true,
+    schema: {
+        tableName: 'sessions',
+        columnNames: {
+            session_id: 'session_id',
+            expires: 'expires',
+            data: 'data'
+        }
+    }
+});
+
 // Session middleware
 app.use(session({
+    key: 'topline_session',
     secret: process.env.SESSION_SECRET || 'topline-secret-key-2026',
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
