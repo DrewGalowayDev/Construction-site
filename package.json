@@ -2,10 +2,10 @@
   "name": "topline-marketplace",
   "version": "1.0.0",
   "description": "TopLine Marketplace - Kenya construction and service providers platform",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [
     "marketplace",
