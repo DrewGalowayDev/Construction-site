@@ -50,8 +50,8 @@ if (!User.associations.artisanProfile) {
   Wallet.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
   // 10. User <-> Transaction (1:N)
-  User.hasMany(Transaction, { foreignKey: 'user_id', as: 'transactions' });
-  Transaction.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+  User.hasMany(Transaction, { foreignKey: { name: 'user_id', allowNull: true }, as: 'transactions' });
+  Transaction.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: true }, as: 'user' });
 
   // 11. User <-> ContactUnlock (1:N)
   User.hasMany(ContactUnlock, { foreignKey: 'user_id', as: 'unlockedContacts' });

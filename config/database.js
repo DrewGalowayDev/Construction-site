@@ -27,6 +27,15 @@ const testConnection = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ MySQL Database connected successfully via Sequelize.');
+
+    // Ensure transactions.user_id is nullable for guest training payments
+    try {
+      await sequelize.query('ALTER TABLE `transactions` MODIFY COLUMN `user_id` INT(11) NULL;');
+      console.log('✅ Schema check: transactions.user_id is nullable for guest checkouts.');
+    } catch (schemaErr) {
+      // Table might not exist yet or user might not have ALTER permission
+      console.log('ℹ️ Transactions table schema notice:', schemaErr.message);
+    }
   } catch (error) {
     console.error('❌ Unable to connect to the MySQL database:', error.message);
   }

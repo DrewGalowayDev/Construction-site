@@ -1,5 +1,6 @@
 const path = require('path');
-const { User, Transaction } = require(path.join(__dirname, '..', 'models'));
+const { Op } = require('sequelize');
+const { User, Transaction, sequelize } = require(path.join(__dirname, '..', 'models'));
 const paystackHelper = require('../helpers/paystackHelper');
 
 // Training Fee Constant
@@ -54,18 +55,67 @@ exports.initializeTrainingPayment = async (req, res) => {
       });
     }
 
-    // Allow guest payments - use session user if available, otherwise guest
-    let userId = req.session.user ? req.session.user.id : 0;
-    let userEmail = (req.session.user && req.session.user.email) || email || `guest_${phone.replace(/\D/g,'')}@toplinehub.co.ke`;
+    // Allow guest payments - use session user if available, otherwise check if account exists by phone/email
+    let userId = req.session.user ? req.session.user.id : null;
+    let userEmail = (req.session.user && req.session.user.email) || (email ? email.trim().toLowerCase() : null);
 
-    // Check if already paid - use 'type' not 'transaction_type'
-    const existingPayment = await Transaction.findOne({
-      where: {
-        user_id: userId,
-        type: 'training_fee',
-        status: 'completed'
+    // If user is not logged in, try to see if an account already exists with this phone or email
+    if (!userId) {
+      try {
+        const cleanPhone = phone.replace(/\D/g, '').slice(-9);
+        const orConditions = [];
+        if (userEmail) {
+          orConditions.push({ email: userEmail });
+        }
+        if (cleanPhone.length >= 7) {
+          orConditions.push(
+            sequelize.where(
+              sequelize.fn('REPLACE', sequelize.col('phone'), ' ', ''),
+              { [Op.like]: `%${cleanPhone}` }
+            )
+          );
+        }
+        if (orConditions.length > 0) {
+          const matchedUser = await User.findOne({ where: { [Op.or]: orConditions } });
+          if (matchedUser) {
+            userId = matchedUser.id;
+            if (!userEmail) userEmail = matchedUser.email;
+          }
+        }
+      } catch (matchErr) {
+        console.warn('User matching notice:', matchErr.message);
       }
-    });
+    }
+
+    if (!userEmail) {
+      userEmail = `guest_${phone.replace(/\D/g, '')}@toplinehub.co.ke`;
+    }
+
+    // Check if already paid
+    let existingPayment = null;
+    if (userId) {
+      existingPayment = await Transaction.findOne({
+        where: {
+          user_id: userId,
+          type: 'training_fee',
+          status: 'completed'
+        }
+      });
+    } else {
+      // For guests, check by phone number in description
+      const cleanPhone = phone.replace(/\D/g, '').slice(-9);
+      if (cleanPhone.length >= 7) {
+        existingPayment = await Transaction.findOne({
+          where: {
+            type: 'training_fee',
+            status: 'completed',
+            description: {
+              [Op.like]: `%${cleanPhone}%`
+            }
+          }
+        });
+      }
+    }
 
     if (existingPayment) {
       return res.status(400).json({
@@ -74,8 +124,8 @@ exports.initializeTrainingPayment = async (req, res) => {
       });
     }
 
-    // Generate unique reference
-    const reference = `TL_TRAIN_${userId}_${Date.now()}`;
+    // Generate unique reference (never use 0)
+    const reference = `TL_TRAIN_${userId || 'GUEST'}_${Date.now()}`;
 
     // Get callback URL
     const host = req.get('host');
@@ -89,7 +139,7 @@ exports.initializeTrainingPayment = async (req, res) => {
       reference: reference,
       callbackUrl: callbackUrl,
       metadata: {
-        user_id: userId,
+        user_id: userId || null,
         payment_type: 'training_fee',
         name: name,
         phone: phone,
@@ -98,17 +148,17 @@ exports.initializeTrainingPayment = async (req, res) => {
       channels: ['card', 'mobile_money', 'bank']
     });
 
-    // Create pending transaction record
+    // Create pending transaction record (user_id is null for guests, NEVER 0)
     await Transaction.create({
-      user_id: userId,
+      user_id: userId || null,
       type: 'training_fee',
       amount: TRAINING_FEE,
       balance_before: 0,
       balance_after: 0,
       status: 'pending',
       payment_method: 'paystack',
-      mpesa_receipt: reference,  // Store reference in mpesa_receipt
-      description: `Training Fee Payment - ${name}`
+      mpesa_receipt: reference,
+      description: `Training Fee Payment - ${name} (${phone})`
     });
 
     res.json({
@@ -150,7 +200,7 @@ exports.paystackCallback = async (req, res) => {
 
     if (verifyRes.data && verifyRes.data.status === 'success') {
       const metadata = verifyRes.data.metadata || {};
-      const userId = metadata.user_id || null;
+      let userId = metadata.user_id && metadata.user_id !== '0' && metadata.user_id !== 0 ? metadata.user_id : null;
       const amount = verifyRes.data.amount ? Number(verifyRes.data.amount) / 100 : TRAINING_FEE;
 
       // Check if already processed (use mpesa_receipt not payment_reference)
@@ -164,30 +214,57 @@ exports.paystackCallback = async (req, res) => {
           page: 'training',
           success: true,
           message: 'This payment has already been processed',
-          transaction: existingTx
+          transaction: existingTx,
+          metadata: metadata
         });
       }
 
-      // Create or update transaction (allow guest user_id = 0)
-      let transaction;
+      // If user_id wasn't in metadata, try matching by phone or email
+      if (!userId && (metadata.email || metadata.phone)) {
+        try {
+          const cleanPhone = (metadata.phone || '').replace(/\D/g, '').slice(-9);
+          const orConditions = [];
+          if (metadata.email && !metadata.email.startsWith('guest_')) {
+            orConditions.push({ email: metadata.email.trim().toLowerCase() });
+          }
+          if (cleanPhone.length >= 7) {
+            orConditions.push(
+              sequelize.where(
+                sequelize.fn('REPLACE', sequelize.col('phone'), ' ', ''),
+                { [Op.like]: `%${cleanPhone}` }
+              )
+            );
+          }
+          if (orConditions.length > 0) {
+            const matchedUser = await User.findOne({ where: { [Op.or]: orConditions } });
+            if (matchedUser) userId = matchedUser.id;
+          }
+        } catch (matchErr) {
+          console.warn('Callback user match error:', matchErr.message);
+        }
+      }
 
-      // Update existing pending transaction
-      transaction = await Transaction.findOne({
-        where: { user_id: userId, mpesa_receipt: paymentRef }
+      // Update existing pending transaction by reference
+      let transaction = await Transaction.findOne({
+        where: { mpesa_receipt: paymentRef }
       });
+
+      const customerName = metadata.name || 'User';
+      const customerPhone = metadata.phone ? ` (${metadata.phone})` : '';
 
       if (transaction) {
         await transaction.update({
+          user_id: userId || transaction.user_id || null,
           status: 'completed',
           amount: amount,
           balance_before: 0,
           balance_after: 0,
-          description: `Training Fee Payment - ${metadata.name || 'User'} (Verified)`
+          description: `Training Fee Payment - ${customerName}${customerPhone} (Verified)`
         });
       } else {
         // Create new transaction
         transaction = await Transaction.create({
-          user_id: userId,
+          user_id: userId || null,
           type: 'training_fee',
           amount: amount,
           balance_before: 0,
@@ -195,7 +272,7 @@ exports.paystackCallback = async (req, res) => {
           status: 'completed',
           payment_method: 'paystack',
           mpesa_receipt: paymentRef,
-          description: `Training Fee Payment - ${metadata.name || 'User'}`
+          description: `Training Fee Payment - ${customerName}${customerPhone}`
         });
       }
 

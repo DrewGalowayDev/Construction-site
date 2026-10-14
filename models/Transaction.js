@@ -7,6 +7,14 @@ const Transaction = sequelize.define('Transaction', {
     autoIncrement: true,
     primaryKey: true
   },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
   type: {
     type: DataTypes.STRING(50),
     allowNull: false
