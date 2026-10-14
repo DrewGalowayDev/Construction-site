@@ -31,6 +31,7 @@ exports.getTrainingPage = async (req, res) => {
       trainingFee: TRAINING_FEE,
       hasPaid: hasPaid,
       userPayment: userPayment,
+      user: req.session.user || null,
       paystackPublicKey: paystackHelper.getPublicKey()
     });
   } catch (err) {
