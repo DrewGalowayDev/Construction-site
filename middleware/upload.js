@@ -88,18 +88,16 @@ const upload = multer({
 const handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      req.flash('error', 'File too large. Maximum file size is 5MB.');
+      return res.status(400).json({ error: 'File too large. Maximum file size is 5MB.' });
     } else if (err.code === 'LIMIT_FILE_COUNT') {
-      req.flash('error', 'Too many files. Maximum 5 images allowed.');
+      return res.status(400).json({ error: 'Too many files. Maximum 5 images allowed.' });
     } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-      req.flash('error', 'Unexpected file field. Please use the correct upload form.');
+      return res.status(400).json({ error: 'Unexpected file field. Please use the correct upload form.' });
     } else {
-      req.flash('error', `Upload error: ${err.message}`);
+      return res.status(400).json({ error: `Upload error: ${err.message}` });
     }
-    return res.redirect('back');
   } else if (err) {
-    req.flash('error', err.message || 'File upload failed.');
-    return res.redirect('back');
+    return res.status(400).json({ error: err.message || 'File upload failed.' });
   }
   next();
 };

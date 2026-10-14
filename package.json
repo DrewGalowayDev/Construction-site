@@ -1,46 +1,30 @@
 {
-  "name": "construction",
+  "name": "topline-marketplace",
   "version": "1.0.0",
-  "description": "TopLineHub - Kenyan Construction Materials & Artisan Marketplace",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
+  "description": "TopLine Marketplace - Kenya construction and service providers platform",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "seed": "node config/seed.js",
-    "reset": "node config/reset-and-seed.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "keywords": [
-    "construction",
     "marketplace",
+    "construction",
     "kenya",
-    "materials",
-    "artisan",
-    "fundis"
+    "mpesa",
+    "service-providers"
   ],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "connect-flash": "^0.1.1",
-    "connect-session-sequelize": "^8.0.6",
-    "dotenv": "^18.0.7",
-    "ejs": "^7.0.1",
-    "express": "^5.3.0",
-    "express-ejs-layouts": "^2.5.1",
-    "express-session": "^1.19.0",
-    "morgan": "^1.12.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "multer": "^2.4.0",
-    "mysql2": "^3.24.5",
-    "sequelize": "^6.37.8"
+    "mysql2": "^3.3.3",
+    "sequelize": "^6.31.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

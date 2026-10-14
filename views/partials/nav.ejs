@@ -1,0 +1,28 @@
+<nav>
+    <div class="w">
+        <a href="/">
+            <img alt="TopLine Marketplace" src="/images/logo.png">
+        </a>
+        <div class="l">
+            <a class="h <%= page === 'providers' ? 'on' : '' %>" href="/providers">Providers</a>
+            <a class="h <%= page === 'jobs' ? 'on' : '' %>" href="/jobs">Jobs</a>
+            <a class="h <%= page === 'materials' ? 'on' : '' %>" href="/materials">Materials</a>
+            <a class="h <%= page === 'training' ? 'on' : '' %>" href="/training">Training</a>
+            <% if (user) { %>
+                <a class="h <%= page === 'dashboard' ? 'on' : '' %>" href="/dashboard/client">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a class="btn" style="padding:8px 14px" href="/auth/logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            <% } else { %>
+                <a class="h" href="/auth/login">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </a>
+                <a class="btn" style="padding:8px 14px" href="/auth/register">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            <% } %>
+        </div>
+    </div>
+</nav>

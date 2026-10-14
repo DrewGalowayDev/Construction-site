@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Dashboard - Topline Construction</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Sidebar - Supplier Specific -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <h2 style="color:var(--navy);margin:0">Topline</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/supplier" class="sidebar-nav-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Supplier Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/materials" class="sidebar-nav-link">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Browse Materials</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Product</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <i class="fas fa-cubes"></i>
+                    <span>My Products</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <i class="fas fa-wallet"></i>
+                    <span>My Wallet</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/client" class="sidebar-nav-link">
+                    <i class="fas fa-user"></i>
+                    <span>Switch to Client</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider" class="sidebar-nav-link">
+                    <i class="fas fa-tools"></i>
+                    <span>Switch to Provider</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/auth/logout" class="sidebar-nav-link" style="color:#dc2626">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1><i class="fas fa-box"></i> Supplier Dashboard</h1>
+                <p style="color:#6b7280;margin:4px 0 0">Manage your products and orders</p>
+            </div>
+            <div class="dashboard-header-actions">
+                <button class="btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Add New Product
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Total Products</div>
+                        <div class="stat-card-value"><%= myProducts ? myProducts.length : 0 %></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#fef3e2;color:#f5a623">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Active Products</div>
+                        <div class="stat-card-value"><%= myProducts ? myProducts.filter(p => p.is_active).length : 0 %></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#d1fae5;color:#065f46">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Total Orders</div>
+                        <div class="stat-card-value"><%= productOrders ? productOrders.length : 0 %></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#dbeafe;color:#1e40af">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Products -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2 class="content-section-title"><i class="fas fa-cubes"></i> My Products</h2>
+                <button class="btn-sm btn-primary"><i class="fas fa-plus"></i> Add Product</button>
+            </div>
+            
+            <% if (myProducts && myProducts.length > 0) { %>
+                <div class="items-grid">
+                    <% myProducts.forEach(product => { %>
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <h3 class="item-card-title"><%= product.title %></h3>
+                            <span class="badge <%= product.is_active ? 'badge-success' : 'badge-danger' %>">
+                                <%= product.is_active ? 'Active' : 'Inactive' %>
+                            </span>
+                        </div>
+                        <p class="item-card-description"><%= product.description.substring(0, 100) %>...</p>
+                        <div class="item-card-meta">
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-warehouse"></i>
+                                Stock: <%= product.stock_quantity %> <%= product.unit %>
+                            </span>
+                            <% if (product.category) { %>
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-folder"></i>
+                                <%= product.category.name %>
+                            </span>
+                            <% } %>
+                        </div>
+                        <div class="item-card-price">KSh <%= product.price.toLocaleString() %></div>
+                        <div class="item-card-actions">
+                            <button class="btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <h3 class="empty-state-title">No Products Yet</h3>
+                    <p class="empty-state-description">Start adding products to your inventory to reach more customers</p>
+                    <button class="btn-sm btn-primary">Add Your First Product</button>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Product Orders -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2 class="content-section-title"><i class="fas fa-shopping-bag"></i> Product Orders</h2>
+            </div>
+            
+            <% if (productOrders && productOrders.length > 0) { %>
+                <div class="items-grid">
+                    <% productOrders.forEach(order => { %>
+                    <% if (order.product) { %>
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <h3 class="item-card-title"><%= order.product.title %></h3>
+                            <span class="badge <%= order.status === 'completed' ? 'badge-success' : order.status === 'pending' ? 'badge-warning' : order.status === 'cancelled' ? 'badge-danger' : 'badge-info' %>">
+                                <%= order.status %>
+                            </span>
+                        </div>
+                        <div class="item-card-meta">
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-boxes"></i>
+                                Quantity: <%= order.quantity %>
+                            </span>
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <%= new Date(order.created_at).toLocaleDateString() %>
+                            </span>
+                        </div>
+                        <% if (order.buyer) { %>
+                        <p class="item-card-description">
+                            <i class="fas fa-user"></i> <%= order.buyer.name %>
+                        </p>
+                        <% } %>
+                        <div class="item-card-price">KSh <%= order.total_price.toLocaleString() %></div>
+                        <div class="item-card-actions">
+                            <button class="btn-sm btn-primary" style="flex:1">
+                                <i class="fas fa-eye"></i> View Order
+                            </button>
+                        </div>
+                    </div>
+                    <% } %>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h3 class="empty-state-title">No Orders Yet</h3>
+                    <p class="empty-state-description">Orders from customers will appear here</p>
+                </div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="document.querySelector('.dashboard-sidebar').classList.toggle('open')">
+    <i class="fas fa-bars"></i>
+</button>
+
+<script>
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !toggle.contains(event.target) && 
+            sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training - Provider Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .training-card {
+            background: linear-gradient(135deg, #0b3a6e 0%, #1e5a9e 100%);
+            border-radius: 16px;
+            padding: 32px;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+        .training-card h2 {
+            color: #ffd166;
+            margin: 0 0 16px;
+            font-size: 28px;
+        }
+        .training-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .training-card ul li {
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .training-card ul li i {
+            color: #ffd166;
+            margin-top: 4px;
+        }
+        .training-price {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ffd166;
+            margin: 24px 0 8px;
+        }
+        .payment-form {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .payment-form label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 14px;
+        }
+        .payment-form input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .payment-form input:focus {
+            outline: none;
+            border-color: #f5a623;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+        .paid-badge {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+        }
+        .paid-badge i {
+            font-size: 64px;
+            color: #10b981;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Sidebar - Provider Specific -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <h2 style="color:var(--navy);margin:0">Topline</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider" class="sidebar-nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/jobs" class="sidebar-nav-link">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Browse Jobs</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/provider/profile/form" class="sidebar-nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/wallet" class="sidebar-nav-link">
+                    <i class="fas fa-wallet"></i>
+                    <span>My Wallet</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/training" class="sidebar-nav-link active">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Training</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/client" class="sidebar-nav-link">
+                    <i class="fas fa-user"></i>
+                    <span>Switch to Client</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/supplier" class="sidebar-nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Switch to Supplier</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/auth/logout" class="sidebar-nav-link" style="color:#dc2626">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1><i class="fas fa-graduation-cap"></i> Construction Materials Training</h1>
+                <p style="color:#6b7280;margin:4px 0 0">Dropshipping class for construction materials</p>
+            </div>
+        </div>
+
+        <% if (hasPaid) { %>
+        <!-- Already Paid -->
+        <div class="content-section">
+            <div class="paid-badge">
+                <i class="fas fa-check-circle"></i>
+                <h2 style="color:#065f46;margin:0 0 8px">Training Fee Paid!</h2>
+                <p style="color:#047857;font-size:16px;margin:0">You have successfully paid for the training. We will contact you with date and venue details.</p>
+                <% if (userPayment) { %>
+                <p style="color:#059669;font-size:14px;margin:16px 0 0">
+                    <strong>Paid:</strong> <%= new Date(userPayment.created_at).toLocaleDateString() %><br>
+                    <strong>Reference:</strong> <%= userPayment.mpesa_receipt %>
+                </p>
+                <% } %>
+            </div>
+        </div>
+        <% } else { %>
+        <!-- Training Info Card -->
+        <div class="training-card">
+            <div class="tag" style="background:rgba(255,255,255,0.2);color:#ffd166;display:inline-block;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;margin-bottom:16px">UPCOMING TRAINING</div>
+            <h2>Construction Materials Dropshipping Class</h2>
+            <p style="font-size:16px;line-height:1.6;margin:0 0 20px;opacity:0.95">
+                Learn to sell construction materials on TopLine without holding stock.
+            </p>
+            
+            <ul>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>How dropshipping works with our supplier back end</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Product knowledge: cement, steel, roofing, tiles, paint</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Pricing, margins and finding contractors & homeowners</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Orders, M-PESA payouts and customer service</span>
+                </li>
+            </ul>
+            
+            <div class="training-price">
+                KSh <%= trainingFee.toLocaleString() %>
+                <small style="font-size:18px;font-weight:400;opacity:0.8">one-off payment</small>
+            </div>
+            <p style="opacity:0.9;font-size:14px;margin:0">Date and venue to be announced. Limited seats.</p>
+        </div>
+
+        <!-- Payment Form -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2 class="content-section-title"><i class="fas fa-credit-card"></i> Register & Pay</h2>
+            </div>
+            
+            <div class="payment-form">
+                <form id="trainingForm">
+                    <div>
+                        <label for="name"><i class="fas fa-user"></i> Full Name *</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name" required value="<%= user ? user.name : '' %>">
+                    </div>
+                    
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                        <div>
+                            <label for="phone"><i class="fas fa-phone"></i> Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" placeholder="0712345678" required value="<%= user ? user.phone || '' : '' %>">
+                        </div>
+                        <div>
+                            <label for="location"><i class="fas fa-map-marker-alt"></i> Location</label>
+                            <input type="text" id="location" name="location" placeholder="Nairobi" value="<%= user ? (user.town || user.county || '') : '' %>">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="email"><i class="fas fa-envelope"></i> Email (Optional)</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" value="<%= user ? user.email || '' : '' %>">
+                    </div>
+                    
+                    <div id="alert-message" style="display:none;padding:16px;border-radius:8px;margin-bottom:16px;font-size:14px"></div>
+                    
+                    <button type="submit" class="btn-sm btn-primary" id="submitBtn" style="width:100%;padding:16px;font-size:16px">
+                        <i class="fas fa-lock"></i> Pay KSh <%= trainingFee.toLocaleString() %> Securely with Paystack
+                    </button>
+                    
+                    <p style="text-align:center;color:#6b7280;font-size:12px;margin:16px 0 0">
+                        <i class="fas fa-shield-alt"></i> Secure payment powered by Paystack
+                    </p>
+                </form>
+            </div>
+        </div>
+        <% } %>
+    </main>
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="document.querySelector('.dashboard-sidebar').classList.toggle('open')">
+    <i class="fas fa-bars"></i>
+</button>
+
+<% if (!hasPaid) { %>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    const trainingForm = document.getElementById('trainingForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertMessage = document.getElementById('alert-message');
+
+    function showAlert(message, type = 'error') {
+        alertMessage.textContent = message;
+        alertMessage.style.display = 'block';
+        alertMessage.style.background = type === 'success' ? '#d1fae5' : '#fee2e2';
+        alertMessage.style.color = type === 'success' ? '#065f46' : '#991b1b';
+        alertMessage.style.border = type === 'success' ? '1px solid #10b981' : '1px solid #ef4444';
+        
+        setTimeout(() => {
+            alertMessage.style.display = 'none';
+        }, 5000);
+    }
+
+    trainingForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const location = document.getElementById('location').value;
+        const email = document.getElementById('email').value;
+
+        if (!name || !phone) {
+            showAlert('Please fill in all required fields');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        try {
+            const response = await fetch('/training/payment/initialize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    phone: phone,
+                    location: location,
+                    email: email
+                })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                showAlert(data.message || 'Failed to initialize payment');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-lock"></i> Pay KSh <%= trainingFee.toLocaleString() %> Securely with Paystack';
+                return;
+            }
+
+            // Redirect to Paystack
+            if (data.authorization_url) {
+                window.location.href = data.authorization_url;
+            } else {
+                showAlert('Payment initialization failed');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-lock"></i> Pay KSh <%= trainingFee.toLocaleString() %> Securely with Paystack';
+            }
+
+        } catch (err) {
+            console.error('Payment error:', err);
+            showAlert('Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-lock"></i> Pay KSh <%= trainingFee.toLocaleString() %> Securely with Paystack';
+        }
+    });
+
+    // Mobile sidebar
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !toggle.contains(event.target) && 
+            sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+        }
+    });
+</script>
+<% } %>
+
+</body>
+</html>

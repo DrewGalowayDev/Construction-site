@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - Topline Construction</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Sidebar - Client Specific -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <h2 style="color:var(--navy);margin:0">Topline</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/client" class="sidebar-nav-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Client Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/jobs" class="sidebar-nav-link">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Browse Jobs</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/materials" class="sidebar-nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Browse Materials</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider" class="sidebar-nav-link">
+                    <i class="fas fa-tools"></i>
+                    <span>Switch to Provider</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/supplier" class="sidebar-nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Switch to Supplier</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/auth/logout" class="sidebar-nav-link" style="color:#dc2626">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1><i class="fas fa-tachometer-alt"></i> Client Dashboard</h1>
+                <p style="color:#6b7280;margin:4px 0 0">Manage your jobs, orders, and account</p>
+            </div>
+            <div class="dashboard-header-actions">
+                <a href="/jobs" class="btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Post New Job
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Total Jobs</div>
+                        <div class="stat-card-value"><%= myJobs ? myJobs.length : 0 %></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#fef3e2;color:#f5a623">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Total Orders</div>
+                        <div class="stat-card-value"><%= myOrders ? myOrders.length : 0 %></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#dbeafe;color:#1e40af">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Active Jobs</div>
+                        <div class="stat-card-value"><%= myJobs ? myJobs.filter(j => j.status === 'open').length : 0 %></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#d1fae5;color:#065f46">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Posted Jobs -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2 class="content-section-title"><i class="fas fa-briefcase"></i> My Posted Jobs</h2>
+                <a href="/jobs" class="btn-sm btn-primary"><i class="fas fa-plus"></i> Post Job</a>
+            </div>
+            
+            <% if (myJobs && myJobs.length > 0) { %>
+                <div class="items-grid">
+                    <% myJobs.forEach(job => { %>
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <h3 class="item-card-title"><%= job.title %></h3>
+                            <span class="badge <%= job.status === 'open' ? 'badge-success' : job.status === 'in_progress' ? 'badge-warning' : 'badge-info' %>">
+                                <%= job.status %>
+                            </span>
+                        </div>
+                        <p class="item-card-description"><%= job.description.substring(0, 120) %>...</p>
+                        <div class="item-card-meta">
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <%= job.location_town %>, <%= job.location_county %>
+                            </span>
+                            <% if (job.applications && job.applications.length > 0) { %>
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-users"></i>
+                                <%= job.applications.length %> applications
+                            </span>
+                            <% } %>
+                        </div>
+                        <div class="item-card-price">KSh <%= job.budget_estimate.toLocaleString() %></div>
+                        <div class="item-card-actions">
+                            <button class="btn-sm btn-primary" style="flex:1">
+                                <i class="fas fa-eye"></i> View Applications
+                            </button>
+                            <button class="btn-sm btn-secondary">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3 class="empty-state-title">No Jobs Posted Yet</h3>
+                    <p class="empty-state-description">Start posting jobs to connect with skilled service providers</p>
+                    <a href="/jobs" class="btn-sm btn-primary">Post Your First Job</a>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- My Orders -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2 class="content-section-title"><i class="fas fa-shopping-cart"></i> My Orders</h2>
+                <a href="/materials" class="btn-sm btn-primary"><i class="fas fa-shopping-bag"></i> Browse Materials</a>
+            </div>
+            
+            <% if (myOrders && myOrders.length > 0) { %>
+                <div class="items-grid">
+                    <% myOrders.forEach(order => { %>
+                    <% if (order.product) { %>
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <h3 class="item-card-title"><%= order.product.title %></h3>
+                            <span class="badge <%= order.status === 'completed' ? 'badge-success' : order.status === 'pending' ? 'badge-warning' : 'badge-info' %>">
+                                <%= order.status %>
+                            </span>
+                        </div>
+                        <div class="item-card-meta">
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-boxes"></i>
+                                Quantity: <%= order.quantity %>
+                            </span>
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <%= new Date(order.created_at).toLocaleDateString() %>
+                            </span>
+                        </div>
+                        <div class="item-card-price">KSh <%= order.total_price.toLocaleString() %></div>
+                        <div class="item-card-actions">
+                            <button class="btn-sm btn-primary" style="flex:1">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                    <% } %>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 class="empty-state-title">No Orders Yet</h3>
+                    <p class="empty-state-description">Browse our materials marketplace to place your first order</p>
+                    <a href="/materials" class="btn-sm btn-primary">Browse Materials</a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="document.querySelector('.dashboard-sidebar').classList.toggle('open')">
+    <i class="fas fa-bars"></i>
+</button>
+
+<script>
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !toggle.contains(event.target) && 
+            sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+        }
+    });
+</script>
+
+</body>
+</html>

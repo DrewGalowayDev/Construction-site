@@ -1,0 +1,108 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<header class="hero s">
+    <div class="w">
+        <h1><%= success ? 'Payment Successful' : 'Payment Failed' %></h1>
+    </div>
+</header>
+
+<section>
+    <div class="w" style="max-width:700px;margin:0 auto">
+        <% if (success) { %>
+        <!-- Success Message -->
+        <div style="background:#d1fae5;border:2px solid #10b981;border-radius:16px;padding:48px 32px;text-align:center">
+            <div style="font-size:80px;color:#10b981;margin-bottom:24px">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 style="color:#065f46;margin:0 0 16px;font-size:28px">Payment Successful!</h2>
+            <p style="color:#047857;font-size:18px;line-height:1.6;margin:0 0 24px"><%= message %></p>
+            
+            <% if (transaction) { %>
+            <div style="background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;text-align:left">
+                <h3 style="color:#0b3a6e;margin:0 0 16px;font-size:18px;border-bottom:2px solid #e5e7eb;padding-bottom:12px">
+                    <i class="fas fa-receipt"></i> Payment Details
+                </h3>
+                <div style="display:grid;gap:12px">
+                    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6">
+                        <span style="color:#6b7280;font-size:14px">Amount Paid:</span>
+                        <span style="color:#111827;font-weight:700;font-size:16px">KSh <%= transaction.amount.toLocaleString() %></span>
+                    </div>
+                    <% if (transaction.mpesa_receipt) { %>
+                    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6">
+                        <span style="color:#6b7280;font-size:14px">Reference:</span>
+                        <span style="color:#111827;font-weight:600;font-size:13px"><%= transaction.mpesa_receipt %></span>
+                    </div>
+                    <% } %>
+                    <% if (metadata && metadata.name) { %>
+                    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6">
+                        <span style="color:#6b7280;font-size:14px">Name:</span>
+                        <span style="color:#111827;font-weight:600;font-size:14px"><%= metadata.name %></span>
+                    </div>
+                    <% } %>
+                    <% if (metadata && metadata.phone) { %>
+                    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6">
+                        <span style="color:#6b7280;font-size:14px">Phone:</span>
+                        <span style="color:#111827;font-weight:600;font-size:14px"><%= metadata.phone %></span>
+                    </div>
+                    <% } %>
+                    <div style="display:flex;justify-content:space-between;padding:8px 0">
+                        <span style="color:#6b7280;font-size:14px">Date:</span>
+                        <span style="color:#111827;font-weight:600;font-size:14px"><%= new Date(transaction.created_at).toLocaleString() %></span>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <div style="background:#fef3e2;border:1px solid #f5a623;border-radius:8px;padding:16px;margin-bottom:24px">
+                <p style="margin:0;color:#92400e;font-size:14px">
+                    <i class="fas fa-info-circle"></i> <strong>What's Next?</strong><br>
+                    We will contact you via phone/email with training date and venue details. Keep your phone nearby!
+                </p>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                <a href="/training" class="btn" style="display:inline-flex;align-items:center;gap:8px">
+                    <i class="fas fa-arrow-left"></i> Back to Training
+                </a>
+                <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/dashboard/provider" class="btn n" style="display:inline-flex;align-items:center;gap:8px">
+                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                </a>
+                <% } else { %>
+                <a href="/" class="btn n" style="display:inline-flex;align-items:center;gap:8px">
+                    <i class="fas fa-home"></i> Go to Home
+                </a>
+                <% } %>
+            </div>
+        </div>
+        <% } else { %>
+        <!-- Failure Message -->
+        <div style="background:#fee2e2;border:2px solid #ef4444;border-radius:16px;padding:48px 32px;text-align:center">
+            <div style="font-size:80px;color:#ef4444;margin-bottom:24px">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <h2 style="color:#991b1b;margin:0 0 16px;font-size:28px">Payment Failed</h2>
+            <p style="color:#991b1b;font-size:16px;line-height:1.6;margin:0 0 24px"><%= message %></p>
+            
+            <div style="background:#fff;border-radius:8px;padding:16px;margin-bottom:24px">
+                <p style="margin:0;color:#374151;font-size:14px">
+                    <i class="fas fa-lightbulb"></i> <strong>Try again?</strong><br>
+                    You can retry the payment or contact support for assistance.
+                </p>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                <a href="/training" class="btn n" style="display:inline-flex;align-items:center;gap:8px">
+                    <i class="fas fa-redo"></i> Try Again
+                </a>
+                <a href="/" class="btn" style="display:inline-flex;align-items:center;gap:8px">
+                    <i class="fas fa-home"></i> Go to Home
+                </a>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</section>
+
+<%- include('partials/footer') %>

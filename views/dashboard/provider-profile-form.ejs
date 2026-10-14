@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= profile ? 'Edit' : 'Create' %> Provider Profile - Topline Construction</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #f5a623;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .avatar-upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            overflow: hidden;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-preview-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #9ca3af;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #0b3a6e;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .file-input-btn:hover {
+            background: #07284f;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+        .form-actions button {
+            flex: 1;
+        }
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Sidebar - Provider Specific -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <h2 style="color:var(--navy);margin:0">Topline</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider" class="sidebar-nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Provider Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/provider/profile/form" class="sidebar-nav-link active">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Edit Profile</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/auth/logout" class="sidebar-nav-link" style="color:#dc2626">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="profile-form-container">
+            <div class="dashboard-header">
+                <div>
+                    <h1><i class="fas fa-user-circle"></i> <%= profile ? 'Edit' : 'Create' %> Provider Profile</h1>
+                    <p style="color:#6b7280;margin:4px 0 0">Complete your profile to start receiving job offers</p>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <div id="alert-container"></div>
+
+                <form id="profileForm" enctype="multipart/form-data">
+                    <!-- Avatar Upload -->
+                    <div class="avatar-upload-section">
+                        <div class="avatar-preview" id="avatarPreview">
+                            <% if (profile && profile.avatar_url) { %>
+                                <img src="<%= profile.avatar_url %>" alt="Profile Picture" id="avatarImage">
+                            <% } else { %>
+                                <div class="avatar-preview-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="file-input-wrapper">
+                            <label class="file-input-btn">
+                                <i class="fas fa-camera"></i> Upload Profile Picture
+                                <input type="file" name="avatar" id="avatarInput" accept="image/*">
+                            </label>
+                        </div>
+                        <p style="font-size:12px;color:#6b7280;margin-top:8px">JPG, PNG, WEBP or GIF (max 3MB)</p>
+                    </div>
+
+                    <!-- Trade -->
+                    <div class="form-group">
+                        <label for="trade"><i class="fas fa-wrench"></i> Trade/Specialization *</label>
+                        <select name="trade" id="trade" required>
+                            <option value="">Select your trade</option>
+                            <option value="Mason" <%= profile && profile.trade === 'Mason' ? 'selected' : '' %>>Mason (Mjenzi)</option>
+                            <option value="Carpenter" <%= profile && profile.trade === 'Carpenter' ? 'selected' : '' %>>Carpenter (Seremala)</option>
+                            <option value="Plumber" <%= profile && profile.trade === 'Plumber' ? 'selected' : '' %>>Plumber (Fundi wa Maji)</option>
+                            <option value="Electrician" <%= profile && profile.trade === 'Electrician' ? 'selected' : '' %>>Electrician (Fundi wa Umeme)</option>
+                            <option value="Painter" <%= profile && profile.trade === 'Painter' ? 'selected' : '' %>>Painter (Mpakaji Rangi)</option>
+                            <option value="Welder" <%= profile && profile.trade === 'Welder' ? 'selected' : '' %>>Welder (Mwunganishi)</option>
+                            <option value="Tiler" <%= profile && profile.trade === 'Tiler' ? 'selected' : '' %>>Tiler (Fundi wa Tiles)</option>
+                            <option value="Roofer" <%= profile && profile.trade === 'Roofer' ? 'selected' : '' %>>Roofer (Fundi wa Mabati)</option>
+                            <option value="General Construction" <%= profile && profile.trade === 'General Construction' ? 'selected' : '' %>>General Construction Worker</option>
+                        </select>
+                    </div>
+
+                    <!-- Experience Years -->
+                    <div class="form-group">
+                        <label for="experience_years"><i class="fas fa-calendar-alt"></i> Years of Experience *</label>
+                        <input type="number" name="experience_years" id="experience_years" min="0" max="50" value="<%= profile ? profile.experience_years : 1 %>" required>
+                    </div>
+
+                    <!-- Daily Rate -->
+                    <div class="form-group">
+                        <label for="daily_rate"><i class="fas fa-money-bill-wave"></i> Daily Rate (KSh) *</label>
+                        <input type="number" name="daily_rate" id="daily_rate" min="500" step="50" value="<%= profile ? profile.daily_rate : 1000 %>" required>
+                        <p style="font-size:12px;color:#6b7280;margin-top:4px">Your daily rate in Kenyan Shillings</p>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="form-group">
+                        <label for="skills"><i class="fas fa-tools"></i> Skills</label>
+                        <textarea name="skills" id="skills" placeholder="List your skills (e.g., Foundation work, Wall construction, Plastering)"><%= profile ? profile.skills || '' : '' %></textarea>
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="form-group">
+                        <label for="bio"><i class="fas fa-info-circle"></i> Bio/Description</label>
+                        <textarea name="bio" id="bio" placeholder="Tell clients about yourself, your experience, and what makes you stand out"><%= profile ? profile.bio || '' : '' %></textarea>
+                    </div>
+
+                    <!-- Availability -->
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" name="is_available" id="is_available" value="1" <%= profile && profile.is_available ? 'checked' : 'checked' %>>
+                            <label for="is_available" style="margin:0"><i class="fas fa-check-circle"></i> I am currently available for work</label>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <a href="/dashboard/provider" class="btn-sm btn-secondary" style="text-align:center;text-decoration:none;flex:1">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn-sm btn-primary" id="submitBtn">
+                            <i class="fas fa-save"></i> <%= profile ? 'Update' : 'Create' %> Profile
+                        </button>
+                    </div>
+                </form>
+
+                <% if (profile) { %>
+                <div style="margin-top:32px;padding-top:32px;border-top:1px solid #e5e7eb">
+                    <button class="btn-sm btn-danger" onclick="deleteProfile()" style="width:100%">
+                        <i class="fas fa-trash"></i> Delete Profile
+                    </button>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="document.querySelector('.dashboard-sidebar').classList.toggle('open')">
+    <i class="fas fa-bars"></i>
+</button>
+
+<script>
+    // Avatar preview
+    document.getElementById('avatarInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('avatarPreview');
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview" id="avatarImage">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Form submission
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const formData = new FormData(this);
+        const isUpdate = <%= profile ? 'true' : 'false' %>;
+        const url = isUpdate ? '/provider/profile/update' : '/provider/profile/create';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    window.location.href = '/dashboard/provider';
+                }, 1500);
+            } else {
+                showAlert('error', data.error || 'Failed to save profile');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            showAlert('error', 'Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+
+    // Delete profile
+    async function deleteProfile() {
+        if (!confirm('Are you sure you want to delete your provider profile? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/provider/profile/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    window.location.href = '/dashboard/provider';
+                }, 1500);
+            } else {
+                showAlert('error', data.error || 'Failed to delete profile');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            showAlert('error', 'Network error. Please try again.');
+        }
+    }
+
+    // Show alert
+    function showAlert(type, message) {
+        const container = document.getElementById('alert-container');
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        container.innerHTML = `
+            <div class="alert ${alertClass}">
+                <i class="fas ${icon}"></i> ${message}
+            </div>
+        `;
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 5000);
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !toggle.contains(event.target) && 
+            sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+        }
+    });
+</script>
+
+</body>
+</html>

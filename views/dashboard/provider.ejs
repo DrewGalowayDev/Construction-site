@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Dashboard - Topline Construction</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Sidebar - Provider Specific -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <h2 style="color:var(--navy);margin:0">Topline</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider" class="sidebar-nav-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/jobs" class="sidebar-nav-link">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Browse Jobs</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/provider/profile/form" class="sidebar-nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/wallet" class="sidebar-nav-link">
+                    <i class="fas fa-wallet"></i>
+                    <span>My Wallet</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/training" class="sidebar-nav-link">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Training</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/client" class="sidebar-nav-link">
+                    <i class="fas fa-user"></i>
+                    <span>Switch to Client</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/supplier" class="sidebar-nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Switch to Supplier</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/auth/logout" class="sidebar-nav-link" style="color:#dc2626">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1><i class="fas fa-tools"></i> Provider Dashboard</h1>
+                <p style="color:#6b7280;margin:4px 0 0">Manage your profile, jobs, and earnings</p>
+            </div>
+            <div class="dashboard-header-actions">
+                <a href="/jobs" class="btn-sm btn-primary">
+                    <i class="fas fa-search"></i> Browse Jobs
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Applications</div>
+                        <div class="stat-card-value"><%= myApplications ? myApplications.length : 0 %></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#fef3e2;color:#f5a623">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+            </div>
+            <% if (myProfile) { %>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Daily Rate</div>
+                        <div class="stat-card-value" style="font-size:20px">KSh <%= myProfile.daily_rate.toLocaleString() %></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#d1fae5;color:#065f46">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Rating</div>
+                        <div class="stat-card-value"><%= myProfile.rating %> <i class="fas fa-star" style="font-size:18px;color:#f5a623"></i></div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#dbeafe;color:#1e40af">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <% } else { %>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-title">Profile Status</div>
+                        <div class="stat-card-value" style="font-size:16px">Not Setup</div>
+                    </div>
+                    <div class="stat-card-icon" style="background:#fee2e2;color:#991b1b">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <!-- Profile Section -->
+        <% if (myProfile) { %>
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2 class="content-section-title"><i class="fas fa-user-circle"></i> My Profile</h2>
+                <a href="/provider/profile/form" class="btn-sm btn-primary"><i class="fas fa-edit"></i> Edit Profile</a>
+            </div>
+            <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+                <!-- Profile Image -->
+                <div style="flex-shrink:0">
+                    <% if (myProfile.avatar_url) { %>
+                        <img src="<%= myProfile.avatar_url %>" alt="Profile Picture" style="width:150px;height:150px;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
+                    <% } else { %>
+                        <div style="width:150px;height:150px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:48px;color:#9ca3af;border:4px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Profile Details -->
+                <div style="flex:1;min-width:300px">
+                    <div style="background:#f8f9fa;padding:20px;border-radius:8px">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">
+                            <div>
+                                <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Name</p>
+                                <p style="font-size:15px;font-weight:600;margin:0"><%= myProfile.user ? myProfile.user.name : 'N/A' %></p>
+                            </div>
+                            <div>
+                                <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Trade</p>
+                                <p style="font-size:15px;font-weight:600;margin:0"><%= myProfile.trade %></p>
+                            </div>
+                            <div>
+                                <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Experience</p>
+                                <p style="font-size:15px;font-weight:600;margin:0"><%= myProfile.experience_years %> years</p>
+                            </div>
+                            <div>
+                                <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Daily Rate</p>
+                                <p style="font-size:15px;font-weight:600;margin:0;color:#f5a623">KSh <%= myProfile.daily_rate.toLocaleString() %></p>
+                            </div>
+                            <div>
+                                <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Rating</p>
+                                <p style="font-size:15px;font-weight:600;margin:0"><%= myProfile.rating %> <i class="fas fa-star" style="color:#f5a623"></i></p>
+                            </div>
+                            <div>
+                                <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Status</p>
+                                <p style="font-size:15px;font-weight:600;margin:0">
+                                    <span class="badge <%= myProfile.is_available ? 'badge-success' : 'badge-danger' %>">
+                                        <%= myProfile.is_available ? 'Available' : 'Not Available' %>
+                                    </span>
+                                    <button onclick="toggleAvailability()" style="margin-left:8px;padding:4px 12px;border:none;background:#e5e7eb;border-radius:6px;cursor:pointer;font-size:12px">
+                                        <i class="fas fa-sync-alt"></i> Toggle
+                                    </button>
+                                </p>
+                            </div>
+                        </div>
+                        <% if (myProfile.skills) { %>
+                        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb">
+                            <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Skills</p>
+                            <p style="font-size:14px;line-height:1.6;margin:0;color:#374151"><%= myProfile.skills %></p>
+                        </div>
+                        <% } %>
+                        <% if (myProfile.bio) { %>
+                        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb">
+                            <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Bio</p>
+                            <p style="font-size:14px;line-height:1.6;margin:0;color:#374151"><%= myProfile.bio %></p>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } else { %>
+        <div class="content-section">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3 class="empty-state-title">Create Your Provider Profile</h3>
+                <p class="empty-state-description">Set up your profile to start receiving job offers from clients</p>
+                <a href="/provider/profile/form" class="btn-sm btn-primary">Create Profile Now</a>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- My Job Applications -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2 class="content-section-title"><i class="fas fa-clipboard-list"></i> My Job Applications</h2>
+                <a href="/jobs" class="btn-sm btn-primary"><i class="fas fa-plus"></i> Apply to Jobs</a>
+            </div>
+            
+            <% if (myApplications && myApplications.length > 0) { %>
+                <div class="items-grid">
+                    <% myApplications.forEach(application => { %>
+                    <% if (application.job) { %>
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <h3 class="item-card-title"><%= application.job.title %></h3>
+                            <span class="badge <%= application.status === 'accepted' ? 'badge-success' : application.status === 'pending' ? 'badge-warning' : application.status === 'rejected' ? 'badge-danger' : 'badge-info' %>">
+                                <%= application.status %>
+                            </span>
+                        </div>
+                        <p class="item-card-description"><%= application.job.description.substring(0, 120) %>...</p>
+                        <div class="item-card-meta">
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <%= application.job.location_town %>
+                            </span>
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <%= new Date(application.created_at).toLocaleDateString() %>
+                            </span>
+                        </div>
+                        <div class="item-card-price">KSh <%= application.job.budget_estimate.toLocaleString() %></div>
+                        <div class="item-card-actions">
+                            <button class="btn-sm btn-primary" style="flex:1">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                    <% } %>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3 class="empty-state-title">No Applications Yet</h3>
+                    <p class="empty-state-description">Browse available jobs and start applying to connect with clients</p>
+                    <a href="/jobs" class="btn-sm btn-primary">Browse Available Jobs</a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="document.querySelector('.dashboard-sidebar').classList.toggle('open')">
+    <i class="fas fa-bars"></i>
+</button>
+
+<script>
+    // Toggle availability
+    async function toggleAvailability() {
+        try {
+            const response = await fetch('/provider/profile/toggle-availability', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.error || 'Failed to toggle availability');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Network error. Please try again.');
+        }
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !toggle.contains(event.target) && 
+            sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+        }
+    });
+</script>
+
+</body>
+</html>

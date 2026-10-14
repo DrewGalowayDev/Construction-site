@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Jobs - Provider Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Sidebar - Provider Specific -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <h2 style="color:var(--navy);margin:0">Topline</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider" class="sidebar-nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/jobs" class="sidebar-nav-link active">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Browse Jobs</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/provider/profile/form" class="sidebar-nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/wallet" class="sidebar-nav-link">
+                    <i class="fas fa-wallet"></i>
+                    <span>My Wallet</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/provider/training" class="sidebar-nav-link">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Training</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/client" class="sidebar-nav-link">
+                    <i class="fas fa-user"></i>
+                    <span>Switch to Client</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="/dashboard/supplier" class="sidebar-nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Switch to Supplier</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:20px">
+                <a href="/auth/logout" class="sidebar-nav-link" style="color:#dc2626">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1><i class="fas fa-briefcase"></i> Browse Available Jobs</h1>
+                <p style="color:#6b7280;margin:4px 0 0">Find and apply to construction jobs</p>
+            </div>
+        </div>
+
+        <!-- Jobs List -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2 class="content-section-title"><i class="fas fa-list"></i> Available Jobs</h2>
+            </div>
+            
+            <% if (jobs && jobs.length > 0) { %>
+                <div class="items-grid">
+                    <% jobs.forEach(job => { %>
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <h3 class="item-card-title"><%= job.title %></h3>
+                            <span class="badge <%= job.status === 'open' ? 'badge-success' : 'badge-info' %>">
+                                <%= job.status %>
+                            </span>
+                        </div>
+                        <p class="item-card-description"><%= job.description.substring(0, 120) %>...</p>
+                        <div class="item-card-meta">
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <%= job.location_town %>, <%= job.location_county %>
+                            </span>
+                            <span class="item-card-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <%= new Date(job.created_at).toLocaleDateString() %>
+                            </span>
+                        </div>
+                        <div class="item-card-price">KSh <%= job.budget_estimate.toLocaleString() %></div>
+                        <div class="item-card-actions">
+                            <button class="btn-sm btn-primary" style="flex:1">
+                                <i class="fas fa-paper-plane"></i> Apply Now
+                            </button>
+                            <button class="btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3 class="empty-state-title">No Jobs Available</h3>
+                    <p class="empty-state-description">Check back later for new job postings</p>
+                </div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="document.querySelector('.dashboard-sidebar').classList.toggle('open')">
+    <i class="fas fa-bars"></i>
+</button>
+
+<script>
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !toggle.contains(event.target) && 
+            sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+        }
+    });
+</script>
+
+</body>
+</html>

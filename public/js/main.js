@@ -1,59 +1,57 @@
-(function ($) {
-    "use strict";
+/**
+ * TopLine Marketplace - Main JavaScript
+ */
 
-    // Spinner
-    var spinner = function () {
-        setTimeout(function () {
-            if ($('#spinner').length > 0) {
-                $('#spinner').removeClass('show');
-            }
-        }, 1);
-    };
-    spinner();
+// WhatsApp phone number for form submissions
+const WA = "";
+
+// Utility function to get element by ID
+const $ = id => document.getElementById(id);
+
+/**
+ * Display a toast notification message
+ * @param {string} m - Message to display
+ */
+function toast(m) {
+    const t = $("t");
+    t.textContent = m;
+    t.style.display = "block";
+    clearTimeout(t._);
+    t._ = setTimeout(() => t.style.display = "none", 5000);
+}
+
+/**
+ * Handle form submission and send via WhatsApp
+ * @param {Event} e - Form submit event
+ * @param {string} title - Title for the WhatsApp message
+ * @param {string} ok - Success message to display
+ * @returns {boolean} false to prevent default form submission
+ */
+function send(e, title, ok) {
+    e.preventDefault();
+    const f = e.target;
+    const lines = [title];
     
-    
-    // Initiate the wowjs
-    new WOW().init();
-
-
-    // Sticky Navbar
-    $(window).scroll(function () {
-        if ($(this).scrollTop() > 300) {
-            $('.sticky-top').addClass('shadow-sm').css('top', '0px');
-        } else {
-            $('.sticky-top').removeClass('shadow-sm').css('top', '-100px');
+    // Collect form data
+    [...f.elements].forEach(x => {
+        if (x.name && x.value) {
+            lines.push(x.name + ": " + x.value);
         }
     });
     
-    
-    // Back to top button
-    $(window).scroll(function () {
-        if ($(this).scrollTop() > 300) {
-            $('.back-to-top').fadeIn('slow');
-        } else {
-            $('.back-to-top').fadeOut('slow');
-        }
-    });
-    $('.back-to-top').click(function () {
-        $('html, body').animate({scrollTop: 0}, 1500, 'easeInOutExpo');
+    // Check if WhatsApp number is configured
+    if (!WA) {
+        toast("This form is not connected yet — nothing was sent.");
         return false;
-    });
-
-
-    // Testimonials carousel
-    $(".testimonial-carousel").owlCarousel({
-        autoplay: true,
-        smartSpeed: 1000,
-        items: 1,
-        dots: false,
-        loop: true,
-        nav: true,
-        navText : [
-            '<i class="bi bi-chevron-left"></i>',
-            '<i class="bi bi-chevron-right"></i>'
-        ]
-    });
-
+    }
     
-})(jQuery);
-
+    // Send via WhatsApp
+    window.open(
+        "https://wa.me/" + WA + "?text=" + encodeURIComponent(lines.join("\n")),
+        "_blank"
+    );
+    
+    toast(ok);
+    f.reset();
+    return false;
+}
