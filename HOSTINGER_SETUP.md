@@ -32,7 +32,7 @@ git push -u origin main
    - **Mode**: Production
    - **Node Version**: 18.x or 20.x
    - **App Root**: `/domains/yourdomain.com/public_html`
-   - **Startup File**: `app.js`
+   - **Startup File**: `index.js`
    - **Port**: Auto-assigned
 
 4. **Add Environment Variables**:
