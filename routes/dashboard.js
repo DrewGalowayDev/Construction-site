@@ -261,70 +261,77 @@ router.get('/supplier', isAuthenticated, async (req, res) => {
     }
 });
 
+// Import admin controller
+const adminController = require('../controllers/adminController');
+
 /**
- * Admin Dashboard - Manage users, training payments, etc.
+ * Admin Dashboard - Standalone Pages Navigation
  */
-router.get('/admin', isAuthenticated, async (req, res) => {
-    try {
-        const users = await User.findAll({
-            order: [['created_at', 'DESC']],
-            limit: 50
-        });
-
-        const providers = await ArtisanProfile.findAll({
-            include: [
-                { model: User, as: 'user' }
-            ],
-            order: [['created_at', 'DESC']],
-            limit: 50
-        });
-
-        const allJobs = await JobPost.findAll({
-            include: [
-                { model: User, as: 'client' }
-            ],
-            order: [['created_at', 'DESC']],
-            limit: 50
-        });
-
-        const allProducts = await Product.findAll({
-            include: [
-                { model: User, as: 'seller' },
-                { model: Category, as: 'category' }
-            ],
-            order: [['created_at', 'DESC']],
-            limit: 50
-        });
-
-        const transactions = await Transaction.findAll({
-            include: [
-                { model: User, as: 'user' }
-            ],
-            order: [['created_at', 'DESC']],
-            limit: 50
-        });
-
-        res.render('dashboard/admin', {
-            title: 'Admin Dashboard',
-            page: 'dashboard',
-            users: users || [],
-            providers: providers || [],
-            allJobs: allJobs || [],
-            allProducts: allProducts || [],
-            transactions: transactions || []
-        });
-    } catch (error) {
-        console.error('Error loading admin dashboard:', error);
-        res.render('dashboard/admin', {
-            title: 'Admin Dashboard',
-            page: 'dashboard',
-            users: [],
-            providers: [],
-            allJobs: [],
-            allProducts: [],
-            transactions: []
-        });
-    }
+router.get('/admin', isAuthenticated, (req, res, next) => {
+    const page = req.query.page;
+    if (page === 'users') return adminController.getUsers(req, res, next);
+    if (page === 'providers') return adminController.getProviders(req, res, next);
+    if (page === 'training') return adminController.getTraining(req, res, next);
+    if (page === 'products') return adminController.getProducts(req, res, next);
+    if (page === 'jobs') return adminController.getJobs(req, res, next);
+    return adminController.getOverview(req, res, next);
 });
+router.get('/admin/overview', isAuthenticated, adminController.getOverview);
+router.get('/admin/users', isAuthenticated, adminController.getUsers);
+router.get('/admin/providers', isAuthenticated, adminController.getProviders);
+router.get('/admin/training', isAuthenticated, adminController.getTraining);
+router.get('/admin/products', isAuthenticated, adminController.getProducts);
+router.get('/admin/jobs', isAuthenticated, adminController.getJobs);
+
+/**
+ * Admin Training Payments CRUD Endpoints
+ */
+router.post('/admin/training/create', isAuthenticated, adminController.createTrainingPayment);
+router.get('/admin/training/:id', isAuthenticated, adminController.getTrainingPayment);
+router.post('/admin/training/:id/update', isAuthenticated, adminController.updateTrainingPayment);
+router.put('/admin/training/:id', isAuthenticated, adminController.updateTrainingPayment);
+router.post('/admin/training/:id/delete', isAuthenticated, adminController.deleteTrainingPayment);
+router.delete('/admin/training/:id', isAuthenticated, adminController.deleteTrainingPayment);
+
+/**
+ * Admin Users CRUD Endpoints
+ */
+router.post('/admin/users/create', isAuthenticated, adminController.createUser);
+router.get('/admin/users/:id', isAuthenticated, adminController.getUser);
+router.post('/admin/users/:id/update', isAuthenticated, adminController.updateUser);
+router.put('/admin/users/:id', isAuthenticated, adminController.updateUser);
+router.post('/admin/users/:id/delete', isAuthenticated, adminController.deleteUser);
+router.delete('/admin/users/:id', isAuthenticated, adminController.deleteUser);
+
+/**
+ * Admin Providers CRUD Endpoints
+ */
+router.post('/admin/providers/create', isAuthenticated, adminController.createProvider);
+router.get('/admin/providers/:id', isAuthenticated, adminController.getProvider);
+router.post('/admin/providers/:id/update', isAuthenticated, adminController.updateProvider);
+router.put('/admin/providers/:id', isAuthenticated, adminController.updateProvider);
+router.post('/admin/providers/:id/toggle', isAuthenticated, adminController.toggleProviderStatus);
+router.post('/admin/providers/:id/delete', isAuthenticated, adminController.deleteProvider);
+router.delete('/admin/providers/:id', isAuthenticated, adminController.deleteProvider);
+
+/**
+ * Admin Products CRUD Endpoints
+ */
+router.post('/admin/products/create', isAuthenticated, adminController.createProduct);
+router.get('/admin/products/:id', isAuthenticated, adminController.getProduct);
+router.post('/admin/products/:id/update', isAuthenticated, adminController.updateProduct);
+router.put('/admin/products/:id', isAuthenticated, adminController.updateProduct);
+router.post('/admin/products/:id/delete', isAuthenticated, adminController.deleteProduct);
+router.delete('/admin/products/:id', isAuthenticated, adminController.deleteProduct);
+
+/**
+ * Admin Jobs CRUD Endpoints
+ */
+router.post('/admin/jobs/create', isAuthenticated, adminController.createJob);
+router.get('/admin/jobs/:id', isAuthenticated, adminController.getJob);
+router.post('/admin/jobs/:id/update', isAuthenticated, adminController.updateJob);
+router.put('/admin/jobs/:id', isAuthenticated, adminController.updateJob);
+router.post('/admin/jobs/:id/delete', isAuthenticated, adminController.deleteJob);
+router.delete('/admin/jobs/:id', isAuthenticated, adminController.deleteJob);
 
 module.exports = router;
