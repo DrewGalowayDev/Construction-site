@@ -1,15 +1,390 @@
 <%- include('partials/header') %>
 <%- include('partials/nav') %>
 
-<header class="hero s">
+<style>
+    .page-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: start;
+        padding: 48px 0;
+    }
+
+    .page-hero-compact {
+        background: var(--navy);
+        color: #fff;
+        padding: 28px 0;
+        text-align: center;
+    }
+
+    .page-hero-compact .tag { margin-bottom: 6px; }
+
+    .page-hero-compact h1 {
+        font-size: clamp(22px, 3vw, 34px);
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .page-hero-compact h1 span { color: var(--gold); }
+
+    .page-hero-compact p {
+        color: #cfdcee;
+        margin: 8px 0 0;
+        font-size: 15px;
+    }
+
+    .page-info-card {
+        background: var(--navy);
+        color: #fff;
+        border-radius: 18px;
+        padding: 36px;
+    }
+
+    .page-info-card h2 {
+        color: #fff;
+        font-size: 24px;
+        margin-bottom: 6px;
+    }
+
+    .page-info-card .info-subtitle {
+        color: #b6c7dc;
+        margin-bottom: 28px;
+        font-size: 15px;
+    }
+
+    .page-info-card .info-item {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        align-items: flex-start;
+    }
+
+    .page-info-card .info-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        border-radius: 12px;
+        background: rgba(245, 166, 35, 0.15);
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .page-info-card .info-text h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        color: #fff;
+    }
+
+    .page-info-card .info-text p {
+        font-size: 14px;
+        color: #b6c7dc;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .page-info-card .details-box {
+        background: rgba(255,255,255,0.06);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 24px;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .page-info-card .details-box h3 {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0 0 10px;
+        color: var(--gold);
+    }
+
+    .page-info-card .details-box li {
+        color: #cfdcee;
+        margin: 8px 0 8px 16px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .page-form-card {
+        background: #fff;
+        border: 2px solid var(--ln);
+        border-radius: 18px;
+        padding: 36px;
+        box-shadow: 0 8px 32px rgba(11, 58, 110, 0.08);
+    }
+
+    .page-form-card h2 {
+        font-size: 24px;
+        margin-bottom: 4px;
+        color: var(--navy);
+    }
+
+    .page-form-card .form-subtitle {
+        color: var(--mu);
+        margin-bottom: 20px;
+        font-size: 15px;
+    }
+
+    .provider-toggle-group {
+        display: flex;
+        background: var(--card);
+        padding: 4px;
+        border-radius: 12px;
+        gap: 6px;
+        margin-bottom: 24px;
+        border: 1px solid var(--ln);
+    }
+
+    .provider-toggle-btn {
+        flex: 1;
+        padding: 10px 14px;
+        border: none;
+        background: transparent;
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--mu);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .provider-toggle-btn.active {
+        background: var(--navy);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(11, 58, 110, 0.2);
+    }
+
+    .page-form-card label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin: 14px 0 4px;
+        color: var(--tx);
+    }
+
+    .page-form-card input,
+    .page-form-card select,
+    .page-form-card textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid var(--ln);
+        border-radius: 10px;
+        font-size: 15px;
+        background: var(--card);
+        color: var(--tx);
+        transition: border-color 0.2s;
+    }
+
+    .page-form-card input:focus,
+    .page-form-card select:focus,
+    .page-form-card textarea:focus {
+        outline: none;
+        border-color: var(--gold);
+    }
+
+    .page-form-card .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .page-form-card .submit-btn {
+        width: 100%;
+        margin-top: 20px;
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 700;
+        background: var(--navy);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    .page-form-card .submit-btn:hover {
+        background: var(--navy2);
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 800px) {
+        .page-layout {
+            grid-template-columns: 1fr;
+            gap: 24px;
+            padding: 28px 0;
+        }
+    }
+</style>
+
+<!-- Compact Hero Strip -->
+<div class="page-hero-compact">
     <div class="w">
         <div class="tag">PROVIDERS</div>
         <h1>Get a provider, or <span>become one</span></h1>
         <p>Customers: tell us what you need. Professionals: join TopLine and get jobs.</p>
     </div>
-</header>
+</div>
 
-<% if (providers && providers.length > 0) { %>
+<section>
+    <div class="w">
+        <div class="page-layout">
+            <!-- LEFT: How It Works -->
+            <div class="page-info-card">
+                <h2>How It Works</h2>
+                <p class="info-subtitle">Fast matching with vetted professionals</p>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-edit"></i></div>
+                    <div class="info-text">
+                        <h3>1. Request a Provider</h3>
+                        <p>Tell us what service you need, where you are located, and when you want the work done.</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-user-check"></i></div>
+                    <div class="info-text">
+                        <h3>2. Vetted Matching</h3>
+                        <p>We match you with qualified, background-checked pros in your area with verified past work.</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-handshake"></i></div>
+                    <div class="info-text">
+                        <h3>3. Pay Safely via M-PESA</h3>
+                        <p>Transparent pricing and milestone payouts. Your payment is protected until the job is completed.</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-hard-hat"></i></div>
+                    <div class="info-text">
+                        <h3>For Artisans &amp; Pros</h3>
+                        <p>Looking to grow your business? Join TopLine to receive steady job requests and build your reputation.</p>
+                    </div>
+                </div>
+
+                <div class="details-box">
+                    <h3><i class="fas fa-tools"></i> Popular Services</h3>
+                    <ul>
+                        <li>Cleaning — home, office &amp; post-construction</li>
+                        <li>Construction — masonry, roofing &amp; renovations</li>
+                        <li>Plumbing &amp; Electrical installations &amp; repairs</li>
+                        <li>Painting, plastering &amp; tiling work</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- RIGHT: The Form (with Tab Switcher to prevent duplication) -->
+            <div class="page-form-card">
+                <!-- Toggle Tabs -->
+                <div class="provider-toggle-group">
+                    <button type="button" class="provider-toggle-btn active" id="tabNeed" onclick="switchProviderTab('need')">
+                        <i class="fas fa-search"></i> I Need a Provider
+                    </button>
+                    <button type="button" class="provider-toggle-btn" id="tabJoin" onclick="switchProviderTab('join')">
+                        <i class="fas fa-user-plus"></i> I Am a Provider
+                    </button>
+                </div>
+
+                <!-- Form 1: I Need a Provider -->
+                <div id="formNeedProvider">
+                    <h2><i class="fas fa-tools" style="color:var(--gold);margin-right:8px"></i> Request a Provider</h2>
+                    <p class="form-subtitle">We will match you with a vetted professional in your area.</p>
+
+                    <form onsubmit="return send(event,'Provider request','Request sent. We will contact you shortly.')">
+                        <label>Full name *</label>
+                        <input name="Name" type="text" placeholder="Enter your full name" required>
+
+                        <div class="two">
+                            <div>
+                                <label>Phone / WhatsApp *</label>
+                                <input name="Phone" type="tel" placeholder="0712345678" required>
+                            </div>
+                            <div>
+                                <label>Area / town *</label>
+                                <input name="Location" type="text" placeholder="e.g. Nairobi" required>
+                            </div>
+                        </div>
+
+                        <label>Service needed *</label>
+                        <select name="Service" required>
+                            <option value="Cleaning">Cleaning</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Painting">Painting</option>
+                            <option value="Repairs">Repairs</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        <label>What needs doing? *</label>
+                        <textarea name="Details" rows="4" placeholder="Describe the work in detail" required></textarea>
+
+                        <button class="submit-btn" type="submit">
+                            <i class="fas fa-paper-plane"></i> Request a Provider
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Form 2: I Am a Provider -->
+                <div id="formJoinProvider" style="display:none">
+                    <h2><i class="fas fa-hard-hat" style="color:var(--gold);margin-right:8px"></i> Join as a Provider</h2>
+                    <p class="form-subtitle">Join TopLine to get verified and receive customer job requests.</p>
+
+                    <form onsubmit="return send(event,'Provider application','Application sent. We will be in touch to verify you.')">
+                        <label>Full name *</label>
+                        <input name="Name" type="text" placeholder="Enter your full name" required>
+
+                        <div class="two">
+                            <div>
+                                <label>Phone / WhatsApp *</label>
+                                <input name="Phone" type="tel" placeholder="0712345678" required>
+                            </div>
+                            <div>
+                                <label>Area / town *</label>
+                                <input name="Location" type="text" placeholder="e.g. Nairobi" required>
+                            </div>
+                        </div>
+
+                        <label>Main skill / trade *</label>
+                        <select name="Skill" required>
+                            <option value="Cleaning">Cleaning</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Painting">Painting</option>
+                            <option value="Repairs">Repairs</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        <label>Years of experience *</label>
+                        <input name="Experience" type="number" min="0" placeholder="e.g. 5" required>
+
+                        <label>About your work</label>
+                        <textarea name="About" rows="3" placeholder="Past jobs, tools, certifications, specialty"></textarea>
+
+                        <button class="submit-btn" type="submit">
+                            <i class="fas fa-check-circle"></i> Apply to Join
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<% /* Verified Service Providers Section - Hidden for now
+if (providers && providers.length > 0) { %>
 <section>
     <div class="w">
         <h2 style="text-align:center">Verified Service Providers</h2>
@@ -44,87 +419,28 @@
         <p class="sub">Be the first to join as a verified service provider!</p>
     </div>
 </section>
-<% } %>
+<% }
+*/ %>
 
-<section class="alt">
-    <div class="w">
-        <h2 style="text-align:center">I need a provider</h2>
-        <p class="sub" style="text-align:center">We will match you with a vetted professional.</p>
-        <form class="fm" onsubmit="return send(event,'Provider request','Request sent. We will contact you shortly.')">
-            <label>Full name</label>
-            <input name="Name" type="text" placeholder="" required>
-            
-            <div class="two">
-                <div>
-                    <label>Phone / WhatsApp</label>
-                    <input name="Phone" type="tel" placeholder="" required>
-                </div>
-                <div>
-                    <label>Area / town</label>
-                    <input name="Location" type="text" placeholder="" required>
-                </div>
-            </div>
-            
-            <label>Service needed</label>
-            <select name="Service" required>
-                <option>Cleaning</option>
-                <option>Construction</option>
-                <option>Plumbing</option>
-                <option>Electrical</option>
-                <option>Painting</option>
-                <option>Repairs</option>
-                <option>Other</option>
-            </select>
-            
-            <label>What needs doing?</label>
-            <textarea name="Details" rows="3" placeholder="Describe the work" required></textarea>
-            
-            <div style="height:16px"></div>
-            <button class="btn n" style="width:100%">Request a provider</button>
-        </form>
-    </div>
-</section>
+<script>
+    function switchProviderTab(type) {
+        const formNeed = document.getElementById('formNeedProvider');
+        const formJoin = document.getElementById('formJoinProvider');
+        const tabNeed = document.getElementById('tabNeed');
+        const tabJoin = document.getElementById('tabJoin');
 
-<section>
-    <div class="w">
-        <h2 style="text-align:center">I am a service provider</h2>
-        <p class="sub" style="text-align:center">Join TopLine to get verified and receive jobs.</p>
-        <form class="fm" onsubmit="return send(event,'Provider application','Application sent. We will be in touch to verify you.')">
-            <label>Full name</label>
-            <input name="Name" type="text" placeholder="" required>
-            
-            <div class="two">
-                <div>
-                    <label>Phone / WhatsApp</label>
-                    <input name="Phone" type="tel" placeholder="" required>
-                </div>
-                <div>
-                    <label>Area / town</label>
-                    <input name="Location" type="text" placeholder="" required>
-                </div>
-            </div>
-            
-            <label>Main skill</label>
-            <select name="Skill" required>
-                <option>Cleaning</option>
-                <option>Construction</option>
-                <option>Plumbing</option>
-                <option>Electrical</option>
-                <option>Painting</option>
-                <option>Repairs</option>
-                <option>Other</option>
-            </select>
-            
-            <label>Years of experience</label>
-            <input name="Experience" type="number" placeholder="e.g. 5" required>
-            
-            <label>About your work</label>
-            <textarea name="About" rows="3" placeholder="Past jobs, tools, certifications"></textarea>
-            
-            <div style="height:16px"></div>
-            <button class="btn n" style="width:100%">Apply to join</button>
-        </form>
-    </div>
-</section>
+        if (type === 'need') {
+            formNeed.style.display = 'block';
+            formJoin.style.display = 'none';
+            tabNeed.classList.add('active');
+            tabJoin.classList.remove('active');
+        } else {
+            formNeed.style.display = 'none';
+            formJoin.style.display = 'block';
+            tabNeed.classList.remove('active');
+            tabJoin.classList.add('active');
+        }
+    }
+</script>
 
 <%- include('partials/footer') %>
