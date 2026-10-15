@@ -314,7 +314,7 @@
                     </div>
 
                     <form id="trainingForm">
-                        <label>Full name *</label>
+                        <label>Full Name *</label>
                         <input name="name" id="name" type="text" placeholder="Enter your full name" required>
 
                         <div class="two">
@@ -323,13 +323,13 @@
                                 <input name="phone" id="phone" type="tel" placeholder="0712345678" required>
                             </div>
                             <div>
-                                <label>Town / county</label>
-                                <input name="location" id="location" type="text" placeholder="Nairobi">
+                                <label>Email Address *</label>
+                                <input name="email" id="email" type="email" placeholder="name@example.com" required>
                             </div>
                         </div>
 
-                        <label>Email (optional)</label>
-                        <input name="email" id="email" type="email" placeholder="your@email.com">
+                        <label>Town / County</label>
+                        <input name="location" id="location" type="text" placeholder="e.g. Nairobi, Kiambu, Mombasa">
 
                         <div id="alert-message" style="display:none;padding:14px;border-radius:8px;margin:14px 0;font-size:14px"></div>
 
@@ -372,13 +372,19 @@
     trainingForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const location = document.getElementById('location').value;
-        const email = document.getElementById('email').value;
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const location = document.getElementById('location').value.trim();
 
-        if (!name || !phone) {
-            showAlert('Please fill in all required fields');
+        if (!name || !phone || !email) {
+            showAlert('Full name, phone number, and email address are all required.');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showAlert('Please provide a valid email address.');
             return;
         }
 

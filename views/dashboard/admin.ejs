@@ -16,8 +16,7 @@
     <aside class="admin-sidebar">
         <div class="admin-sidebar-header">
             <a href="/dashboard/admin" class="admin-sidebar-logo">
-                <i class="fas fa-shield-alt"></i>
-                <span>Topline Admin</span>
+                <img src="/images/logo.png" alt="TopLine Logo" class="admin-sidebar-logo-img">
             </a>
         </div>
         <ul class="admin-nav-list">
@@ -412,13 +411,29 @@
                                         <tr>
                                             <td style="font-weight:700;color:#9ca3af;">#<%= tx.id %></td>
                                             <td>
-                                                <% if (tx.user) { %>
-                                                    <div style="font-weight:700;color:#111827;"><%= tx.user.name %></div>
-                                                    <div style="font-size:12px;color:#6b7280;"><%= tx.user.email %> | <%= tx.user.phone %></div>
-                                                <% } else { %>
-                                                    <div style="font-weight:600;color:#374151;">Guest User</div>
-                                                    <div style="font-size:11px;color:#9ca3af;"><%= (tx.description || '').substring(0, 32) %></div>
-                                                <% } %>
+                                                <% 
+                                                    let cName = tx.user ? tx.user.name : '';
+                                                    let cEmail = tx.user ? tx.user.email : '';
+                                                    let cPhone = tx.user ? tx.user.phone : '';
+
+                                                    if (!cName || !cPhone || !cEmail) {
+                                                        const desc = tx.description || '';
+                                                        const matchName = desc.match(/Training Fee Payment -\s*([^|(\n]+)/i);
+                                                        const matchPhone = desc.match(/Phone:\s*([^|\n-]+)/i);
+                                                        const matchEmail = desc.match(/Email:\s*([^|\n-]+)/i);
+
+                                                        if (!cName && matchName) cName = matchName[1].trim();
+                                                        if (!cPhone && matchPhone) cPhone = matchPhone[1].trim();
+                                                        if (!cEmail && matchEmail) cEmail = matchEmail[1].trim();
+                                                    }
+                                                %>
+                                                <div style="font-weight:700;color:#111827;font-size:14px;"><%= cName || 'Training Client' %></div>
+                                                <div style="font-size:12px;color:#0b3a6e;font-weight:600;margin-top:2px;">
+                                                    <i class="fas fa-phone-alt" style="font-size:10px;margin-right:4px;"></i><%= cPhone || 'N/A' %>
+                                                </div>
+                                                <div style="font-size:12px;color:#6b7280;margin-top:1px;">
+                                                    <i class="fas fa-envelope" style="font-size:10px;margin-right:4px;"></i><%= cEmail || 'N/A' %>
+                                                </div>
                                             </td>
                                             <td>
                                                 <code style="background:#f3f4f6;padding:3px 6px;border-radius:4px;font-size:12px;font-weight:700;color:#0b3a6e;">
@@ -1060,23 +1075,42 @@
             </div>
             <div class="admin-modal-body">
                 <div class="form-group-admin">
-                    <label>Select User (Optional)</label>
-                    <select name="user_id" class="form-control-admin">
-                        <option value="">-- Guest / Unregistered User --</option>
+                    <label>Select Registered User to Autofill (Optional)</label>
+                    <select name="user_id" id="createPaymentUserSelect" class="form-control-admin" onchange="autofillCreatePayment(this)">
+                        <option value="">-- Manual Entry / New Client --</option>
                         <% if (typeof allUsers !== 'undefined') { %>
                             <% allUsers.forEach(u => { %>
-                                <option value="<%= u.id %>"><%= u.name %> (<%= u.phone %> - <%= u.email %>)</option>
+                                <option value="<%= u.id %>" data-name="<%= u.name %>" data-phone="<%= u.phone %>" data-email="<%= u.email %>">
+                                    <%= u.name %> (<%= u.phone %> - <%= u.email %>)
+                                </option>
                             <% }) %>
                         <% } %>
                     </select>
                 </div>
+
+                <div class="form-group-admin">
+                    <label>Client Full Name *</label>
+                    <input type="text" name="client_name" id="createClientName" class="form-control-admin" placeholder="e.g. John Mwangi" required>
+                </div>
+
                 <div class="form-row-admin">
                     <div class="form-group-admin">
-                        <label>Amount (KES)*</label>
+                        <label>Phone Number (M-Pesa) *</label>
+                        <input type="text" name="client_phone" id="createClientPhone" class="form-control-admin" placeholder="0712345678" required>
+                    </div>
+                    <div class="form-group-admin">
+                        <label>Email Address *</label>
+                        <input type="email" name="client_email" id="createClientEmail" class="form-control-admin" placeholder="client@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-row-admin">
+                    <div class="form-group-admin">
+                        <label>Amount (KES) *</label>
                         <input type="number" step="0.01" name="amount" class="form-control-admin" value="1500" required>
                     </div>
                     <div class="form-group-admin">
-                        <label>Payment Method*</label>
+                        <label>Payment Method *</label>
                         <select name="payment_method" class="form-control-admin">
                             <option value="mpesa">M-Pesa</option>
                             <option value="paystack">Paystack</option>
@@ -1087,11 +1121,11 @@
                 </div>
                 <div class="form-row-admin">
                     <div class="form-group-admin">
-                        <label>Receipt / Reference Number*</label>
+                        <label>Receipt / Reference Number *</label>
                         <input type="text" name="mpesa_receipt" class="form-control-admin" placeholder="e.g. QK89123XZ" required>
                     </div>
                     <div class="form-group-admin">
-                        <label>Status*</label>
+                        <label>Status *</label>
                         <select name="status" class="form-control-admin">
                             <option value="completed">Completed</option>
                             <option value="pending">Pending</option>
@@ -1101,8 +1135,8 @@
                     </div>
                 </div>
                 <div class="form-group-admin">
-                    <label>Description / Customer Notes</label>
-                    <input type="text" name="description" class="form-control-admin" placeholder="e.g. Training Fee Payment - John Doe (0712345678)">
+                    <label>Additional Notes / Description</label>
+                    <input type="text" name="description" class="form-control-admin" placeholder="Optional notes about the payment">
                 </div>
             </div>
             <div class="admin-modal-footer">
@@ -1123,13 +1157,27 @@
                 <button type="button" class="admin-modal-close" data-close-modal><i class="fas fa-times"></i></button>
             </div>
             <div class="admin-modal-body">
+                <div class="form-group-admin">
+                    <label>Client Full Name *</label>
+                    <input type="text" name="client_name" id="editPaymentClientName" class="form-control-admin" required>
+                </div>
                 <div class="form-row-admin">
                     <div class="form-group-admin">
-                        <label>Amount (KES)</label>
+                        <label>Phone Number *</label>
+                        <input type="text" name="client_phone" id="editPaymentClientPhone" class="form-control-admin" required>
+                    </div>
+                    <div class="form-group-admin">
+                        <label>Email Address *</label>
+                        <input type="email" name="client_email" id="editPaymentClientEmail" class="form-control-admin" required>
+                    </div>
+                </div>
+                <div class="form-row-admin">
+                    <div class="form-group-admin">
+                        <label>Amount (KES) *</label>
                         <input type="number" step="0.01" name="amount" id="editPaymentAmount" class="form-control-admin" required>
                     </div>
                     <div class="form-group-admin">
-                        <label>Status</label>
+                        <label>Status *</label>
                         <select name="status" id="editPaymentStatus" class="form-control-admin">
                             <option value="completed">Completed</option>
                             <option value="pending">Pending</option>

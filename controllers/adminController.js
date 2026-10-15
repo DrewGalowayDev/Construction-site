@@ -403,23 +403,97 @@ exports.getJobs = async (req, res) => {
  * ==========================================
  */
 
-// CREATE Training Payment
+// CREATE Training Payment - Strictly requires Client Name, Phone Number, and Email Address
 exports.createTrainingPayment = async (req, res) => {
     try {
-        const { user_id, amount, payment_method, mpesa_receipt, status, description, type } = req.body;
+        const { client_name, client_email, client_phone, user_id, amount, payment_method, mpesa_receipt, status, description, type } = req.body;
+
+        let finalName = client_name ? client_name.trim() : '';
+        let finalEmail = client_email ? client_email.trim().toLowerCase() : '';
+        let finalPhone = client_phone ? client_phone.trim() : '';
+        let targetUserId = user_id && user_id !== '0' && user_id !== '' ? parseInt(user_id, 10) : null;
+
+        // If a user was selected, fill in any missing fields from that user
+        if (targetUserId) {
+            const selectedUser = await User.findByPk(targetUserId);
+            if (selectedUser) {
+                if (!finalName) finalName = selectedUser.name;
+                if (!finalEmail) finalEmail = selectedUser.email;
+                if (!finalPhone) finalPhone = selectedUser.phone;
+            }
+        }
+
+        // Validate that Name, Email, and Phone Number are strictly provided!
+        if (!finalName || !finalEmail || !finalPhone) {
+            const errorMsg = 'Client Full Name, Phone Number, and Email Address are all strictly required to record training payment.';
+            if (req.xhr || req.headers.accept?.includes('application/json')) {
+                return res.status(400).json({ success: false, message: errorMsg });
+            }
+            return res.redirect('/dashboard/admin/training?error=' + encodeURIComponent(errorMsg));
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(finalEmail)) {
+            const errorMsg = 'Please provide a valid client email address.';
+            if (req.xhr || req.headers.accept?.includes('application/json')) {
+                return res.status(400).json({ success: false, message: errorMsg });
+            }
+            return res.redirect('/dashboard/admin/training?error=' + encodeURIComponent(errorMsg));
+        }
+
+        // If no user was selected, check if user exists or auto-create account so client is captured permanently
+        if (!targetUserId) {
+            try {
+                const cleanPhone = finalPhone.replace(/\D/g, '').slice(-9);
+                const orConditions = [{ email: finalEmail }];
+                if (cleanPhone.length >= 7) {
+                    orConditions.push(
+                        sequelize.where(
+                            sequelize.fn('REPLACE', sequelize.col('phone'), ' ', ''),
+                            { [Op.like]: `%${cleanPhone}` }
+                        )
+                    );
+                }
+                let matchedUser = await User.findOne({ where: { [Op.or]: orConditions } });
+
+                if (!matchedUser) {
+                    matchedUser = await User.create({
+                        name: finalName,
+                        email: finalEmail,
+                        phone: finalPhone,
+                        password: 'Password123!',
+                        role: 'buyer',
+                        county: 'Nairobi',
+                        town: 'Nairobi',
+                        is_verified: true
+                    });
+                    await Wallet.create({ user_id: matchedUser.id, balance: 0 }).catch(() => {});
+                } else {
+                    if (!matchedUser.phone && finalPhone) {
+                        await matchedUser.update({ phone: finalPhone }).catch(() => {});
+                    }
+                }
+                if (matchedUser) {
+                    targetUserId = matchedUser.id;
+                }
+            } catch (userErr) {
+                console.warn('Admin payment user matching notice:', userErr.message);
+            }
+        }
 
         const receipt = mpesa_receipt ? mpesa_receipt.trim() : `MANUAL_${Date.now()}`;
         const paymentAmount = parseFloat(amount) || 1500;
         const paymentStatus = status || 'completed';
-        const parsedUserId = user_id && user_id !== '0' && user_id !== '' ? parseInt(user_id, 10) : null;
+        const formattedDescription = `Training Fee Payment - ${finalName} | Phone: ${finalPhone} | Email: ${finalEmail}${description ? ' - ' + description.trim() : ''}`;
 
         const newTx = await Transaction.create({
-            user_id: parsedUserId,
+            user_id: targetUserId,
             type: type || 'training_fee',
             amount: paymentAmount,
             balance_before: 0,
             balance_after: 0,
-            description: description ? description.trim() : `Manual Training Fee Payment - Ref: ${receipt}`,
+            description: formattedDescription,
             payment_method: payment_method || 'mpesa',
             mpesa_receipt: receipt,
             status: paymentStatus
@@ -458,9 +532,11 @@ exports.getTrainingPayment = async (req, res) => {
 exports.updateTrainingPayment = async (req, res) => {
     try {
         const { id } = req.params;
-        const { amount, status, mpesa_receipt, description, payment_method, user_id } = req.body;
+        const { client_name, client_email, client_phone, amount, status, mpesa_receipt, description, payment_method, user_id } = req.body;
 
-        const tx = await Transaction.findByPk(id);
+        const tx = await Transaction.findByPk(id, {
+            include: [{ model: User, as: 'user' }]
+        });
         if (!tx) {
             if (req.xhr || req.headers.accept?.includes('application/json')) {
                 return res.status(404).json({ success: false, message: 'Payment record not found' });
@@ -472,10 +548,29 @@ exports.updateTrainingPayment = async (req, res) => {
         if (amount !== undefined) updates.amount = parseFloat(amount) || tx.amount;
         if (status) updates.status = status;
         if (mpesa_receipt !== undefined) updates.mpesa_receipt = mpesa_receipt.trim();
-        if (description !== undefined) updates.description = description.trim();
         if (payment_method) updates.payment_method = payment_method;
+
+        let finalName = client_name ? client_name.trim() : (tx.user ? tx.user.name : '');
+        let finalEmail = client_email ? client_email.trim().toLowerCase() : (tx.user ? tx.user.email : '');
+        let finalPhone = client_phone ? client_phone.trim() : (tx.user ? tx.user.phone : '');
+
+        // Update linked user if client details are edited
+        if (tx.user && (client_name || client_email || client_phone)) {
+            const userUpdates = {};
+            if (client_name) userUpdates.name = finalName;
+            if (client_email) userUpdates.email = finalEmail;
+            if (client_phone) userUpdates.phone = finalPhone;
+            await tx.user.update(userUpdates).catch(() => {});
+        }
+
+        if (finalName || finalPhone || finalEmail) {
+            updates.description = `Training Fee Payment - ${finalName || 'Client'} | Phone: ${finalPhone || 'N/A'} | Email: ${finalEmail || 'N/A'}${description ? ' - ' + description.trim() : ''}`;
+        } else if (description !== undefined) {
+            updates.description = description.trim();
+        }
+
         if (user_id !== undefined) {
-            updates.user_id = user_id && user_id !== '0' && user_id !== '' ? parseInt(user_id, 10) : null;
+            updates.user_id = user_id && user_id !== '0' && user_id !== '' ? parseInt(user_id, 10) : tx.user_id;
         }
 
         await tx.update(updates);

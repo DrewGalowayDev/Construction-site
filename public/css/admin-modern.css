@@ -54,17 +54,18 @@
 .admin-sidebar-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: flex-start;
     text-decoration: none;
-    color: var(--admin-primary);
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.5px;
+    width: 100%;
 }
 
-.admin-sidebar-logo i {
-    font-size: 24px;
-    color: var(--admin-accent);
+.admin-sidebar-logo-img {
+    max-height: 44px;
+    max-width: 190px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
 }
 
 .admin-nav-list {

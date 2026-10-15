@@ -208,6 +208,28 @@ function executeDelete() {
 }
 
 /**
+ * Autofill Client Details from Selected User in Training Payment Modal
+ */
+function autofillCreatePayment(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    if (!selectedOption || !selectedOption.value) return;
+
+    const name = selectedOption.getAttribute('data-name') || '';
+    const phone = selectedOption.getAttribute('data-phone') || '';
+    const email = selectedOption.getAttribute('data-email') || '';
+
+    if (document.getElementById('createClientName') && name) {
+        document.getElementById('createClientName').value = name;
+    }
+    if (document.getElementById('createClientPhone') && phone) {
+        document.getElementById('createClientPhone').value = phone;
+    }
+    if (document.getElementById('createClientEmail') && email) {
+        document.getElementById('createClientEmail').value = email;
+    }
+}
+
+/**
  * Edit Training Payment
  */
 function editTrainingPayment(id) {
@@ -228,8 +250,30 @@ function editTrainingPayment(id) {
             document.getElementById('editPaymentMethod').value = tx.payment_method || 'mpesa';
             document.getElementById('editPaymentDescription').value = tx.description || '';
 
-            if (document.getElementById('editPaymentUser')) {
-                document.getElementById('editPaymentUser').value = tx.user_id || '';
+            // Extract client contact details
+            let clientName = tx.user ? tx.user.name : '';
+            let clientEmail = tx.user ? tx.user.email : '';
+            let clientPhone = tx.user ? tx.user.phone : '';
+
+            if (!clientName || !clientPhone || !clientEmail) {
+                const desc = tx.description || '';
+                const matchName = desc.match(/Training Fee Payment -\s*([^|(\n]+)/i);
+                const matchPhone = desc.match(/Phone:\s*([^|\n-]+)/i);
+                const matchEmail = desc.match(/Email:\s*([^|\n-]+)/i);
+
+                if (!clientName && matchName) clientName = matchName[1].trim();
+                if (!clientPhone && matchPhone) clientPhone = matchPhone[1].trim();
+                if (!clientEmail && matchEmail) clientEmail = matchEmail[1].trim();
+            }
+
+            if (document.getElementById('editPaymentClientName')) {
+                document.getElementById('editPaymentClientName').value = clientName;
+            }
+            if (document.getElementById('editPaymentClientPhone')) {
+                document.getElementById('editPaymentClientPhone').value = clientPhone;
+            }
+            if (document.getElementById('editPaymentClientEmail')) {
+                document.getElementById('editPaymentClientEmail').value = clientEmail;
             }
 
             openModal('editTrainingModal');
@@ -252,9 +296,25 @@ function viewTrainingPayment(id) {
             const detailsBody = document.getElementById('viewPaymentDetailsBody');
             if (!detailsBody) return;
 
-            const userName = tx.user ? tx.user.name : 'Guest User';
-            const userEmail = tx.user ? tx.user.email : 'N/A';
-            const userPhone = tx.user ? tx.user.phone : 'N/A';
+            // Extract client contact details
+            let userName = tx.user ? tx.user.name : '';
+            let userEmail = tx.user ? tx.user.email : '';
+            let userPhone = tx.user ? tx.user.phone : '';
+
+            if (!userName || !userPhone || !userEmail) {
+                const desc = tx.description || '';
+                const matchName = desc.match(/Training Fee Payment -\s*([^|(\n]+)/i);
+                const matchPhone = desc.match(/Phone:\s*([^|\n-]+)/i);
+                const matchEmail = desc.match(/Email:\s*([^|\n-]+)/i);
+
+                if (!userName && matchName) userName = matchName[1].trim();
+                if (!userPhone && matchPhone) userPhone = matchPhone[1].trim();
+                if (!userEmail && matchEmail) userEmail = matchEmail[1].trim();
+            }
+
+            userName = userName || 'Client';
+            userPhone = userPhone || 'Not provided';
+            userEmail = userEmail || 'Not provided';
             const dateStr = new Date(tx.created_at).toLocaleString();
 
             detailsBody.innerHTML = `
@@ -273,22 +333,23 @@ function viewTrainingPayment(id) {
                     </div>
                 </div>
 
+                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:16px;">
+                    <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:#1e40af;margin-bottom:6px;letter-spacing:0.5px;">
+                        <i class="fas fa-id-card"></i> Client Contact Information
+                    </div>
+                    <div style="font-weight:700;font-size:15px;color:#1e3a8a;margin-bottom:4px;">${userName}</div>
+                    <div style="font-size:13px;color:#1d4ed8;margin-bottom:2px;">
+                        <i class="fas fa-phone-alt" style="font-size:11px;margin-right:4px;"></i> <strong>Phone:</strong> ${userPhone}
+                    </div>
+                    <div style="font-size:13px;color:#1d4ed8;">
+                        <i class="fas fa-envelope" style="font-size:11px;margin-right:4px;"></i> <strong>Email:</strong> ${userEmail}
+                    </div>
+                </div>
+
                 <table style="width:100%;font-size:13.5px;border-collapse:collapse;">
                     <tr style="border-bottom:1px solid #e5e7eb;">
                         <td style="padding:10px 0;color:#6b7280;font-weight:600;width:40%;">Receipt / Ref:</td>
                         <td style="padding:10px 0;font-weight:700;color:#111827;">${tx.mpesa_receipt || 'N/A'}</td>
-                    </tr>
-                    <tr style="border-bottom:1px solid #e5e7eb;">
-                        <td style="padding:10px 0;color:#6b7280;font-weight:600;">Customer Name:</td>
-                        <td style="padding:10px 0;font-weight:600;">${userName}</td>
-                    </tr>
-                    <tr style="border-bottom:1px solid #e5e7eb;">
-                        <td style="padding:10px 0;color:#6b7280;font-weight:600;">Email:</td>
-                        <td style="padding:10px 0;">${userEmail}</td>
-                    </tr>
-                    <tr style="border-bottom:1px solid #e5e7eb;">
-                        <td style="padding:10px 0;color:#6b7280;font-weight:600;">Phone:</td>
-                        <td style="padding:10px 0;">${userPhone}</td>
                     </tr>
                     <tr style="border-bottom:1px solid #e5e7eb;">
                         <td style="padding:10px 0;color:#6b7280;font-weight:600;">Payment Method:</td>
@@ -304,7 +365,7 @@ function viewTrainingPayment(id) {
                     </tr>
                     <tr>
                         <td style="padding:10px 0;color:#6b7280;font-weight:600;">Description:</td>
-                        <td style="padding:10px 0;">${tx.description || 'None'}</td>
+                        <td style="padding:10px 0;font-size:12.5px;">${tx.description || 'None'}</td>
                     </tr>
                 </table>
             `;

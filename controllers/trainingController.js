@@ -48,25 +48,33 @@ exports.initializeTrainingPayment = async (req, res) => {
   try {
     const { name, phone, location, email } = req.body;
 
-    if (!name || !phone) {
+    if (!name || !name.trim() || !phone || !phone.trim() || !email || !email.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Name and phone number are required'
+        message: 'Full name, phone number, and email address are all required.'
       });
     }
 
-    // Allow guest payments - use session user if available, otherwise check if account exists by phone/email
-    let userId = req.session.user ? req.session.user.id : null;
-    let userEmail = (req.session.user && req.session.user.email) || (email ? email.trim().toLowerCase() : null);
+    const trimmedName = name.trim();
+    const trimmedPhone = phone.trim();
+    const userEmail = email.trim().toLowerCase();
 
-    // If user is not logged in, try to see if an account already exists with this phone or email
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address.'
+      });
+    }
+
+    let userId = req.session.user ? req.session.user.id : null;
+
+    // If user is not logged in, check if user exists or create account to fully capture the client
     if (!userId) {
       try {
-        const cleanPhone = phone.replace(/\D/g, '').slice(-9);
-        const orConditions = [];
-        if (userEmail) {
-          orConditions.push({ email: userEmail });
-        }
+        const cleanPhone = trimmedPhone.replace(/\D/g, '').slice(-9);
+        const orConditions = [{ email: userEmail }];
         if (cleanPhone.length >= 7) {
           orConditions.push(
             sequelize.where(
@@ -75,20 +83,35 @@ exports.initializeTrainingPayment = async (req, res) => {
             )
           );
         }
-        if (orConditions.length > 0) {
-          const matchedUser = await User.findOne({ where: { [Op.or]: orConditions } });
-          if (matchedUser) {
-            userId = matchedUser.id;
-            if (!userEmail) userEmail = matchedUser.email;
+        let matchedUser = await User.findOne({ where: { [Op.or]: orConditions } });
+
+        if (!matchedUser) {
+          // Auto-create user account so client is captured permanently
+          matchedUser = await User.create({
+            name: trimmedName,
+            email: userEmail,
+            phone: trimmedPhone,
+            password: 'Password123!',
+            role: 'buyer',
+            county: location || 'Nairobi',
+            town: location || 'Nairobi',
+            is_verified: true
+          });
+          // Also initialize wallet
+          await Wallet.create({ user_id: matchedUser.id, balance: 0 }).catch(() => {});
+        } else {
+          // Update phone or name if missing
+          if (!matchedUser.phone && trimmedPhone) {
+            await matchedUser.update({ phone: trimmedPhone }).catch(() => {});
           }
         }
-      } catch (matchErr) {
-        console.warn('User matching notice:', matchErr.message);
-      }
-    }
 
-    if (!userEmail) {
-      userEmail = `guest_${phone.replace(/\D/g, '')}@toplinehub.co.ke`;
+        if (matchedUser) {
+          userId = matchedUser.id;
+        }
+      } catch (userErr) {
+        console.warn('User matching/creation notice:', userErr.message);
+      }
     }
 
     // Check if already paid
@@ -101,31 +124,32 @@ exports.initializeTrainingPayment = async (req, res) => {
           status: 'completed'
         }
       });
-    } else {
-      // For guests, check by phone number in description
-      const cleanPhone = phone.replace(/\D/g, '').slice(-9);
+    }
+
+    if (!existingPayment) {
+      const cleanPhone = trimmedPhone.replace(/\D/g, '').slice(-9);
+      const orCheck = [{ description: { [Op.like]: `%${userEmail}%` } }];
       if (cleanPhone.length >= 7) {
-        existingPayment = await Transaction.findOne({
-          where: {
-            type: 'training_fee',
-            status: 'completed',
-            description: {
-              [Op.like]: `%${cleanPhone}%`
-            }
-          }
-        });
+        orCheck.push({ description: { [Op.like]: `%${cleanPhone}%` } });
       }
+      existingPayment = await Transaction.findOne({
+        where: {
+          type: 'training_fee',
+          status: 'completed',
+          [Op.or]: orCheck
+        }
+      });
     }
 
     if (existingPayment) {
       return res.status(400).json({
         success: false,
-        message: 'You have already paid for this training'
+        message: 'You have already paid for this training.'
       });
     }
 
-    // Generate unique reference (never use 0)
-    const reference = `TL_TRAIN_${userId || 'GUEST'}_${Date.now()}`;
+    // Generate unique reference
+    const reference = `TL_TRAIN_${userId || 'CLIENT'}_${Date.now()}`;
 
     // Get callback URL
     const host = req.get('host');
@@ -141,14 +165,15 @@ exports.initializeTrainingPayment = async (req, res) => {
       metadata: {
         user_id: userId || null,
         payment_type: 'training_fee',
-        name: name,
-        phone: phone,
+        name: trimmedName,
+        phone: trimmedPhone,
+        email: userEmail,
         location: location || 'Not provided'
       },
       channels: ['card', 'mobile_money', 'bank']
     });
 
-    // Create pending transaction record (user_id is null for guests, NEVER 0)
+    // Create pending transaction record with full client details captured in description
     await Transaction.create({
       user_id: userId || null,
       type: 'training_fee',
@@ -158,7 +183,7 @@ exports.initializeTrainingPayment = async (req, res) => {
       status: 'pending',
       payment_method: 'paystack',
       mpesa_receipt: reference,
-      description: `Training Fee Payment - ${name} (${phone})`
+      description: `Training Fee Payment - ${trimmedName} | Phone: ${trimmedPhone} | Email: ${userEmail}`
     });
 
     res.json({
@@ -219,13 +244,17 @@ exports.paystackCallback = async (req, res) => {
         });
       }
 
-      // If user_id wasn't in metadata, try matching by phone or email
-      if (!userId && (metadata.email || metadata.phone)) {
+      // Ensure client is linked to a user account
+      const customerName = metadata.name || 'Client';
+      const customerPhone = metadata.phone || '';
+      const customerEmail = (metadata.email || '').trim().toLowerCase();
+
+      if (!userId && (customerEmail || customerPhone)) {
         try {
-          const cleanPhone = (metadata.phone || '').replace(/\D/g, '').slice(-9);
+          const cleanPhone = customerPhone.replace(/\D/g, '').slice(-9);
           const orConditions = [];
-          if (metadata.email && !metadata.email.startsWith('guest_')) {
-            orConditions.push({ email: metadata.email.trim().toLowerCase() });
+          if (customerEmail && !customerEmail.startsWith('guest_')) {
+            orConditions.push({ email: customerEmail });
           }
           if (cleanPhone.length >= 7) {
             orConditions.push(
@@ -236,7 +265,19 @@ exports.paystackCallback = async (req, res) => {
             );
           }
           if (orConditions.length > 0) {
-            const matchedUser = await User.findOne({ where: { [Op.or]: orConditions } });
+            let matchedUser = await User.findOne({ where: { [Op.or]: orConditions } });
+            if (!matchedUser && customerEmail) {
+              matchedUser = await User.create({
+                name: customerName,
+                email: customerEmail,
+                phone: customerPhone || 'N/A',
+                password: 'Password123!',
+                role: 'buyer',
+                county: metadata.location || 'Nairobi',
+                town: metadata.location || 'Nairobi',
+                is_verified: true
+              }).catch(() => null);
+            }
             if (matchedUser) userId = matchedUser.id;
           }
         } catch (matchErr) {
@@ -249,8 +290,7 @@ exports.paystackCallback = async (req, res) => {
         where: { mpesa_receipt: paymentRef }
       });
 
-      const customerName = metadata.name || 'User';
-      const customerPhone = metadata.phone ? ` (${metadata.phone})` : '';
+      const fullDescription = `Training Fee Payment - ${customerName} | Phone: ${customerPhone} | Email: ${customerEmail}`;
 
       if (transaction) {
         await transaction.update({
@@ -259,7 +299,7 @@ exports.paystackCallback = async (req, res) => {
           amount: amount,
           balance_before: 0,
           balance_after: 0,
-          description: `Training Fee Payment - ${customerName}${customerPhone} (Verified)`
+          description: fullDescription + ' (Verified)'
         });
       } else {
         // Create new transaction
@@ -272,7 +312,7 @@ exports.paystackCallback = async (req, res) => {
           status: 'completed',
           payment_method: 'paystack',
           mpesa_receipt: paymentRef,
-          description: `Training Fee Payment - ${customerName}${customerPhone}`
+          description: fullDescription
         });
       }
 
