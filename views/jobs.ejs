@@ -256,39 +256,48 @@
                 <h2><i class="fas fa-briefcase" style="color:var(--gold);margin-right:8px"></i> Post Your Job</h2>
                 <p class="form-subtitle">Providers in your area will see it and send you quotes.</p>
 
-                <form onsubmit="return send(event,'Job post','Job posted. Providers will contact you with quotes.')">
-                    <label>Full name *</label>
-                    <input name="Name" type="text" placeholder="Enter your full name" required>
+                <form id="jobPostForm" onsubmit="return submitJobPost(event)">
+                    <label>Job Title *</label>
+                    <input name="title" type="text" placeholder="e.g. Office Cleaning Required" required>
+
+                    <label>Job Category (Trade Required) *</label>
+                    <select name="trade_required" required>
+                        <option value="">Select a category</option>
+                        <option value="Cleaning">Cleaning</option>
+                        <option value="Construction">Construction</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Painting">Painting</option>
+                        <option value="Repairs">Repairs</option>
+                        <option value="Other">Other</option>
+                    </select>
 
                     <div class="two">
                         <div>
-                            <label>Phone / WhatsApp *</label>
-                            <input name="Phone" type="tel" placeholder="0712345678" required>
+                            <label>County *</label>
+                            <input name="location_county" type="text" placeholder="e.g. Nairobi" required>
                         </div>
                         <div>
-                            <label>Area / town *</label>
-                            <input name="Location" type="text" placeholder="e.g. Nairobi" required>
+                            <label>Town / Area *</label>
+                            <input name="location_town" type="text" placeholder="e.g. Westlands" required>
                         </div>
                     </div>
 
-                    <label>Job category *</label>
-                    <select name="Category" required>
-                        <option>Cleaning</option>
-                        <option>Construction</option>
-                        <option>Plumbing</option>
-                        <option>Electrical</option>
-                        <option>Painting</option>
-                        <option>Repairs</option>
-                        <option>Other</option>
-                    </select>
+                    <label>Job Description *</label>
+                    <textarea name="description" rows="4" placeholder="Describe the work that needs doing in detail" required></textarea>
 
-                    <label>Job description *</label>
-                    <textarea name="Description" rows="4" placeholder="Describe the work that needs doing" required></textarea>
+                    <div class="two">
+                        <div>
+                            <label>Budget Estimate (KSh) *</label>
+                            <input name="budget_estimate" type="number" step="0.01" placeholder="e.g. 10000" required>
+                        </div>
+                        <div>
+                            <label>Duration</label>
+                            <input name="duration" type="text" placeholder="e.g. 2 weeks" value="2 weeks">
+                        </div>
+                    </div>
 
-                    <label>Budget (KSh)</label>
-                    <input name="Budget" type="text" placeholder="e.g. 10,000 or negotiable">
-
-                    <button class="submit-btn" type="submit">
+                    <button class="submit-btn" type="submit" id="submitBtn">
                         <i class="fas fa-paper-plane"></i> Post Job
                     </button>
                 </form>
@@ -330,5 +339,121 @@ if (jobs && jobs.length > 0) { %>
 </section>
 <% }
 */ %>
+
+<style>
+    /* Toast notification styles */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--navy);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: none;
+        z-index: 10000;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+    }
+    .toast.success {
+        background: #10b981;
+    }
+    .toast.error {
+        background: #ef4444;
+    }
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div id="toast" class="toast"></div>
+
+<script>
+    /**
+     * Show toast notification
+     */
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast ' + type;
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 5000);
+    }
+
+    /**
+     * Submit job post to backend
+     */
+    async function submitJobPost(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const submitBtn = document.getElementById('submitBtn');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+        
+        try {
+            // Collect form data
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            // Submit to backend
+            const response = await fetch('/jobs/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast(result.message, 'success');
+                form.reset();
+                
+                // Redirect to client dashboard after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/dashboard/client';
+                }, 2000);
+            } else {
+                // Handle errors
+                if (result.redirect) {
+                    showToast(result.message, 'error');
+                    setTimeout(() => {
+                        window.location.href = result.redirect;
+                    }, 2000);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            }
+        } catch (error) {
+            console.error('Error submitting job:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+        
+        return false;
+    }
+</script>
 
 <%- include('partials/footer') %>

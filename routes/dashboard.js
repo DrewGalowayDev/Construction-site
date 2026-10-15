@@ -44,7 +44,18 @@ router.get('/client', isAuthenticated, async (req, res) => {
                 limit: 10,
                 order: [['created_at', 'DESC']],
                 include: [
-                    { model: JobApplication, as: 'applications', required: false }
+                    { 
+                        model: JobApplication, 
+                        as: 'applications', 
+                        required: false,
+                        include: [
+                            {
+                                model: User,
+                                as: 'artisan',
+                                attributes: ['id', 'name', 'email', 'phone', 'county', 'town']
+                            }
+                        ]
+                    }
                 ]
             });
         } catch (err) {

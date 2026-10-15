@@ -1,0 +1,420 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<style>
+    .job-details-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .job-header {
+        background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+        color: white;
+        padding: 32px;
+        border-radius: 16px;
+        margin-bottom: 32px;
+    }
+
+    .job-header h1 {
+        margin: 0 0 12px;
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 800;
+    }
+
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 14px;
+        color: #cfdcee;
+        margin-top: 16px;
+    }
+
+    .job-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .job-meta-item i {
+        color: var(--gold);
+    }
+
+    .job-section {
+        background: white;
+        border: 2px solid var(--ln);
+        border-radius: 16px;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 16px rgba(11, 58, 110, 0.08);
+    }
+
+    .job-section h2 {
+        font-size: 20px;
+        color: var(--navy);
+        margin: 0 0 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--ln);
+    }
+
+    .job-section h2 i {
+        color: var(--gold);
+        margin-right: 8px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .info-item {
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border-left: 3px solid var(--gold);
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .info-item .value {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--navy);
+    }
+
+    .contact-card {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        border: 2px solid #a7f3d0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 16px;
+    }
+
+    .contact-card h3 {
+        font-size: 16px;
+        color: #065f46;
+        margin: 0 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .contact-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-size: 14px;
+    }
+
+    .contact-info a {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #065f46;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 8px 12px;
+        background: white;
+        border-radius: 8px;
+        transition: transform 0.2s;
+    }
+
+    .contact-info a:hover {
+        transform: translateY(-2px);
+    }
+
+    .contact-info i {
+        color: #10b981;
+    }
+
+    .application-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+
+    .application-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 12px;
+    }
+
+    .applicant-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--navy);
+    }
+
+    .bid-amount {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--gold);
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .badge-success { background: #d1fae5; color: #065f46; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--navy);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--navy2);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: var(--navy);
+        border: 2px solid var(--navy);
+    }
+
+    .btn-secondary:hover {
+        background: var(--navy);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .job-header {
+            padding: 20px;
+        }
+        
+        .job-section {
+            padding: 20px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="job-details-container w">
+    <% if (job) { %>
+        <!-- Job Header -->
+        <div class="job-header">
+            <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px">
+                <h1><%= job.title %></h1>
+                <span class="badge <%= job.status === 'open' ? 'badge-success' : job.status === 'in_progress' ? 'badge-warning' : 'badge-info' %>" 
+                      style="font-size:14px;padding:8px 16px">
+                    <%= job.status.toUpperCase() %>
+                </span>
+            </div>
+            
+            <div class="job-meta">
+                <div class="job-meta-item">
+                    <i class="fas fa-tools"></i>
+                    <span><%= job.trade_required %></span>
+                </div>
+                <div class="job-meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span><%= job.location_town %>, <%= job.location_county %></span>
+                </div>
+                <div class="job-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Posted <%= new Date(job.created_at).toLocaleDateString() %></span>
+                </div>
+                <% if (job.duration) { %>
+                <div class="job-meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Duration: <%= job.duration %></span>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Job Description -->
+        <div class="job-section">
+            <h2><i class="fas fa-file-text"></i> Job Description</h2>
+            <p style="line-height:1.8;color:#374151;margin:0;white-space:pre-wrap"><%= job.description %></p>
+        </div>
+
+        <!-- Job Details -->
+        <div class="job-section">
+            <h2><i class="fas fa-info-circle"></i> Job Details</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Budget Estimate</label>
+                    <div class="value">KSh <%= job.budget_estimate.toLocaleString() %></div>
+                </div>
+                <div class="info-item">
+                    <label>Trade Required</label>
+                    <div class="value"><%= job.trade_required %></div>
+                </div>
+                <div class="info-item">
+                    <label>Location</label>
+                    <div class="value"><%= job.location_town %>, <%= job.location_county %></div>
+                </div>
+                <% if (job.duration) { %>
+                <div class="info-item">
+                    <label>Duration</label>
+                    <div class="value"><%= job.duration %></div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Client Contact Information (Visible to Providers) -->
+        <% if (canSeeClientContact && job.client) { %>
+        <div class="job-section">
+            <h2><i class="fas fa-user"></i> Client Information</h2>
+            <div class="contact-card">
+                <h3>
+                    <i class="fas fa-id-card"></i>
+                    <%= job.client.name %>
+                </h3>
+                <div class="contact-info">
+                    <a href="tel:<%= job.client.phone %>">
+                        <i class="fas fa-phone"></i>
+                        <%= job.client.phone %>
+                    </a>
+                    <a href="mailto:<%= job.client.email %>">
+                        <i class="fas fa-envelope"></i>
+                        <%= job.client.email %>
+                    </a>
+                    <% if (job.client.town && job.client.county) { %>
+                    <span style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:white;border-radius:8px">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <%= job.client.town %>, <%= job.client.county %>
+                    </span>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Applications (Visible to Job Poster Only) -->
+        <% if (canSeeApplications && job.applications && job.applications.length > 0) { %>
+        <div class="job-section">
+            <h2><i class="fas fa-inbox"></i> Applications Received (<%= job.applications.length %>)</h2>
+            
+            <% job.applications.forEach(app => { %>
+            <div class="application-card">
+                <div class="application-header">
+                    <div>
+                        <span class="applicant-name">
+                            <%= app.artisan ? app.artisan.name : 'Provider' %>
+                        </span>
+                        <span class="badge badge-<%= app.status === 'pending' ? 'warning' : app.status === 'accepted' ? 'success' : 'info' %>">
+                            <%= app.status %>
+                        </span>
+                    </div>
+                    <div class="bid-amount">KSh <%= app.bid_amount.toLocaleString() %></div>
+                </div>
+
+                <% if (app.pitch_message) { %>
+                <p style="margin:0 0 12px;line-height:1.6;color:#374151"><%= app.pitch_message %></p>
+                <% } %>
+
+                <% if (app.artisan) { %>
+                <div class="contact-card" style="margin:0">
+                    <h3><i class="fas fa-address-card"></i> Contact Information</h3>
+                    <div class="contact-info">
+                        <a href="tel:<%= app.artisan.phone %>">
+                            <i class="fas fa-phone"></i>
+                            <%= app.artisan.phone %>
+                        </a>
+                        <a href="mailto:<%= app.artisan.email %>">
+                            <i class="fas fa-envelope"></i>
+                            <%= app.artisan.email %>
+                        </a>
+                        <% if (app.artisan.town && app.artisan.county) { %>
+                        <span style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:white;border-radius:8px">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <%= app.artisan.town %>, <%= app.artisan.county %>
+                        </span>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+            <% }) %>
+        </div>
+        <% } %>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <% if (user && user.role === 'artisan' && canSeeClientContact) { %>
+                <button class="btn btn-primary" onclick="window.location.href='/dashboard/provider/jobs'">
+                    <i class="fas fa-arrow-left"></i> Back to Jobs
+                </button>
+            <% } else if (canSeeApplications) { %>
+                <button class="btn btn-primary" onclick="window.location.href='/dashboard/client'">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            <% } else { %>
+                <button class="btn btn-primary" onclick="window.location.href='/jobs'">
+                    <i class="fas fa-arrow-left"></i> Back to Jobs
+                </button>
+            <% } %>
+            
+            <button class="btn btn-secondary" onclick="window.history.back()">
+                <i class="fas fa-undo"></i> Go Back
+            </button>
+        </div>
+
+    <% } else { %>
+        <!-- Job Not Found -->
+        <div class="job-section" style="text-align:center;padding:60px 20px">
+            <div style="font-size:64px;color:var(--ln);margin-bottom:16px">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <h2 style="color:var(--navy);margin:0 0 12px">Job Not Found</h2>
+            <p style="color:#6b7280;margin:0 0 24px">The job you're looking for doesn't exist or has been removed.</p>
+            <a href="/jobs" class="btn btn-primary">
+                <i class="fas fa-search"></i> Browse Jobs
+            </a>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

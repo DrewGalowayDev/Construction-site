@@ -256,31 +256,39 @@
                 <h2><i class="fas fa-box-open" style="color:var(--gold);margin-right:8px"></i> List Your Materials</h2>
                 <p class="form-subtitle">Reach more customers. Cement, steel, roofing, paint, tiles.</p>
 
-                <form onsubmit="return send(event,'Materials supplier signup','Signup sent. We will contact you to list your products.')">
+                <form id="supplierSignupForm" onsubmit="return submitSupplierSignup(event)">
                     <label>Business / supplier name *</label>
-                    <input name="Business" type="text" placeholder="Enter your business name" required>
+                    <input name="business_name" type="text" placeholder="Enter your business name" required>
+
+                    <label>Contact person name</label>
+                    <input name="contact_name" type="text" placeholder="Your name">
 
                     <div class="two">
                         <div>
                             <label>Contact phone *</label>
-                            <input name="Phone" type="tel" placeholder="0712345678" required>
+                            <input name="phone" type="tel" placeholder="0712345678" required>
                         </div>
                         <div>
-                            <label>Location *</label>
-                            <input name="Location" type="text" placeholder="e.g. Nairobi" required>
+                            <label>Email</label>
+                            <input name="email" type="email" placeholder="your@email.com">
                         </div>
                     </div>
 
+                    <label>Location *</label>
+                    <input name="location" type="text" placeholder="e.g. Nairobi, Industrial Area" required>
+
                     <label>What do you supply? *</label>
-                    <textarea name="Products" rows="3" placeholder="List your product categories" required></textarea>
+                    <textarea name="products_supplied" rows="3" placeholder="List your product categories (e.g., Cement, Steel bars, Roofing materials, Paint, Tiles)" required></textarea>
 
                     <label>Delivery available? *</label>
-                    <select name="Delivery" required>
-                        <option>Yes - we deliver</option>
-                        <option>No - pickup only</option>
+                    <select name="delivery_available" required>
+                        <option value="">Select option</option>
+                        <option value="Yes - we deliver">Yes - we deliver</option>
+                        <option value="No - pickup only">No - pickup only</option>
+                        <option value="Depends on location">Depends on location</option>
                     </select>
 
-                    <button class="submit-btn" type="submit">
+                    <button class="submit-btn" type="submit" id="supplierSignupBtn">
                         <i class="fas fa-paper-plane"></i> Sign Up as Supplier
                     </button>
                 </form>
@@ -320,5 +328,74 @@ if (products && products.length > 0) { %>
 </section>
 <% }
 */ %>
+
+<!-- Toast Notification -->
+<div id="toast" style="display:none;position:fixed;top:20px;right:20px;background:var(--navy);color:white;padding:16px 24px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:10000;max-width:400px"></div>
+
+<script>
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 5000);
+    }
+
+    // Submit supplier signup form
+    async function submitSupplierSignup(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const submitBtn = document.getElementById('supplierSignupBtn');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        
+        try {
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            const response = await fetch('/materials/supplier-signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast(result.message, 'success');
+                form.reset();
+                
+                // Optionally redirect to login after 3 seconds
+                setTimeout(() => {
+                    showToast('Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/auth/login';
+                    }, 1000);
+                }, 3000);
+            } else {
+                showToast(result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error submitting signup:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+        
+        return false;
+    }
+</script>
 
 <%- include('partials/footer') %>

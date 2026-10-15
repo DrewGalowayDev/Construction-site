@@ -301,36 +301,45 @@
                     <h2><i class="fas fa-tools" style="color:var(--gold);margin-right:8px"></i> Request a Provider</h2>
                     <p class="form-subtitle">We will match you with a vetted professional in your area.</p>
 
-                    <form onsubmit="return send(event,'Provider request','Request sent. We will contact you shortly.')">
+                    <form id="providerRequestForm" onsubmit="return submitProviderRequest(event)">
                         <label>Full name *</label>
-                        <input name="Name" type="text" placeholder="Enter your full name" required>
+                        <input name="contact_name" type="text" placeholder="Enter your full name" required>
 
                         <div class="two">
                             <div>
                                 <label>Phone / WhatsApp *</label>
-                                <input name="Phone" type="tel" placeholder="0712345678" required>
+                                <input name="contact_phone" type="tel" placeholder="0712345678" required>
                             </div>
                             <div>
-                                <label>Area / town *</label>
-                                <input name="Location" type="text" placeholder="e.g. Nairobi" required>
+                                <label>County *</label>
+                                <input name="location_county" type="text" placeholder="e.g. Nairobi" required>
                             </div>
                         </div>
 
-                        <label>Service needed *</label>
-                        <select name="Service" required>
-                            <option value="Cleaning">Cleaning</option>
-                            <option value="Construction">Construction</option>
-                            <option value="Plumbing">Plumbing</option>
-                            <option value="Electrical">Electrical</option>
-                            <option value="Painting">Painting</option>
-                            <option value="Repairs">Repairs</option>
-                            <option value="Other">Other</option>
-                        </select>
+                        <div class="two">
+                            <div>
+                                <label>Town / Area *</label>
+                                <input name="location_town" type="text" placeholder="e.g. Westlands" required>
+                            </div>
+                            <div>
+                                <label>Service needed *</label>
+                                <select name="service_type" required>
+                                    <option value="">Select service</option>
+                                    <option value="Cleaning">Cleaning</option>
+                                    <option value="Construction">Construction</option>
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Painting">Painting</option>
+                                    <option value="Repairs">Repairs</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
 
                         <label>What needs doing? *</label>
-                        <textarea name="Details" rows="4" placeholder="Describe the work in detail" required></textarea>
+                        <textarea name="description" rows="4" placeholder="Describe the work in detail" required></textarea>
 
-                        <button class="submit-btn" type="submit">
+                        <button class="submit-btn" type="submit" id="requestProviderBtn">
                             <i class="fas fa-paper-plane"></i> Request a Provider
                         </button>
                     </form>
@@ -341,39 +350,58 @@
                     <h2><i class="fas fa-hard-hat" style="color:var(--gold);margin-right:8px"></i> Join as a Provider</h2>
                     <p class="form-subtitle">Join TopLine to get verified and receive customer job requests.</p>
 
-                    <form onsubmit="return send(event,'Provider application','Application sent. We will be in touch to verify you.')">
+                    <form id="providerSignupForm" onsubmit="return submitProviderSignup(event)">
                         <label>Full name *</label>
-                        <input name="Name" type="text" placeholder="Enter your full name" required>
+                        <input name="name" type="text" placeholder="Enter your full name" required>
 
                         <div class="two">
                             <div>
                                 <label>Phone / WhatsApp *</label>
-                                <input name="Phone" type="tel" placeholder="0712345678" required>
+                                <input name="phone" type="tel" placeholder="0712345678" required>
                             </div>
                             <div>
-                                <label>Area / town *</label>
-                                <input name="Location" type="text" placeholder="e.g. Nairobi" required>
+                                <label>Email</label>
+                                <input name="email" type="email" placeholder="your@email.com">
                             </div>
                         </div>
 
-                        <label>Main skill / trade *</label>
-                        <select name="Skill" required>
-                            <option value="Cleaning">Cleaning</option>
-                            <option value="Construction">Construction</option>
-                            <option value="Plumbing">Plumbing</option>
-                            <option value="Electrical">Electrical</option>
-                            <option value="Painting">Painting</option>
-                            <option value="Repairs">Repairs</option>
-                            <option value="Other">Other</option>
-                        </select>
+                        <div class="two">
+                            <div>
+                                <label>County *</label>
+                                <input name="location_county" type="text" placeholder="e.g. Nairobi" required>
+                            </div>
+                            <div>
+                                <label>Town / Area *</label>
+                                <input name="location_town" type="text" placeholder="e.g. Westlands" required>
+                            </div>
+                        </div>
 
-                        <label>Years of experience *</label>
-                        <input name="Experience" type="number" min="0" placeholder="e.g. 5" required>
+                        <div class="two">
+                            <div>
+                                <label>Main skill / trade *</label>
+                                <select name="trade" required>
+                                    <option value="">Select your trade</option>
+                                    <option value="Cleaning">Cleaning</option>
+                                    <option value="Construction">Construction</option>
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Painting">Painting</option>
+                                    <option value="Carpentry">Carpentry</option>
+                                    <option value="Masonry">Masonry</option>
+                                    <option value="Repairs">General Repairs</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Years of experience *</label>
+                                <input name="experience_years" type="number" min="0" placeholder="e.g. 5" required>
+                            </div>
+                        </div>
 
                         <label>About your work</label>
-                        <textarea name="About" rows="3" placeholder="Past jobs, tools, certifications, specialty"></textarea>
+                        <textarea name="bio" rows="3" placeholder="Past jobs, tools, certifications, specialty"></textarea>
 
-                        <button class="submit-btn" type="submit">
+                        <button class="submit-btn" type="submit" id="signupProviderBtn">
                             <i class="fas fa-check-circle"></i> Apply to Join
                         </button>
                     </form>
@@ -422,6 +450,9 @@ if (providers && providers.length > 0) { %>
 <% }
 */ %>
 
+<!-- Toast Notification -->
+<div id="toast" style="display:none;position:fixed;top:20px;right:20px;background:var(--navy);color:white;padding:16px 24px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:10000;max-width:400px"></div>
+
 <script>
     function switchProviderTab(type) {
         const formNeed = document.getElementById('formNeedProvider');
@@ -440,6 +471,115 @@ if (providers && providers.length > 0) { %>
             tabNeed.classList.remove('active');
             tabJoin.classList.add('active');
         }
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 5000);
+    }
+
+    // Submit provider request form
+    async function submitProviderRequest(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const submitBtn = document.getElementById('requestProviderBtn');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        
+        try {
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            const response = await fetch('/providers/request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast(result.message, 'success');
+                form.reset();
+            } else {
+                showToast(result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error submitting request:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+        
+        return false;
+    }
+
+    // Submit provider signup form
+    async function submitProviderSignup(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const submitBtn = document.getElementById('signupProviderBtn');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        
+        try {
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            const response = await fetch('/providers/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast(result.message, 'success');
+                form.reset();
+                
+                // Optionally redirect to login after 3 seconds
+                setTimeout(() => {
+                    showToast('Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/auth/login';
+                    }, 1000);
+                }, 3000);
+            } else {
+                showToast(result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error submitting signup:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+        
+        return false;
     }
 </script>
 
