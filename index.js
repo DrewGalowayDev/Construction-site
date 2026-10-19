@@ -51,6 +51,11 @@ const sessionStore = new MySQLStore({
     }
 });
 
+// Catch session store errors so requests do not hang
+sessionStore.on('error', function(error) {
+    console.error('❌ [Session Store Error]:', error.message || error);
+});
+
 // Session middleware
 app.use(session({
     key: 'topline_session',
@@ -112,9 +117,10 @@ app.use((err, req, res, next) => {
 
 // Server configuration
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
-app.listen(PORT, () => {
-    console.log(`TopLine Marketplace server running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+    console.log(`TopLine Marketplace server running on ${HOST}:${PORT}`);
     console.log(`Visit: http://localhost:${PORT}`);
 });
 
