@@ -11,6 +11,7 @@ yarn-error.log*
 
 # Database
 *.sql
+!seed-saudi-qatar-jobs.sql
 *.db
 *.sqlite
 

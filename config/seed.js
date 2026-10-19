@@ -225,28 +225,182 @@ const seedDatabase = async () => {
       }
     ]);
 
-    console.log('🌱 Seeding demo jobs...');
+    console.log('🌱 Seeding verified Saudi Arabia & Qatar jobs...');
     await JobPost.bulkCreate([
       {
         client_id: clientUser.id,
-        title: 'Looking for 2 Masons & 1 Handyman for Perimeter Wall Construction',
-        description: 'We are raising a 150-meter perimeter stone wall in Syokimau. Foundation trench is already excavated. Needs dressing 9x9 quarry stones, mortar mix, and hoop iron reinforcement.',
-        trade_required: 'Mason / Bricklayer',
-        location_county: 'Machakos',
-        location_town: 'Syokimau',
-        budget_estimate: 65000.00,
-        duration: '10 Days',
+        title: 'Finish Mason & Marble Tile Installer – Luxury Villa Compound',
+        description: 'Seeking experienced finish masons and marble fixers for luxury villa compounds in Riyadh. Requires block work, precision marble floor installation, wall cladding, and exterior stone finishing. Food, accommodation, visa and medical provided.',
+        trade_required: 'Mason',
+        location_county: 'Saudi Arabia',
+        location_town: 'Riyadh',
+        budget_estimate: 110000.00,
+        duration: '2 Years Contract',
         status: 'open'
       },
       {
         client_id: clientUser.id,
-        title: 'Complete First-Fix Electrical Piping & Conduit Fitting for 3-Bedroom Villa',
-        description: 'Site is ready for conduit laying in concrete slab and wall channelling before plastering. Single phase 240V, distribution board, generator changeover switch wiring.',
-        trade_required: 'Certified Electrician',
-        location_county: 'Kiambu',
-        location_town: 'Ruiru Mugutha',
-        budget_estimate: 42000.00,
-        duration: '1 Week',
+        title: 'High-Rise Steel Fixer & Rebar Fabricator – Metro & Commercial Tower',
+        description: 'Certified steel fixers needed for major metro infrastructure and commercial tower projects in Riyadh. Reading structural rebar BBS drawings, tying heavy foundation cages, raft foundations, and shear walls. Overtime available.',
+        trade_required: 'Steel fixer',
+        location_county: 'Saudi Arabia',
+        location_town: 'Riyadh',
+        budget_estimate: 105000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Industrial MEP Electrician & Cable Jointer – Coastal Commercial Hub',
+        description: 'Licensed commercial & industrial electricians for coastal commercial development in Jeddah. Cable pulling (HV/LV), conduit installation, distribution board termination, switchgear, and safety grounding.',
+        trade_required: 'Electrician',
+        location_county: 'Saudi Arabia',
+        location_town: 'Jeddah',
+        budget_estimate: 140000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Certified 6G TIG & ARC Structural Pipe Welder – Industrial Network',
+        description: 'Seeking AWS/ASME certified 6G TIG/ARC pipe and structural welders for petrochemical and industrial piping networks in Eastern Province. Must pass radiographic inspection test. Free food, shared accommodation & medical provided.',
+        trade_required: 'Welder',
+        location_county: 'Saudi Arabia',
+        location_town: 'Dammam',
+        budget_estimate: 165000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Shuttering Carpenter & Formwork Specialist – Bridge & Decking Works',
+        description: 'Formwork carpenters experienced in PERI, DOKA, and conventional timber formwork for civil road structures and commercial developments in Riyadh. Setting out shuttering, props, and decking.',
+        trade_required: 'Carpenter',
+        location_county: 'Saudi Arabia',
+        location_town: 'Riyadh',
+        budget_estimate: 105000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Certified Heavy Duty Scaffolder – Mega Infrastructure Project',
+        description: 'CISRS/TUV certified scaffolders needed for the NEOM mega-development project. Erecting and dismantling heavy-duty cuplock, ringlock, and tubular access scaffolding up to 40 meters. Strict safety and harness protocols.',
+        trade_required: 'Scaffolder',
+        location_county: 'Saudi Arabia',
+        location_town: 'NEOM',
+        budget_estimate: 115000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Heavy Excavator & Tower Crane Operator – Major Earthmoving Operations',
+        description: 'Licensed heavy equipment operators for 30T-50T crawler excavators and tower cranes on major earthmoving and foundation operations in NEOM. Valid GCC/Saudi heavy driving license required.',
+        trade_required: 'Equipment operator',
+        location_county: 'Saudi Arabia',
+        location_town: 'NEOM',
+        budget_estimate: 155000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Civil Construction General Foreman – Commercial & Residential Towers',
+        description: 'Experienced site foreman to supervise multi-national crews of masons, carpenters, and steel fixers. Managing daily site progress, material requisitions, QA/QC inspections, and HSE standards on high-rise commercial structures.',
+        trade_required: 'Foreman',
+        location_county: 'Saudi Arabia',
+        location_town: 'Jeddah',
+        budget_estimate: 220000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Commercial MEP Plumber & Pipefitter – Hotel & Marina Towers',
+        description: 'Experienced commercial plumbers for luxury hotel development in Lusail Marina. Installation of PPR, PEX, and HDPE supply lines, drainage stacks, booster pumps, and sanitary fixtures. Verified agency placement with food and lodging.',
+        trade_required: 'Plumber',
+        location_county: 'Qatar',
+        location_town: 'Lusail',
+        budget_estimate: 125000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Building Automation & Low Voltage (ELV) Technician – West Bay Hub',
+        description: 'Technicians needed for installation and commissioning of building management systems (BMS), fire alarm, CCTV, and structured cabling in West Bay towers, Doha. Free visa, return ticket, and medical insurance provided.',
+        trade_required: 'Electrician',
+        location_county: 'Qatar',
+        location_town: 'Doha',
+        budget_estimate: 145000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Commercial Bricklayer & Stone Cladding Mason – Airport Expansion',
+        description: 'Skilled masons for Hamad International Airport commercial expansion. Architectural concrete blockwork, dry-mix screeding, granite floor paving, and wall stone cladding. Attractive tax-free compensation package.',
+        trade_required: 'Mason',
+        location_county: 'Qatar',
+        location_town: 'Doha',
+        budget_estimate: 110000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Mobile Crane & Heavy Forklift Operator – Port & Logistics Terminal',
+        description: 'Experienced operators for 50T-100T all-terrain mobile cranes and container forklifts at Hamad Port & Al Wakrah industrial hub. GCC heavy license required. Air ticket, accommodation, and overtime included.',
+        trade_required: 'Equipment operator',
+        location_county: 'Qatar',
+        location_town: 'Al Wakrah',
+        budget_estimate: 150000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Airless Spray Painter & Epoxy Floor Specialist – Commercial Warehouses',
+        description: 'Industrial painters experienced with airless spray equipment, sandblasting, drywall taping/skimming, and two-part epoxy floor coatings for logistics and stadium auxiliary facilities in Al Rayyan.',
+        trade_required: 'Painter',
+        location_county: 'Qatar',
+        location_town: 'Al Rayyan',
+        budget_estimate: 100000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'MEP Site Supervisor / Foreman – High-Rise Residential Tower',
+        description: 'Supervision of electrical, plumbing, and HVAC subcontractor teams on 35-storey residential tower in The Pearl / West Bay, Doha. Coordinates site drawings, inspections, testing, and commissioning.',
+        trade_required: 'Foreman',
+        location_county: 'Qatar',
+        location_town: 'Doha',
+        budget_estimate: 230000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Bridge & Pre-Cast Concrete Steel Fixer – Express Highway Extension',
+        description: 'Steel fixers for pre-cast concrete beam fabrication and highway flyover construction in Al Wakrah. Rebar bending, beam assembly, and post-tensioning duct installation.',
+        trade_required: 'Steel fixer',
+        location_county: 'Qatar',
+        location_town: 'Al Wakrah',
+        budget_estimate: 108000.00,
+        duration: '2 Years Contract',
+        status: 'open'
+      },
+      {
+        client_id: clientUser.id,
+        title: 'Structural Steel Welder & Canopy Erector – Commercial Pavilion Project',
+        description: 'Structural steel welders and fitters for architectural canopy and stadium roof maintenance in Lusail. Flux-cored and stick welding, bolt tightening to torque specs, overhead welding.',
+        trade_required: 'Welder',
+        location_county: 'Qatar',
+        location_town: 'Lusail',
+        budget_estimate: 155000.00,
+        duration: '2 Years Contract',
         status: 'open'
       }
     ]);
