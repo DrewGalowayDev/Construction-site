@@ -1,153 +1,1018 @@
 <%- include('../partials/header') %>
 
 <style>
-.auth-page {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #0b3a6e 0%, #07284f 100%);
-    padding: 20px;
+:root {
+  --navy: #083a75;
+  --navy-dark: #052449;
+  --navy-deep: #03162e;
+  --gold: #fdb515;
+  --gold-hover: #e5a312;
+  --bg: #ffffff;
+  --bg-soft: #f8fafc;
+  --tx: #0c1b30;
+  --tx-muted: #5a6b82;
+  --bd: #dbe4ef;
+  --bd-focus: #083a75;
+  --card: #ffffff;
+  --success: #10b981;
 }
-.auth-card {
-    background: var(--bg);
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    max-width: 450px;
-    width: 100%;
-    padding: 40px;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
 }
-.auth-card .logo {
-    width: 120px;
-    height: auto;
-    margin: 0 auto 20px;
-    display: block;
+
+/* Split-Screen Full Height Layout */
+.split-auth-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
 }
-.auth-card h2 {
-    color: var(--navy);
-    margin-bottom: 8px;
-    text-align: center;
+
+/* ====================================================
+   LEFT COLUMN: 3-SECOND AUTO-MOVING HERO CAROUSEL
+   ==================================================== */
+.auth-hero-side {
+  flex: 1.15;
+  min-width: 0;
+  background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 55%, var(--navy) 100%);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 56px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08);
 }
-.auth-card .subtitle {
-    color: var(--mu);
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 14px;
+
+/* Decorative Background Ambient Glows & Grid Pattern */
+.auth-hero-side::before {
+  content: "";
+  position: absolute;
+  top: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(253, 181, 21, 0.18) 0%, rgba(253, 181, 21, 0) 70%);
+  pointer-events: none;
+  z-index: 1;
 }
+
+.auth-hero-side::after {
+  content: "";
+  position: absolute;
+  bottom: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(8, 58, 117, 0) 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-overlay-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Hero Top Branding */
+.hero-top-nav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+.hero-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #ffffff;
+}
+.hero-brand img {
+  height: 38px;
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+.hero-brand span {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+}
+.hero-brand em {
+  font-style: normal;
+  color: var(--gold);
+}
+.hero-trust-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #e2e8f0;
+  backdrop-filter: blur(8px);
+}
+.hero-trust-tag i {
+  color: var(--gold);
+}
+
+/* Carousel Main Stage */
+.carousel-stage {
+  position: relative;
+  z-index: 2;
+  margin: auto 0;
+  padding: 20px 0;
+  min-height: 340px;
+}
+
+.carousel-slides-wrap {
+  position: relative;
+  min-height: 280px;
+}
+
+.carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(25px);
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  visibility: visible;
+  position: relative;
+}
+
+.slide-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(253, 181, 21, 0.16);
+  border: 1px solid rgba(253, 181, 21, 0.35);
+  color: var(--gold);
+  border-radius: 99px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.carousel-slide h2 {
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.carousel-slide h2 span {
+  color: var(--gold);
+}
+
+.carousel-slide p {
+  font-size: 16px;
+  line-height: 1.65;
+  color: #cbd5e1;
+  max-width: 520px;
+  margin-bottom: 24px;
+}
+
+/* Feature Pills Inside Slide */
+.slide-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.slide-feat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+.slide-feat-pill i {
+  color: var(--gold);
+}
+
+/* 3-Second Carousel Progress & Navigation */
+.carousel-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.carousel-indicators {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.indicator-dot {
+  position: relative;
+  width: 38px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 99px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.indicator-dot .progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--gold);
+  border-radius: 99px;
+}
+
+.indicator-dot.active {
+  width: 58px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.indicator-dot.active .progress-fill {
+  animation: progressTimer 3s linear forwards;
+}
+
+@keyframes progressTimer {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.carousel-nav-arrows {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-arrow {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.btn-arrow:hover {
+  background: var(--gold);
+  color: var(--navy-dark);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+/* Hero Bottom Footer Note */
+.hero-footer-note {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: #94a3b8;
+  padding-top: 20px;
+}
+.hero-footer-note span i {
+  color: var(--gold);
+  margin-right: 6px;
+}
+
+
+/* ====================================================
+   RIGHT COLUMN: SIGN-IN FORM
+   ==================================================== */
+.auth-form-side {
+  flex: 0.95;
+  min-width: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 32px;
+  position: relative;
+}
+
+/* Top Back Navigation */
+.auth-top-action {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-to-jobs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tx-muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--bd);
+  background: var(--bg);
+  transition: all 0.2s;
+}
+.back-to-jobs-btn:hover {
+  color: var(--navy);
+  border-color: var(--navy);
+  background: var(--bg-soft);
+}
+
+/* Form Container Card */
+.form-card {
+  width: 100%;
+  max-width: 440px;
+  margin: auto 0;
+  padding: 10px 0;
+}
+
+.form-header {
+  margin-bottom: 24px;
+}
+
+.form-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--tx);
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+}
+
+.form-header p {
+  color: var(--tx-muted);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+/* Redirection notice */
+.redirect-banner {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 20px;
+  font-size: 13.5px;
+  color: #1e40af;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Error message banner */
+.alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Form Inputs */
 .form-group {
-    margin-bottom: 20px;
+  margin-bottom: 18px;
 }
+
 .form-group label {
-    display: block;
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: var(--tx);
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tx);
+  margin-bottom: 7px;
 }
-.form-group input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid var(--ln);
-    border-radius: 10px;
-    font: inherit;
-    background: var(--card);
-    color: var(--tx);
-    transition: all 0.3s;
+
+.form-group label i {
+  color: var(--navy);
+  margin-right: 4px;
 }
-.form-group input:focus {
-    outline: none;
-    border-color: var(--gold);
-    background: var(--bg);
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
-.alert {
-    padding: 12px 16px;
-    border-radius: 8px;
+
+.input-wrapper input {
+  width: 100%;
+  padding: 13px 16px;
+  font-size: 14.5px;
+  font-family: inherit;
+  border: 1.5px solid var(--bd);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--tx);
+  transition: all 0.2s ease;
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  border-color: var(--bd-focus);
+  box-shadow: 0 0 0 3px rgba(8, 58, 117, 0.12);
+  background: #ffffff;
+}
+
+.input-wrapper .toggle-pw-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--tx-muted);
+  cursor: pointer;
+  padding: 6px;
+  font-size: 14px;
+}
+
+.input-wrapper .toggle-pw-btn:hover {
+  color: var(--navy);
+}
+
+/* Remember me & Forgot Password */
+.form-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  font-size: 13.5px;
+}
+
+.remember-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--tx-muted);
+  user-select: none;
+}
+.remember-label input[type="checkbox"] {
+  accent-color: var(--navy);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.forgot-password-link {
+  color: var(--navy);
+  text-decoration: none;
+  font-weight: 600;
+}
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+/* Submit Button */
+.btn-submit {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--gold);
+  color: #121f33;
+  border: none;
+  border-radius: 10px;
+  font-size: 15.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(253, 181, 21, 0.3);
+}
+
+.btn-submit:hover {
+  background: var(--gold-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(253, 181, 21, 0.4);
+}
+
+/* Quick Demo Worker Accounts */
+.demo-accounts-card {
+  margin-top: 24px;
+  background: var(--bg-soft);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.demo-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.demo-btn {
+  background: #ffffff;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--tx);
+  line-height: 1.35;
+}
+
+.demo-btn:hover {
+  border-color: var(--navy);
+  background: #eff6ff;
+}
+
+.demo-btn strong {
+  display: block;
+  color: var(--navy);
+  font-size: 12.5px;
+}
+
+.demo-btn span {
+  color: var(--tx-muted);
+  font-size: 11px;
+}
+
+/* Footer Section */
+.form-footer {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid var(--bd);
+  text-align: center;
+  font-size: 14px;
+  color: var(--tx-muted);
+}
+
+.form-footer a {
+  color: var(--navy);
+  font-weight: 700;
+  text-decoration: none;
+}
+.form-footer a:hover {
+  text-decoration: underline;
+}
+
+.worker-unlock-callout {
+  margin-top: 14px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #92400e;
+  text-align: center;
+}
+.worker-unlock-callout a {
+  color: #b45309;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* ====================================================
+   RESPONSIVE DESIGN (TABLET & MOBILE)
+   ==================================================== */
+@media (max-width: 960px) {
+  .split-auth-container {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .auth-hero-side {
+    flex: none;
+    padding: 36px 24px;
+    min-height: 380px;
+  }
+  .carousel-stage {
+    min-height: 220px;
+  }
+  .carousel-slides-wrap {
+    min-height: 200px;
+  }
+  .carousel-slide h2 {
+    font-size: 24px;
+  }
+  .carousel-slide p {
+    font-size: 14.5px;
+    margin-bottom: 16px;
+  }
+  .auth-form-side {
+    flex: none;
+    padding: 36px 20px 48px;
+  }
+  .auth-top-action {
+    position: static;
     margin-bottom: 20px;
-    font-size: 14px;
-}
-.alert-danger {
-    background: #fee;
-    color: #c33;
-    border: 1px solid #fcc;
-}
-.btn-auth {
     width: 100%;
-    padding: 16px;
-    background: var(--gold);
-    color: #07284f;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
-}
-.btn-auth:hover {
-    background: #d49020;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 166, 35, 0.4);
-}
-.auth-footer {
-    text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--ln);
-}
-.auth-footer a {
-    color: var(--gold);
-    font-weight: 600;
-    text-decoration: none;
-}
-.auth-footer a:hover {
-    text-decoration: underline;
+    justify-content: flex-end;
+  }
 }
 </style>
 
-<div class="auth-page">
-    <div class="auth-card">
-        <img src="/images/logo.png" alt="TopLine" class="logo">
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Sign in to access your dashboard</p>
+<div class="split-auth-container">
+  
+  <!-- ====================================================
+       LEFT SIDE: HERO CAROUSEL (3-SECOND AUTO TRANSITION)
+       ==================================================== -->
+  <div class="auth-hero-side" id="heroCarouselSide">
+    <div class="hero-overlay-grid"></div>
 
-        <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-circle"></i> <%= error %>
-        </div>
-        <% } %>
-
-        <form action="/auth/login" method="POST">
-            <div class="form-group">
-                <label for="email">
-                    <i class="fas fa-user"></i> Username or Email
-                </label>
-                <input type="text" id="email" name="email" placeholder="Enter username or email" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">
-                    <i class="fas fa-lock"></i> Password
-                </label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
-            </div>
-
-            <button type="submit" class="btn-auth">
-                <i class="fas fa-sign-in-alt"></i> Sign In
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            <p style="color:var(--mu);font-size:14px">
-                Don't have an account? 
-                <a href="/auth/register">Create Account</a>
-            </p>
-            <p style="color:var(--mu);font-size:12px;margin-top:10px">
-                <a href="/" style="color:var(--mu)">
-                    <i class="fas fa-arrow-left"></i> Back to Home
-                </a>
-            </p>
-        </div>
+    <!-- Top Branding -->
+    <div class="hero-top-nav">
+      <a href="/" class="hero-brand">
+        <img src="/images/logo.png" alt="TopLine">
+        <span>TopLine<em>.Jobs</em></span>
+      </a>
+      <div class="hero-trust-tag">
+        <i class="fas fa-shield-alt"></i> Verified Construction Portal
+      </div>
     </div>
+
+    <!-- Carousel Main Stage -->
+    <div class="carousel-stage">
+      <div class="carousel-slides-wrap" id="carouselSlides">
+        
+        <!-- SLIDE 1: VERIFIED JOBS -->
+        <div class="carousel-slide active" data-index="0">
+          <div class="slide-badge">
+            <i class="fas fa-globe"></i> Kenya &bull; Saudi Arabia &bull; UAE &bull; Qatar
+          </div>
+          <h2>Verified Construction Placements. <span>Zero Fake Offers.</span></h2>
+          <p>
+            Connect directly with authenticated commercial and residential builders. All job orders, licenses, and labor quotas are checked by our engineering compliance team before publishing.
+          </p>
+          <div class="slide-features">
+            <div class="slide-feat-pill"><i class="fas fa-check-circle"></i> Vetted Contractors Only</div>
+            <div class="slide-feat-pill"><i class="fas fa-check-circle"></i> Direct Employer Links</div>
+            <div class="slide-feat-pill"><i class="fas fa-check-circle"></i> Domestic &amp; Gulf Projects</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 2: ESCROW & M-PESA -->
+        <div class="carousel-slide" data-index="1">
+          <div class="slide-badge">
+            <i class="fas fa-wallet"></i> Guaranteed Escrow Protection
+          </div>
+          <h2>Milestone-Protected Funds &amp; <span>Instant M-Pesa Payouts.</span></h2>
+          <p>
+            Never chase an unpaid contractor again. Platform escrow holds project funds upfront, releasing verified disbursements directly to your phone via Safaricom M-Pesa or bank transfer.
+          </p>
+          <div class="slide-features">
+            <div class="slide-feat-pill"><i class="fas fa-lock"></i> 100% Escrow Security</div>
+            <div class="slide-feat-pill"><i class="fas fa-bolt"></i> Realtime M-Pesa Rails</div>
+            <div class="slide-feat-pill"><i class="fas fa-file-invoice"></i> Transparent Invoicing</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 3: DIRECT TRADES -->
+        <div class="carousel-slide" data-index="2">
+          <div class="slide-badge">
+            <i class="fas fa-hard-hat"></i> 10+ Certified Trades
+          </div>
+          <h2>Specialized Construction Trades. <span>Top Competitive Rates.</span></h2>
+          <p>
+            Masons, steel fixers, MEP electricians, welders, plumbers, scaffolders, and site supervisors. Highlight your certifications, completed sites, and artisan badges to win premium tenders.
+          </p>
+          <div class="slide-features">
+            <div class="slide-feat-pill"><i class="fas fa-id-badge"></i> Certified Artisan Profile</div>
+            <div class="slide-feat-pill"><i class="fas fa-briefcase"></i> Direct Work Orders</div>
+            <div class="slide-feat-pill"><i class="fas fa-star"></i> Reputation Badges</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 4: WORKER ACTIVATION -->
+        <div class="carousel-slide" data-index="3">
+          <div class="slide-badge">
+            <i class="fas fa-user-check"></i> Lifetime Activation
+          </div>
+          <h2>One-Time Profile Activation. <span>Unlimited Opportunities.</span></h2>
+          <p>
+            Activate your artisan account with a one-time KSh 1,000 fee. No middleman agency commissions, no ongoing percentage cuts. Direct dialing to site managers and vetted agency reps.
+          </p>
+          <div class="slide-features">
+            <div class="slide-feat-pill"><i class="fas fa-coins"></i> KSh 1,000 Lifetime Access</div>
+            <div class="slide-feat-pill"><i class="fas fa-ban"></i> Zero Agency Commission</div>
+            <div class="slide-feat-pill"><i class="fas fa-phone-alt"></i> Direct Contractor Contacts</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controls & 3-Second Progress Bar -->
+      <div class="carousel-controls-bar">
+        <div class="carousel-indicators" id="carouselIndicators">
+          <div class="indicator-dot active" onclick="jumpToSlide(0)"><div class="progress-fill"></div></div>
+          <div class="indicator-dot" onclick="jumpToSlide(1)"><div class="progress-fill"></div></div>
+          <div class="indicator-dot" onclick="jumpToSlide(2)"><div class="progress-fill"></div></div>
+          <div class="indicator-dot" onclick="jumpToSlide(3)"><div class="progress-fill"></div></div>
+        </div>
+
+        <div class="carousel-nav-arrows">
+          <button type="button" class="btn-arrow" onclick="prevSlide()" title="Previous slide">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button type="button" class="btn-arrow" onclick="nextSlide()" title="Next slide">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Footer Note -->
+    <div class="hero-footer-note">
+      <span><i class="fas fa-shield-alt"></i> Safe from recruiter extortion &amp; scam offers</span>
+      <span>TopLine Verified Construction Portal</span>
+    </div>
+  </div>
+
+
+  <!-- ====================================================
+       RIGHT SIDE: SIGN-IN PAGE / FORM
+       ==================================================== -->
+  <div class="auth-form-side">
+    <div class="auth-top-action">
+      <a href="<%= (typeof redirect !== 'undefined' && redirect) ? redirect : '/jobs' %>" class="back-to-jobs-btn">
+        <i class="fas fa-arrow-left"></i> Back to Jobs Portal
+      </a>
+    </div>
+
+    <div class="form-card">
+      <div class="form-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in with your phone number, username, or email to access your worker profile, job applications, and dashboard.</p>
+      </div>
+
+      <!-- Redirection notice if redirected from jobs -->
+      <% if (typeof redirect !== 'undefined' && redirect && redirect.includes('job')) { %>
+        <div class="redirect-banner">
+          <i class="fas fa-info-circle"></i>
+          <div>Please sign in to view and apply for verified construction listings.</div>
+        </div>
+      <% } %>
+
+      <!-- Server error message if any -->
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert-error">
+          <i class="fas fa-exclamation-circle"></i>
+          <div><%= error %></div>
+        </div>
+      <% } %>
+
+      <!-- Main Sign In Form -->
+      <form action="/auth/login" method="POST" id="signinForm">
+        <input type="hidden" name="redirect" value="<%= (typeof redirect !== 'undefined') ? redirect : '' %>">
+
+        <div class="form-group">
+          <label for="signinEmail">
+            <i class="fas fa-id-card"></i> Phone Number, Username, or Email
+          </label>
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              id="signinEmail" 
+              name="email" 
+              placeholder="e.g. +254711000001 or john_kamau" 
+              required 
+              autofocus
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="signinPassword">
+            <i class="fas fa-lock"></i> Password
+          </label>
+          <div class="input-wrapper">
+            <input 
+              type="password" 
+              id="signinPassword" 
+              name="password" 
+              placeholder="Enter your password" 
+              required
+            >
+            <button type="button" class="toggle-pw-btn" onclick="togglePasswordVisibility('signinPassword', this)" title="Show / hide password">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row-between">
+          <label class="remember-label">
+            <input type="checkbox" name="remember" checked>
+            <span>Remember my login</span>
+          </label>
+          <a href="#" class="forgot-password-link" onclick="alert('Please contact TopLine Support at info@toplinehub.co.ke to reset your account password.')">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnSignInSubmit">
+          <i class="fas fa-sign-in-alt"></i> Sign In to Account
+        </button>
+      </form>
+
+      <!-- Quick Demo Worker Access -->
+      <div class="demo-accounts-card">
+        <div class="demo-title">
+          <i class="fas fa-bolt"></i> Quick Demo Worker Accounts (Click to Fill)
+        </div>
+        <div class="demo-grid">
+          <button type="button" class="demo-btn" onclick="fillDemoUser('+254711000001', 'WorkerPass2026!')">
+            <strong>John Kamau</strong>
+            <span>Mason &bull; +254711000001</span>
+          </button>
+          <button type="button" class="demo-btn" onclick="fillDemoUser('+254711000002', 'WorkerPass2026!')">
+            <strong>Peter Ochieng</strong>
+            <span>Electrician &bull; +254711000002</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer Callouts & Links -->
+      <div class="worker-unlock-callout">
+        <i class="fas fa-shield-check"></i> New worker? 
+        <a href="/jobs#join">Activate Worker Profile (KSh 1,000)</a> to unlock Gulf &amp; Kenya jobs.
+      </div>
+
+      <div class="form-footer">
+        <p>
+          Don't have an account? 
+          <a href="/auth/register">Create Client Account</a> &bull; 
+          <a href="/">Home</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
 </div>
+
+<!-- CAROUSEL AUTO-TRANSITION (EVERY 3 SECONDS) & CLIENT LOGIC -->
+<script>
+(function() {
+  let currentIndex = 0;
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.indicator-dot');
+  const totalSlides = slides.length;
+  let carouselTimer = null;
+  const INTERVAL_MS = 3000; // Exactly 3 seconds
+
+  function showSlide(index) {
+    if (index < 0) index = totalSlides - 1;
+    if (index >= totalSlides) index = 0;
+    currentIndex = index;
+
+    slides.forEach((s, idx) => {
+      if (idx === currentIndex) {
+        s.classList.add('active');
+      } else {
+        s.classList.remove('active');
+      }
+    });
+
+    dots.forEach((d, idx) => {
+      if (idx === currentIndex) {
+        d.classList.add('active');
+        // Restart CSS progress bar animation
+        const fill = d.querySelector('.progress-fill');
+        if (fill) {
+          fill.style.animation = 'none';
+          void fill.offsetWidth; // Trigger reflow
+          fill.style.animation = 'progressTimer 3s linear forwards';
+        }
+      } else {
+        d.classList.remove('active');
+        const fill = d.querySelector('.progress-fill');
+        if (fill) fill.style.animation = 'none';
+      }
+    });
+  }
+
+  function startTimer() {
+    stopTimer();
+    carouselTimer = setInterval(() => {
+      showSlide(currentIndex + 1);
+    }, INTERVAL_MS);
+  }
+
+  function stopTimer() {
+    if (carouselTimer) {
+      clearInterval(carouselTimer);
+      carouselTimer = null;
+    }
+  }
+
+  window.nextSlide = function() {
+    showSlide(currentIndex + 1);
+    startTimer();
+  };
+
+  window.prevSlide = function() {
+    showSlide(currentIndex - 1);
+    startTimer();
+  };
+
+  window.jumpToSlide = function(index) {
+    showSlide(index);
+    startTimer();
+  };
+
+  // Pause on hover over carousel, resume on leave
+  const heroSide = document.getElementById('heroCarouselSide');
+  if (heroSide) {
+    heroSide.addEventListener('mouseenter', () => {
+      // Keep timer running so user still sees 3-second cycle unless actively interacting
+    });
+  }
+
+  // Password visibility toggle (Zero emojis)
+  window.togglePasswordVisibility = function(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+      input.type = 'password';
+      btn.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+  };
+
+  // Quick fill demo user
+  window.fillDemoUser = function(user, pass) {
+    const emailEl = document.getElementById('signinEmail');
+    const passEl = document.getElementById('signinPassword');
+    if (emailEl) emailEl.value = user;
+    if (passEl) passEl.value = pass;
+    const btn = document.getElementById('btnSignInSubmit');
+    if (btn) btn.focus();
+  };
+
+  // Start the 3-second carousel on page load
+  showSlide(0);
+  startTimer();
+})();
+</script>
 
 </body>
 </html>

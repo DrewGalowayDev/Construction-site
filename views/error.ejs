@@ -1,0 +1,16 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<header class="hero s">
+    <div class="w">
+        <div class="tag">ERROR</div>
+        <h1>Something went wrong.</h1>
+        <p><%= message || 'An unexpected error occurred. Please try again.' %></p>
+        <div style="margin-top:20px">
+            <a class="btn" href="/">Return to Home</a>
+            <a class="btn o" href="/jobs" style="margin-left:10px">Back to Jobs</a>
+        </div>
+    </div>
+</header>
+
+<%- include('partials/footer') %>

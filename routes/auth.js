@@ -4,7 +4,8 @@ const path = require('path');
 
 // Import models
 const modelsPath = path.join(__dirname, '..', 'models');
-const { User, ArtisanProfile, Wallet } = require(modelsPath);
+const { User, ArtisanProfile, Wallet, sequelize } = require(modelsPath);
+const { Op } = require('sequelize');
 
 /**
  * GET Login Page
@@ -12,7 +13,8 @@ const { User, ArtisanProfile, Wallet } = require(modelsPath);
 router.get('/login', (req, res) => {
     res.render('auth/login', {
         title: 'Sign In',
-        page: 'login'
+        page: 'login',
+        redirect: req.query.redirect || ''
     });
 });
 
@@ -21,22 +23,33 @@ router.get('/login', (req, res) => {
  */
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, redirect } = req.body;
+        const input = (email || '').trim();
         
-        // Support both email and username login
-        // Try to find user by email first, then by name (username)
-        let user = await User.findOne({ where: { email } });
-        
-        // If not found by email, try finding by name (username)
-        if (!user) {
-            user = await User.findOne({ where: { name: email } });
+        // Support email, username, and phone number login
+        const cleanPhone = input.replace(/\D/g, '').slice(-9);
+        const orConditions = [
+            { email: input },
+            { name: input }
+        ];
+        if (cleanPhone.length >= 7) {
+            orConditions.push({ phone: input });
+            orConditions.push(
+                sequelize.where(
+                    sequelize.fn('REPLACE', sequelize.col('phone'), ' ', ''),
+                    { [Op.like]: `%${cleanPhone}` }
+                )
+            );
         }
+
+        const user = await User.findOne({ where: { [Op.or]: orConditions } });
 
         if (!user || !(await user.validPassword(password))) {
             return res.render('auth/login', {
                 title: 'Sign In',
                 page: 'login',
-                error: 'Invalid username/email or password'
+                redirect: redirect || '',
+                error: 'Invalid username, phone number, email, or password'
             });
         }
 
@@ -48,10 +61,16 @@ router.post('/login', async (req, res) => {
             phone: user.phone,
             role: user.role,
             county: user.county,
-            town: user.town
+            town: user.town,
+            is_verified: user.is_verified
         };
 
-        // Redirect based on role
+        // If redirect URL specified, follow it
+        if (redirect && redirect.startsWith('/')) {
+            return res.redirect(redirect);
+        }
+
+        // Otherwise redirect based on role
         if (user.role === 'admin') {
             res.redirect('/dashboard/admin');
         } else if (user.role === 'artisan') {
@@ -66,6 +85,7 @@ router.post('/login', async (req, res) => {
         res.render('auth/login', {
             title: 'Sign In',
             page: 'login',
+            redirect: req.body.redirect || '',
             error: 'Login error occurred'
         });
     }

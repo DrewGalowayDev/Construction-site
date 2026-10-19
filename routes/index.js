@@ -9,9 +9,15 @@ const {
     JobPost,
     Category,
     User,
-    ArtisanProfile
+    ArtisanProfile,
+    Transaction,
+    Wallet,
+    JobApplication,
+    sequelize
 } = require(modelsPath);
 const { Op } = require('sequelize');
+const paystackHelper = require('../helpers/paystackHelper');
+const bcrypt = require('bcryptjs');
 
 /**
  * Home page route - with featured products and jobs
@@ -86,31 +92,53 @@ router.get('/providers', async (req, res) => {
 });
 
 /**
- * Jobs page route - with job listings
+ * Jobs page route - with job listings & verified portal
  */
 router.get('/jobs', async (req, res) => {
     try {
-        // Get all open jobs
+        // Get all open jobs from backend
         const jobs = await JobPost.findAll({
             where: { status: 'open' },
-            limit: 20,
             order: [['created_at', 'DESC']],
             include: [
                 { model: User, as: 'client', attributes: ['id', 'name'] }
             ]
         });
 
+        let hasPaid = false;
+        let userPayment = null;
+        if (req.session.user) {
+            userPayment = await Transaction.findOne({
+                where: {
+                    user_id: req.session.user.id,
+                    type: { [Op.in]: ['worker_activation', 'training_fee'] },
+                    status: 'completed'
+                }
+            });
+            if (userPayment || req.session.user.role === 'admin' || req.session.user.is_verified) {
+                hasPaid = true;
+            }
+        }
+
         res.render('jobs', {
-            title: 'Post a Job',
+            title: 'TopLine – Verified Gulf Construction Jobs',
             page: 'jobs',
-            jobs: jobs || []
+            jobs: jobs || [],
+            hasPaid,
+            userPayment,
+            user: req.session.user || null,
+            paystackPublicKey: paystackHelper.getPublicKey()
         });
     } catch (error) {
         console.error('Error loading jobs:', error);
         res.render('jobs', {
-            title: 'Post a Job',
+            title: 'TopLine – Verified Gulf Construction Jobs',
             page: 'jobs',
-            jobs: []
+            jobs: [],
+            hasPaid: false,
+            userPayment: null,
+            user: req.session.user || null,
+            paystackPublicKey: paystackHelper.getPublicKey()
         });
     }
 });
@@ -158,21 +186,349 @@ router.get('/materials', async (req, res) => {
 // Removed - handled by /training router
 
 /**
- * POST route to create a new job post
+ * GET API: Realtime Jobs with trade & location filtering
+ */
+router.get('/api/jobs', async (req, res) => {
+    try {
+        const { trade, location, search } = req.query;
+        const whereClause = { status: 'open' };
+        const conditions = [];
+
+        if (trade && trade !== 'all' && trade !== 'All' && trade !== 'All trades') {
+            conditions.push({ trade_required: { [Op.like]: `%${trade}%` } });
+        }
+
+        if (location && location.trim() && location !== 'all' && location !== 'All Locations') {
+            const loc = location.trim();
+            conditions.push({
+                [Op.or]: [
+                    { location_county: { [Op.like]: `%${loc}%` } },
+                    { location_town: { [Op.like]: `%${loc}%` } }
+                ]
+            });
+        }
+
+        if (search && search.trim()) {
+            const q = search.trim();
+            conditions.push({
+                [Op.or]: [
+                    { title: { [Op.like]: `%${q}%` } },
+                    { description: { [Op.like]: `%${q}%` } },
+                    { trade_required: { [Op.like]: `%${q}%` } },
+                    { location_county: { [Op.like]: `%${q}%` } },
+                    { location_town: { [Op.like]: `%${q}%` } }
+                ]
+            });
+        }
+
+        if (conditions.length > 0) {
+            whereClause[Op.and] = conditions;
+        }
+
+        const jobs = await JobPost.findAll({
+            where: whereClause,
+            order: [['created_at', 'DESC']],
+            include: [
+                { model: User, as: 'client', attributes: ['id', 'name'] }
+            ]
+        });
+
+        res.json({
+            success: true,
+            count: jobs.length,
+            jobs
+        });
+    } catch (error) {
+        console.error('API jobs error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch jobs' });
+    }
+});
+
+/**
+ * POST API: Worker / Client Quick Sign In
+ */
+router.post('/api/jobs/auth/signin', async (req, res) => {
+    try {
+        const { phoneOrEmail, password } = req.body;
+        if (!phoneOrEmail || !password) {
+            return res.status(400).json({ success: false, message: 'Phone/Email and password required' });
+        }
+
+        const cleanPhone = phoneOrEmail.replace(/\D/g, '').slice(-9);
+        const orConditions = [
+            { email: phoneOrEmail.trim().toLowerCase() },
+            { phone: phoneOrEmail.trim() }
+        ];
+        if (cleanPhone.length >= 7) {
+            orConditions.push(
+                sequelize.where(
+                    sequelize.fn('REPLACE', sequelize.col('phone'), ' ', ''),
+                    { [Op.like]: `%${cleanPhone}` }
+                )
+            );
+        }
+
+        const user = await User.findOne({ where: { [Op.or]: orConditions } });
+        if (!user || !(await user.validPassword(password))) {
+            return res.status(401).json({ success: false, message: 'Invalid phone/email or password' });
+        }
+
+        req.session.user = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            county: user.county,
+            town: user.town,
+            is_verified: user.is_verified
+        };
+
+        res.json({
+            success: true,
+            message: `Welcome back, ${user.name}!`,
+            user: req.session.user
+        });
+    } catch (err) {
+        console.error('API signin error:', err);
+        res.status(500).json({ success: false, message: 'Server error during sign in' });
+    }
+});
+
+/**
+ * POST API: Initialize Worker Platform Activation Payment (KSh 1,000)
+ */
+router.post('/api/jobs/payment/initialize', async (req, res) => {
+    try {
+        const { name, phone, email, password, trade, preferred_country } = req.body;
+        if (!name || !phone) {
+            return res.status(400).json({ success: false, message: 'Name and phone number are required.' });
+        }
+
+        const trimmedName = name.trim();
+        const trimmedPhone = phone.trim();
+        const userEmail = (email && email.trim()) ? email.trim().toLowerCase() : `worker_${trimmedPhone.replace(/\D/g, '')}@toplinehub.co.ke`;
+
+        let userId = req.session.user ? req.session.user.id : null;
+        let userObj = null;
+
+        if (userId) {
+            userObj = await User.findByPk(userId);
+        } else {
+            const cleanPhone = trimmedPhone.replace(/\D/g, '').slice(-9);
+            const orConditions = [{ email: userEmail }];
+            if (cleanPhone.length >= 7) {
+                orConditions.push(
+                    sequelize.where(
+                        sequelize.fn('REPLACE', sequelize.col('phone'), ' ', ''),
+                        { [Op.like]: `%${cleanPhone}` }
+                    )
+                );
+            }
+            userObj = await User.findOne({ where: { [Op.or]: orConditions } });
+
+            if (!userObj) {
+                userObj = await User.create({
+                    name: trimmedName,
+                    email: userEmail,
+                    phone: trimmedPhone,
+                    password: password || 'WorkerPass2026!',
+                    role: 'artisan',
+                    county: preferred_country || 'Saudi Arabia',
+                    town: trade || 'Construction Artisan',
+                    is_verified: false
+                });
+                await ArtisanProfile.create({
+                    user_id: userObj.id,
+                    trade: trade || 'General Construction',
+                    experience_years: 2,
+                    daily_rate: 2500,
+                    is_available: true,
+                    county: preferred_country || 'Saudi Arabia',
+                    town: trade || 'General Construction'
+                }).catch(() => {});
+            }
+            userId = userObj.id;
+        }
+
+        // Set session
+        req.session.user = {
+            id: userObj.id,
+            name: userObj.name,
+            email: userObj.email,
+            phone: userObj.phone,
+            role: userObj.role,
+            county: userObj.county,
+            town: userObj.town,
+            is_verified: userObj.is_verified
+        };
+
+        const ACTIVATION_FEE = 1000.00;
+        const reference = `TL_JOB_ACT_${userId}_${Date.now()}`;
+        const host = req.get('host');
+        const protocol = req.protocol;
+        const callbackUrl = `${protocol}://${host}/jobs?reference=${reference}&payment_status=check`;
+
+        const paystackRes = await paystackHelper.initializeTransaction({
+            email: userEmail,
+            amount: ACTIVATION_FEE,
+            reference: reference,
+            callbackUrl: callbackUrl,
+            metadata: {
+                user_id: userId,
+                payment_type: 'worker_activation',
+                name: trimmedName,
+                phone: trimmedPhone,
+                trade: trade || 'Artisan',
+                country: preferred_country || 'Gulf'
+            },
+            channels: ['mobile_money', 'card']
+        });
+
+        await Transaction.create({
+            user_id: userId,
+            type: 'worker_activation',
+            amount: ACTIVATION_FEE,
+            balance_before: 0,
+            balance_after: 0,
+            status: 'pending',
+            payment_method: 'paystack',
+            mpesa_receipt: reference,
+            description: `Worker Platform Activation (KSh 1,000) - ${trimmedName} | Trade: ${trade} | Phone: ${trimmedPhone}`
+        });
+
+        res.json({
+            success: true,
+            authorization_url: paystackRes.data.authorization_url,
+            access_code: paystackRes.data.access_code,
+            reference: reference,
+            isSimulated: !!paystackRes.isSimulated
+        });
+    } catch (err) {
+        console.error('Jobs payment init error:', err);
+        res.status(500).json({ success: false, message: err.message || 'Payment initialization failed' });
+    }
+});
+
+/**
+ * GET API: Verify Worker Platform Activation Payment
+ */
+router.get('/api/jobs/payment/verify', async (req, res) => {
+    try {
+        const { reference } = req.query;
+        if (!reference) {
+            return res.status(400).json({ success: false, message: 'Missing reference' });
+        }
+
+        const existingTx = await Transaction.findOne({ where: { mpesa_receipt: reference } });
+        if (existingTx && existingTx.status === 'completed') {
+            if (existingTx.user_id && req.session.user) {
+                req.session.user.is_verified = true;
+            }
+            return res.json({
+                success: true,
+                completed: true,
+                message: 'Payment verified! Account unlocked.'
+            });
+        }
+
+        const verifyRes = await paystackHelper.verifyTransaction(reference);
+        if (verifyRes.data && verifyRes.data.status === 'success') {
+            if (existingTx) {
+                await existingTx.update({ status: 'completed' });
+                if (existingTx.user_id) {
+                    await User.update({ is_verified: true }, { where: { id: existingTx.user_id } });
+                }
+            }
+            if (req.session.user) {
+                req.session.user.is_verified = true;
+            }
+            return res.json({
+                success: true,
+                completed: true,
+                message: 'Payment verified successfully! Welcome to TopLine Verified Jobs.'
+            });
+        } else if (verifyRes.isSimulated) {
+            if (existingTx) {
+                await existingTx.update({ status: 'completed' });
+                if (existingTx.user_id) {
+                    await User.update({ is_verified: true }, { where: { id: existingTx.user_id } });
+                }
+            }
+            if (req.session.user) {
+                req.session.user.is_verified = true;
+            }
+            return res.json({
+                success: true,
+                completed: true,
+                message: 'Payment verified successfully (Simulated mode).'
+            });
+        }
+
+        return res.json({
+            success: true,
+            completed: false,
+            status: verifyRes.data ? verifyRes.data.status : 'pending',
+            message: 'Waiting for payment confirmation...'
+        });
+    } catch (err) {
+        console.error('Verify error:', err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+/**
+ * POST route to create a new job post (Employer / Client)
  */
 router.post('/jobs/create', async (req, res) => {
     try {
-        const { title, description, trade_required, location_county, location_town, budget_estimate, duration } = req.body;
+        const { title, description, trade_required, location_county, location_town, budget_estimate, duration, client_name, client_phone, client_email } = req.body;
 
-        // Get user ID from session (client who's posting the job)
-        const clientId = req.session.user ? req.session.user.id : null;
+        let clientId = req.session.user ? req.session.user.id : null;
 
+        // If not logged in, auto-link or create client user so job posting is frictionless
         if (!clientId) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Please log in to post a job',
-                redirect: '/auth/login?redirect=/jobs'
-            });
+            if (client_phone || client_email) {
+                const cleanPhone = (client_phone || '').replace(/\D/g, '').slice(-9);
+                const orConditions = [];
+                if (client_email) orConditions.push({ email: client_email.trim().toLowerCase() });
+                if (cleanPhone.length >= 7) {
+                    orConditions.push(
+                        sequelize.where(
+                            sequelize.fn('REPLACE', sequelize.col('phone'), ' ', ''),
+                            { [Op.like]: `%${cleanPhone}` }
+                        )
+                    );
+                }
+                let clientUser = null;
+                if (orConditions.length > 0) {
+                    clientUser = await User.findOne({ where: { [Op.or]: orConditions } });
+                }
+                if (!clientUser) {
+                    clientUser = await User.create({
+                        name: client_name || 'Project Employer',
+                        email: client_email || `employer_${Date.now()}@toplinehub.co.ke`,
+                        phone: client_phone || '+254700000000',
+                        password: 'ClientPass2026!',
+                        role: 'buyer',
+                        county: location_county || 'Nairobi',
+                        town: location_town || 'Westlands',
+                        is_verified: true
+                    });
+                }
+                clientId = clientUser.id;
+                req.session.user = {
+                    id: clientUser.id,
+                    name: clientUser.name,
+                    email: clientUser.email,
+                    phone: clientUser.phone,
+                    role: clientUser.role,
+                    county: clientUser.county,
+                    town: clientUser.town
+                };
+            } else {
+                clientId = 2; // Default platform verified client
+            }
         }
 
         // Validate required fields
@@ -198,8 +554,9 @@ router.post('/jobs/create', async (req, res) => {
 
         res.json({ 
             success: true, 
-            message: 'Job posted successfully! Providers will see it and send you quotes.',
-            jobId: newJob.id 
+            message: 'Job posted successfully! It is now live on TopLine for verified providers.',
+            jobId: newJob.id,
+            job: newJob
         });
 
     } catch (error) {

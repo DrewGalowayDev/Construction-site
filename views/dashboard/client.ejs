@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard - Topline Construction</title>
-    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -272,28 +271,17 @@
 </div>
 
 <!-- Mobile Menu Toggle -->
-<button class="mobile-menu-toggle" onclick="document.querySelector('.dashboard-sidebar').classList.toggle('open')">
+<button class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
 </button>
 
-<script>
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const sidebar = document.querySelector('.dashboard-sidebar');
-        const toggle = document.querySelector('.mobile-menu-toggle');
-        
-        if (window.innerWidth <= 768 && 
-            !sidebar.contains(event.target) && 
-            !toggle.contains(event.target) && 
-            sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-        }
-    });
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay"></div>
 
+<script src="/js/dashboard-mobile.js"></script>
+<script>
     // View job details function
     function viewJobDetails(jobId) {
-        // For now, just scroll to the job or we could open a modal
-        // In a future enhancement, this could open a detailed modal
         window.location.href = '/jobs/' + jobId;
     }
 </script>

@@ -1,459 +1,1467 @@
 <%- include('partials/header') %>
 <%- include('partials/nav') %>
 
+<!-- TopLine Jobs Portal Styling (Clean, Zero-Emoji, 4-Column Card Grid, Edge-to-Edge Hero) -->
 <style>
-    .page-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-        align-items: start;
-        padding: 48px 0;
-    }
+:root {
+  --navy: #083a75;
+  --navy-dark: #052449;
+  --gold: #fdb515;
+  --gold-hover: #e5a312;
+  --bg: #ffffff;
+  --bg2: #f4f7fb;
+  --tx: #0c1b30;
+  --mut: #5a6b82;
+  --bd: #dde5ef;
+  --card: #ffffff;
+  --success: #10b981;
+}
 
-    .page-hero-compact {
-        background: var(--navy);
-        color: #fff;
-        padding: 28px 0;
-        text-align: center;
-    }
+.jobs-portal {
+  color: var(--tx);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  background: var(--bg);
+  overflow-x: hidden;
+  width: 100%;
+}
 
-    .page-hero-compact .tag { margin-bottom: 6px; }
+.jobs-portal * { box-sizing: border-box; }
 
-    .page-hero-compact h1 {
-        font-size: clamp(22px, 3vw, 34px);
-        font-weight: 800;
-        margin: 0;
-        line-height: 1.2;
-    }
+/* Wide edge-to-edge container */
+.jobs-portal .w-full {
+  width: 100%;
+  max-width: 1480px;
+  margin: auto;
+  padding: 0 28px;
+}
 
-    .page-hero-compact h1 span { color: var(--gold); }
+/* Standard centered content container */
+.jobs-portal .w {
+  width: 100%;
+  max-width: 1280px;
+  margin: auto;
+  padding: 0 24px;
+}
 
-    .page-hero-compact p {
-        color: #cfdcee;
-        margin: 8px 0 0;
-        font-size: 15px;
-    }
+/* Buttons */
+.jobs-portal .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--gold);
+  color: #1a1200;
+  font-weight: 700;
+  border: 0;
+  border-radius: 10px;
+  padding: 13px 24px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+.jobs-portal .btn:hover { background: var(--gold-hover); transform: translateY(-1px); }
+.jobs-portal .btn.s { padding: 9px 16px; font-size: 13px; border-radius: 8px; }
+.jobs-portal .btn.o { background: #fff; border: 2px solid var(--bd); color: var(--tx); }
+.jobs-portal .btn.o:hover { border-color: var(--navy); color: var(--navy); }
+.jobs-portal .btn.navy { background: var(--navy); color: #fff; }
+.jobs-portal .btn.navy:hover { background: var(--navy-dark); }
 
-    .page-info-card {
-        background: var(--navy);
-        color: #fff;
-        border-radius: 18px;
-        padding: 36px;
-    }
+/* FULL-WIDTH CENTERED HERO SECTION (STRETCHING FROM LEFT TO RIGHT) */
+.jobs-portal .hero-fullwidth {
+  width: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  padding: 72px 24px 64px;
+  border-bottom: 1px solid var(--bd);
+  text-align: center;
+}
+.jobs-portal .hero-fullwidth .hero-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: center;
+}
+.jobs-portal .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg2);
+  color: var(--navy);
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 8px 18px;
+  font-size: 13px;
+  margin-bottom: 22px;
+  border: 1px solid var(--bd);
+  box-shadow: 0 2px 6px rgba(8, 58, 117, 0.04);
+}
+.jobs-portal h1 {
+  font-size: clamp(32px, 4.8vw, 54px);
+  line-height: 1.15;
+  margin: 0 0 20px;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--tx);
+  text-align: center;
+}
+.jobs-portal h1 em {
+  color: var(--navy);
+  font-style: normal;
+  box-shadow: inset 0 -0.32em 0 var(--gold);
+}
+.jobs-portal .hero-fullwidth p {
+  font-size: 18px;
+  color: var(--mut);
+  max-width: 780px;
+  margin: 0 auto 32px;
+  line-height: 1.65;
+  text-align: center;
+}
+.jobs-portal .hero-actions-center {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-    .page-info-card h2 {
-        color: #fff;
-        font-size: 24px;
-        margin-bottom: 6px;
-    }
+/* Trade Ticker Strip */
+.jobs-portal .tr-strip {
+  padding: 24px 0 10px;
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+}
+.jobs-portal .tr {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.jobs-portal .tr span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  color: var(--tx);
+}
+.jobs-portal .tr span i { color: var(--navy); }
+.jobs-portal .tr span:hover {
+  background: var(--bg2);
+  border-color: var(--navy);
+  color: var(--navy);
+}
 
-    .page-info-card .info-subtitle {
-        color: #b6c7dc;
-        margin-bottom: 28px;
-        font-size: 15px;
-    }
+/* Sections */
+.jobs-portal section { padding: 60px 0; }
+.jobs-portal section.a { background: var(--bg2); }
+.jobs-portal h2 {
+  font-size: 28px;
+  margin: 0 0 8px;
+  font-style: italic;
+  font-weight: 900;
+  color: var(--tx);
+}
+.jobs-portal .sub { color: var(--mut); margin: 0 0 28px; font-size: 15px; }
 
-    .page-info-card .info-item {
-        display: flex;
-        gap: 16px;
-        margin-bottom: 24px;
-        align-items: flex-start;
-    }
+/* 3-Column How It Works Cards */
+.jobs-portal .g3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.jobs-portal .card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  padding: 26px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.jobs-portal .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+.jobs-portal .n {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--navy);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+.jobs-portal .card h3 { margin: 0 0 8px; font-size: 18px; color: var(--tx); font-weight: 700; }
+.jobs-portal .card p { margin: 0; color: var(--mut); font-size: 14px; line-height: 1.55; }
 
-    .page-info-card .info-icon {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        border-radius: 12px;
-        background: rgba(245, 166, 35, 0.15);
-        color: var(--gold);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-    }
+/* Filter Controls: Chips & Realtime Location */
+.jobs-portal .filters-container {
+  background: #fff;
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 18px rgba(8, 58, 117, 0.03);
+}
+.jobs-portal .chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.jobs-portal .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--bd);
+  background: var(--card);
+  color: var(--tx);
+  border-radius: 99px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.jobs-portal .chip i { color: var(--mut); }
+.jobs-portal .chip:hover { border-color: var(--navy); }
+.jobs-portal .chip.on {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.jobs-portal .chip.on i { color: #fff; }
 
-    .page-info-card .info-text h3 {
-        font-size: 16px;
-        font-weight: 700;
-        margin: 0 0 4px;
-        color: #fff;
-    }
+/* Location Filter Bar */
+.jobs-portal .loc-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+}
+.jobs-portal .loc-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.jobs-portal .loc-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 16px;
+  color: var(--navy);
+}
+.jobs-portal .loc-input {
+  width: 100%;
+  padding: 13px 16px 13px 44px;
+  border-radius: 10px;
+  border: 1.5px solid var(--bd);
+  background: #fff;
+  color: var(--tx);
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.jobs-portal .loc-input:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+.jobs-portal .quick-locs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  align-items: center;
+}
+.jobs-portal .loc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 99px;
+  padding: 5px 14px;
+  cursor: pointer;
+  color: var(--mut);
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.jobs-portal .loc-pill:hover,
+.jobs-portal .loc-pill.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1a1200;
+}
 
-    .page-info-card .info-text p {
-        font-size: 14px;
-        color: #b6c7dc;
-        margin: 0;
-        line-height: 1.5;
-    }
+/* 4-COLUMN RESPONSIVE JOB CARDS GRID */
+.jobs-portal .jobs-grid-4col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
 
-    .page-info-card .details-box {
-        background: rgba(255,255,255,0.06);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 24px;
-        border: 1px solid rgba(255,255,255,0.08);
-    }
+.jobs-portal .job-card-col {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 310px;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.jobs-portal .job-card-col:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 24px rgba(8, 58, 117, 0.08);
+}
 
-    .page-info-card .details-box h3 {
-        font-size: 15px;
-        font-weight: 700;
-        margin: 0 0 10px;
-        color: var(--gold);
-    }
+.jobs-portal .job-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.jobs-portal .trade-tag {
+  background: #eef4fb;
+  color: var(--navy);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.jobs-portal .ok-badge {
+  background: #e6f7ec;
+  color: #14703a;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.jobs-portal .job-card-title {
+  font-size: 17px;
+  color: var(--navy);
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 0 0 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 46px;
+}
+.jobs-portal .job-card-desc {
+  color: var(--mut);
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+.jobs-portal .job-meta-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 18px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  font-size: 13px;
+  color: var(--mut);
+}
+.jobs-portal .job-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.jobs-portal .salary-tag {
+  font-weight: 800;
+  color: #047857;
+  background: #ecfdf5;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+}
 
-    .page-info-card .details-box li {
-        color: #cfdcee;
-        margin: 8px 0 8px 16px;
-        font-size: 14px;
-        line-height: 1.5;
-    }
+/* Safe From Scams Banner */
+.jobs-portal .safe {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 16px;
+  padding: 40px 36px;
+  box-shadow: 0 12px 35px rgba(8, 58, 117, 0.15);
+}
+.jobs-portal .safe h2 { color: #fff; margin-bottom: 12px; }
+.jobs-portal .safe ul { margin: 18px 0 0; padding-left: 20px; }
+.jobs-portal .safe li {
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #e2e8f0;
+}
 
-    .page-form-card {
-        background: #fff;
-        border: 2px solid var(--ln);
-        border-radius: 18px;
-        padding: 36px;
-        box-shadow: 0 8px 32px rgba(11, 58, 110, 0.08);
-    }
+/* Action Hub Card (Sign In / Register / Post a Job) */
+.jobs-portal .action-card {
+  max-width: 620px;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--bd);
+  box-shadow: 0 14px 35px -5px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  border-radius: 16px;
+}
+.jobs-portal .tab-switcher {
+  display: flex;
+  background: #f1f5f9;
+  border-bottom: 1px solid var(--bd);
+}
+.jobs-portal .tab-btn {
+  flex: 1;
+  padding: 16px 12px;
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--mut);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.jobs-portal .tab-btn.active {
+  background: #fff;
+  color: var(--navy);
+  border-bottom: 3px solid var(--navy);
+}
+.jobs-portal .tab-panel {
+  padding: 30px 26px;
+}
 
-    .page-form-card h2 {
-        font-size: 24px;
-        margin-bottom: 4px;
-        color: var(--navy);
-    }
+/* Forms */
+.jobs-portal form { display: grid; gap: 15px; }
+.jobs-portal .form-group { display: grid; gap: 6px; }
+.jobs-portal .form-group label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.jobs-portal input,
+.jobs-portal select,
+.jobs-portal textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--bd);
+  background: var(--card);
+  color: var(--tx);
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.jobs-portal input:focus,
+.jobs-portal select:focus,
+.jobs-portal textarea:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+.jobs-portal .two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
-    .page-form-card .form-subtitle {
-        color: var(--mu);
-        margin-bottom: 20px;
-        font-size: 15px;
-    }
+/* FAQ Details */
+.jobs-portal details {
+  border-bottom: 1px solid var(--bd);
+  padding: 18px 0;
+}
+.jobs-portal summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--navy);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.jobs-portal summary::-webkit-details-marker { display: none; }
+.jobs-portal summary:after {
+  content: "+";
+  font-size: 20px;
+  color: var(--mut);
+  font-weight: 400;
+}
+.jobs-portal details[open] summary:after { content: "–"; }
+.jobs-portal details p {
+  color: var(--mut);
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
 
-    .page-form-card label {
-        display: block;
-        font-weight: 600;
-        font-size: 14px;
-        margin: 14px 0 4px;
-        color: var(--tx);
-    }
+/* Toast Notification */
+.jobs-portal .toast {
+  display: none;
+  padding: 14px 18px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 10px;
+}
+.jobs-portal .toast.success { background: #e6f7ec; color: #14703a; border: 1px solid #b7ebc6; }
+.jobs-portal .toast.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
-    .page-form-card input,
-    .page-form-card select,
-    .page-form-card textarea {
-        width: 100%;
-        padding: 13px 16px;
-        border: 1px solid var(--ln);
-        border-radius: 10px;
-        font: inherit;
-        background: var(--card);
-        color: var(--tx);
-        transition: border-color 0.2s;
-    }
+/* Realtime Payment Modal Overlay */
+.pay-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 27, 48, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.pay-modal {
+  background: #fff;
+  border-radius: 18px;
+  max-width: 440px;
+  width: 100%;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+  animation: modalScale 0.25s ease-out;
+}
+@keyframes modalScale {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
 
-    .page-form-card input:focus,
-    .page-form-card select:focus,
-    .page-form-card textarea:focus {
-        outline: none;
-        border-color: var(--gold);
-    }
-
-    .page-form-card .two {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px;
-    }
-
-    .page-form-card .submit-btn {
-        width: 100%;
-        margin-top: 20px;
-        padding: 16px;
-        font-size: 16px;
-        font-weight: 700;
-        background: var(--navy);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: background 0.2s, transform 0.1s;
-    }
-
-    .page-form-card .submit-btn:hover {
-        background: var(--navy2);
-        transform: translateY(-1px);
-    }
-
-    @media (max-width: 800px) {
-        .page-layout {
-            grid-template-columns: 1fr;
-            gap: 24px;
-            padding: 28px 0;
-        }
-    }
+/* Responsive Breakpoints for 4-Column Grid */
+@media (max-width: 1260px) {
+  .jobs-portal .jobs-grid-4col { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .jobs-portal .jobs-grid-4col { grid-template-columns: repeat(2, 1fr); }
+  .jobs-portal .g3 { grid-template-columns: 1fr; }
+  .jobs-portal .loc-bar { grid-template-columns: 1fr; }
+}
+@media (max-width: 580px) {
+  .jobs-portal .jobs-grid-4col { grid-template-columns: 1fr; }
+  .jobs-portal .two-col { grid-template-columns: 1fr; }
+  .jobs-portal .hero-fullwidth { padding: 48px 16px; }
+  .jobs-portal h1 { font-size: 28px; }
+  .jobs-portal .tab-btn { font-size: 12px; padding: 12px 6px; }
+  .jobs-portal .hero-actions-center { flex-direction: column; width: 100%; }
+  .jobs-portal .hero-actions-center .btn { width: 100%; }
+}
 </style>
 
-<!-- Compact Hero Strip -->
-<div class="page-hero-compact">
-    <div class="w">
-        <div class="tag">JOBS</div>
-        <h1>Post a job. <span>Get quotes.</span></h1>
-        <p>Describe your project, and TopLine-verified providers will bid. Pick the best.</p>
+<div class="jobs-portal">
+
+  <!-- 1. FULL-WIDTH CENTERED HERO SECTION (STRETCHING FROM LEFT TO RIGHT) -->
+  <header class="hero-fullwidth">
+    <div class="hero-inner">
+      <span class="pill">
+        <i class="fas fa-hard-hat" style="color:var(--navy)"></i>
+        Verified Construction Jobs &bull; Kenya &bull; Saudi Arabia &bull; UAE &bull; Qatar
+      </span>
+      <h1>Construction jobs in the Gulf &amp; Kenya, <em>verified</em> before you apply.</h1>
+      <p>
+        Masons, electricians, welders, drivers, foremen and more. Browse checked opportunities, post projects for competitive artisan quotes, or activate your worker profile. No fake offers.
+      </p>
+      <div class="hero-actions-center">
+        <a class="btn" href="#join" onclick="showAuthTab('signup')">
+          <i class="fas fa-id-card"></i> Worker Activation &bull; KSh 1,000
+        </a>
+        <a class="btn navy" href="#join" onclick="showAuthTab('postjob')">
+          <i class="fas fa-plus-circle"></i> Post a Job
+        </a>
+        <a class="btn o" href="#jobs">
+          <i class="fas fa-search"></i> Browse Jobs (<%= (jobs && jobs.length) || 0 %>)
+        </a>
+      </div>
     </div>
+  </header>
+
+  <!-- 2. TRADES TICKER STRIP (CLEAN ICONS, ZERO EMOJIS) -->
+  <div class="tr-strip">
+    <div class="w-full">
+      <div class="tr">
+        <span onclick="filterByTrade('Mason')"><i class="fas fa-layer-group"></i> Masons</span>
+        <span onclick="filterByTrade('Steel fixer')"><i class="fas fa-cubes"></i> Steel fixers</span>
+        <span onclick="filterByTrade('Electrician')"><i class="fas fa-bolt"></i> Electricians</span>
+        <span onclick="filterByTrade('Plumber')"><i class="fas fa-wrench"></i> Plumbers</span>
+        <span onclick="filterByTrade('Welder')"><i class="fas fa-fire-alt"></i> Welders</span>
+        <span onclick="filterByTrade('Carpenter')"><i class="fas fa-hammer"></i> Carpenters</span>
+        <span onclick="filterByTrade('Scaffolder')"><i class="fas fa-building"></i> Scaffolders</span>
+        <span onclick="filterByTrade('Equipment operator')"><i class="fas fa-truck-pickup"></i> Equipment operators</span>
+        <span onclick="filterByTrade('Painter')"><i class="fas fa-paint-roller"></i> Painters</span>
+        <span onclick="filterByTrade('Foreman')"><i class="fas fa-user-tie"></i> Foremen / Supervisors</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. HOW IT WORKS -->
+  <section id="how">
+    <div class="w-full">
+      <h2 style="text-align:center">How TopLine works</h2>
+      <p class="sub" style="text-align:center">Three simple steps from sign-up to real, checked construction opportunities.</p>
+      <div class="g3">
+        <div class="card">
+          <div class="n">1</div>
+          <h3>Create your account</h3>
+          <p>Add your trade, years of experience, certificates, and preferred location (Kenya or Gulf), plus your CV.</p>
+        </div>
+        <div class="card">
+          <div class="n">2</div>
+          <h3>Pay a small fee</h3>
+          <p>A one-time KSh 1,000 unlocks your full dashboard and direct applications. Employers and agencies never charge you through us.</p>
+        </div>
+        <div class="card">
+          <div class="n">3</div>
+          <h3>Get matched &amp; hired</h3>
+          <p>Receive recommended construction jobs and vetted agencies that fit your trade, each verified by our engineering team.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. VERIFIED JOBS SECTION (4 COLUMNS RESPONSIVE GRID) -->
+  <section class="a" id="jobs">
+    <div class="w-full">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:12px">
+        <div>
+          <h2>Verified construction jobs, matched to you</h2>
+          <p class="sub" style="margin:0">Live listings originating directly from the TopLine backend. Filter in realtime by trade and location.</p>
+        </div>
+        <button class="btn s navy" onclick="showAuthTab('postjob');document.getElementById('join').scrollIntoView({behavior:'smooth'})">
+          <i class="fas fa-plus"></i> Post a Job (Free)
+        </button>
+      </div>
+
+      <!-- Realtime Filter Controls -->
+      <div class="filters-container">
+        <!-- Trade Filter Chips (Zero Emojis, Clean Icons) -->
+        <div class="chips" id="chips">
+          <button type="button" class="chip on" onclick="filterByTrade('all')"><i class="fas fa-th-large"></i> All trades</button>
+          <button type="button" class="chip" onclick="filterByTrade('Mason')"><i class="fas fa-layer-group"></i> Mason</button>
+          <button type="button" class="chip" onclick="filterByTrade('Steel fixer')"><i class="fas fa-cubes"></i> Steel fixer</button>
+          <button type="button" class="chip" onclick="filterByTrade('Electrician')"><i class="fas fa-bolt"></i> Electrician</button>
+          <button type="button" class="chip" onclick="filterByTrade('Plumber')"><i class="fas fa-wrench"></i> Plumber</button>
+          <button type="button" class="chip" onclick="filterByTrade('Welder')"><i class="fas fa-fire-alt"></i> Welder</button>
+          <button type="button" class="chip" onclick="filterByTrade('Carpenter')"><i class="fas fa-hammer"></i> Carpenter</button>
+          <button type="button" class="chip" onclick="filterByTrade('Scaffolder')"><i class="fas fa-building"></i> Scaffolder</button>
+          <button type="button" class="chip" onclick="filterByTrade('Equipment operator')"><i class="fas fa-truck-pickup"></i> Equipment operator</button>
+          <button type="button" class="chip" onclick="filterByTrade('Painter')"><i class="fas fa-paint-roller"></i> Painter</button>
+          <button type="button" class="chip" onclick="filterByTrade('Foreman')"><i class="fas fa-user-tie"></i> Foreman / Supervisor</button>
+        </div>
+
+        <!-- Realtime Location Filter Bar -->
+        <div class="loc-bar">
+          <div class="loc-input-wrap">
+            <i class="fas fa-map-marker-alt loc-icon"></i>
+            <input 
+              id="locSearchInput" 
+              class="loc-input" 
+              type="text" 
+              placeholder="Filter in realtime by county, town, or country (e.g. Riyadh, Dubai, Nairobi, Mombasa, Doha, Kiambu)..."
+              oninput="onRealtimeLocationInput(this.value)"
+            >
+          </div>
+          <button type="button" class="btn s o" onclick="resetFilters()">
+            <i class="fas fa-undo"></i> Reset Filters
+          </button>
+        </div>
+
+        <!-- Quick Location Pills (Zero Emojis) -->
+        <div class="quick-locs">
+          <span style="font-size:12px;font-weight:700;color:var(--mut);margin-right:6px">Quick Locations:</span>
+          <span class="loc-pill active" onclick="filterByLocation('All Locations')"><i class="fas fa-globe"></i> All Locations</span>
+          <span class="loc-pill" onclick="filterByLocation('Saudi Arabia')"><i class="fas fa-map-pin"></i> Saudi Arabia</span>
+          <span class="loc-pill" onclick="filterByLocation('UAE')"><i class="fas fa-map-pin"></i> UAE (Dubai/Abu Dhabi)</span>
+          <span class="loc-pill" onclick="filterByLocation('Qatar')"><i class="fas fa-map-pin"></i> Qatar (Doha)</span>
+          <span class="loc-pill" onclick="filterByLocation('Nairobi')"><i class="fas fa-map-pin"></i> Nairobi</span>
+          <span class="loc-pill" onclick="filterByLocation('Mombasa')"><i class="fas fa-map-pin"></i> Mombasa</span>
+          <span class="loc-pill" onclick="filterByLocation('Kiambu')"><i class="fas fa-map-pin"></i> Kiambu</span>
+          <span class="loc-pill" onclick="filterByLocation('Machakos')"><i class="fas fa-map-pin"></i> Machakos</span>
+        </div>
+      </div>
+
+      <!-- Live Job Counter -->
+      <div id="jobStatusText" style="font-size:14px;color:var(--mut);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+        <span id="jobCountBadge" style="background:var(--navy);color:#fff;padding:3px 10px;border-radius:99px;font-size:12px"><%= (jobs && jobs.length) || 0 %></span>
+        <span id="jobCountLabel">Verified opportunities available</span>
+      </div>
+
+      <!-- 4-COLUMN CARDS CONTAINER -->
+      <div id="list" class="jobs-grid-4col">
+        <% if (jobs && jobs.length > 0) { %>
+          <% jobs.forEach(function(job) { %>
+            <div class="job-card-col" data-trade="<%= job.trade_required %>" data-location="<%= job.location_town %>, <%= job.location_county %>" data-title="<%= job.title %>">
+              <div>
+                <div class="job-card-top">
+                  <span class="trade-tag"><i class="fas fa-tag"></i> <%= job.trade_required %></span>
+                  <span class="ok-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                </div>
+                <h3 class="job-card-title"><%= job.title %></h3>
+                <p class="job-card-desc">
+                  <%= job.description ? (job.description.length > 140 ? job.description.substring(0, 140) + '...' : job.description) : 'Verified construction placement.' %>
+                </p>
+                <div class="job-meta-stack">
+                  <div class="job-meta-row">
+                    <span><i class="fas fa-map-marker-alt" style="color:var(--navy);margin-right:4px"></i> <%= job.location_town %>, <%= job.location_county %></span>
+                  </div>
+                  <div class="job-meta-row">
+                    <% if (job.budget_estimate) { %>
+                      <span class="salary-tag">KSh <%= Number(job.budget_estimate).toLocaleString() %></span>
+                    <% } %>
+                    <% if (job.duration) { %>
+                      <span><i class="far fa-clock"></i> <%= job.duration %></span>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <% if (hasPaid || (user && user.role === 'admin')) { %>
+                  <a class="btn s navy" href="/jobs/<%= job.id %>" style="width:100%">
+                    <i class="fas fa-check-circle"></i> View / Apply
+                  </a>
+                <% } else { %>
+                  <button type="button" class="btn s" onclick="promptWorkerUnlock('<%= job.title %>')" style="width:100%">
+                    <i class="fas fa-lock"></i> Unlock to Apply
+                  </button>
+                  <div style="font-size:11px;color:var(--mut);text-align:center;margin-top:4px">KSh 1,000 Activation</div>
+                <% } %>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div style="grid-column: 1 / -1; text-align:center;padding:50px 20px;background:#fff;border-radius:14px;border:1px dashed var(--bd)">
+            <p style="color:var(--mut);font-size:16px;margin:0">No jobs match your current filter. Try resetting or selecting another trade.</p>
+            <button class="btn s o" onclick="resetFilters()" style="margin-top:14px">View All Jobs</button>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. SAFE FROM SCAMS BANNER -->
+  <section>
+    <div class="w-full">
+      <div class="safe">
+        <h2><i class="fas fa-shield-alt" style="color:var(--gold);margin-right:10px"></i> Built to keep you safe from scams</h2>
+        <p style="margin:0;font-size:16px">Gulf and regional job fraud is common, especially for construction trades. Here is how TopLine protects you:</p>
+        <ul>
+          <li><strong>Contractors and agencies are verified:</strong> We check commercial licences, labour registrations, and project credentials before any job is listed.</li>
+          <li><strong>Zero recruiter extortion:</strong> You never pay a recruiter through TopLine. The only platform fee is your one-time profile activation.</li>
+          <li><strong>One-tap suspicious reporting:</strong> Report any abnormal request or non-compliant agency directly and our legal compliance team acts immediately.</li>
+          <li><strong>Transparent terms:</strong> Every listing displays project country, accommodation details, salary scale, and verified contractor status.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. ACTION HUB: SIGN IN / ACTIVATION / POST A JOB -->
+  <section class="a" id="join">
+    <div class="w-full">
+      <div class="action-card">
+        
+        <!-- Tab Header Switcher -->
+        <div class="tab-switcher">
+          <button type="button" id="tab-btn-signup" class="tab-btn active" onclick="showAuthTab('signup')">
+            <i class="fas fa-user-check"></i> Worker Activation (KSh 1,000)
+          </button>
+          <button type="button" id="tab-btn-postjob" class="tab-btn" onclick="showAuthTab('postjob')">
+            <i class="fas fa-file-signature"></i> Post a Job (Free)
+          </button>
+          <a href="/auth/login?redirect=/jobs" id="tab-btn-signin" class="tab-btn" style="text-decoration:none">
+            <i class="fas fa-sign-in-alt"></i> Worker Sign In
+          </a>
+        </div>
+
+        <!-- 2. WORKER REGISTRATION & REALTIME PAYMENT PANEL -->
+        <div id="auth-panel-signup" class="tab-panel" style="display:none">
+          <div style="text-align:center;margin-bottom:16px">
+            <h2 style="margin:0 0 4px;font-size:24px">Worker Profile &amp; Verification</h2>
+            <div style="font-size:36px;font-weight:900;color:var(--navy);margin:4px 0">KSh 1,000</div>
+            <div class="meta">One-time verified platform fee &bull; Instant M-Pesa unlock</div>
+          </div>
+
+          <ul style="margin:14px 0 18px;padding:0;list-style:none;font-size:14px;color:var(--tx)">
+            <li style="padding:4px 0 4px 22px;position:relative"><span style="position:absolute;left:0;color:#10b981;font-weight:bold"><i class="fas fa-check"></i></span> Direct application to verified Gulf and regional employers</li>
+            <li style="padding:4px 0 4px 22px;position:relative"><span style="position:absolute;left:0;color:#10b981;font-weight:bold"><i class="fas fa-check"></i></span> Unrestricted access to contractor contact numbers</li>
+            <li style="padding:4px 0 4px 22px;position:relative"><span style="position:absolute;left:0;color:#10b981;font-weight:bold"><i class="fas fa-check"></i></span> Document verification badge on your artisan profile</li>
+          </ul>
+
+          <form id="form-worker-payment" onsubmit="handleWorkerActivationPayment(event)">
+            <div class="two-col">
+              <input required placeholder="Full name *" id="reg-name" name="name" value="<%= user ? user.name : '' %>">
+              <input required type="tel" placeholder="Phone (M-Pesa registered) *" id="reg-phone" name="phone" value="<%= user ? user.phone : '' %>">
+            </div>
+
+            <div class="two-col">
+              <input type="email" placeholder="Email address (optional)" id="reg-email" name="email" value="<%= user ? user.email : '' %>">
+              <input required type="password" id="reg-pass" name="password" minlength="6" placeholder="Create account password *" value="WorkerPass2026!">
+            </div>
+
+            <div class="two-col">
+              <select required id="reg-trade" name="trade">
+                <option value="">Select your trade *</option>
+                <option value="Mason">Mason / Bricklayer</option>
+                <option value="Steel fixer">Steel fixer / Rebar</option>
+                <option value="Electrician">Electrician / MEP</option>
+                <option value="Plumber">Plumber / Pipefitter</option>
+                <option value="Welder">Welder / Fabricator (6G/TIG)</option>
+                <option value="Carpenter">Shuttering / Finish Carpenter</option>
+                <option value="Scaffolder">Scaffolder</option>
+                <option value="Equipment operator">Equipment Operator (Excavator/Crane)</option>
+                <option value="Painter">Painter / Decorator</option>
+                <option value="Foreman / supervisor">Foreman / Site Supervisor</option>
+                <option value="Other">Other Construction Trade</option>
+              </select>
+
+              <select required id="reg-country" name="preferred_country">
+                <option value="">Preferred Country *</option>
+                <option value="Saudi Arabia">Saudi Arabia (KSA)</option>
+                <option value="UAE">United Arab Emirates (Dubai/Abu Dhabi)</option>
+                <option value="Qatar">Qatar (Doha)</option>
+                <option value="Kuwait">Kuwait</option>
+                <option value="Oman">Oman</option>
+                <option value="Bahrain">Bahrain</option>
+                <option value="Kenya">Kenya (Domestic Projects)</option>
+              </select>
+            </div>
+
+            <button class="btn" type="submit" id="btn-worker-pay" style="width:100%;font-size:16px;padding:15px;margin-top:6px">
+              <i class="fas fa-lock"></i> Activate &amp; Pay KSh 1,000 (M-Pesa)
+            </button>
+            <div class="toast" id="signup-toast"></div>
+          </form>
+
+          <div style="text-align:center;margin-top:16px;font-size:14px;color:var(--mut)">
+            Already registered? <a href="/auth/login?redirect=/jobs" style="color:var(--navy);font-weight:700">Sign in to your account</a>
+          </div>
+        </div>
+
+        <!-- 3. POST A JOB PANEL (CLIENT / EMPLOYER) -->
+        <div id="auth-panel-postjob" class="tab-panel" style="display:none">
+          <div style="text-align:center;margin-bottom:16px">
+            <h2 style="margin:0 0 4px;font-size:24px"><i class="fas fa-briefcase" style="color:var(--navy);margin-right:8px"></i> Post a Construction Job</h2>
+            <p style="margin:0;color:var(--mut);font-size:14px">Describe your project. Vetted providers will see it immediately and send quotes.</p>
+          </div>
+
+          <form id="form-post-job" onsubmit="handleClientJobPost(event)">
+            <% if (!user) { %>
+              <div class="two-col">
+                <input required placeholder="Your Name or Company *" name="client_name" id="pj-client-name">
+                <input required type="tel" placeholder="Your Phone (to receive quotes) *" name="client_phone" id="pj-client-phone">
+              </div>
+              <input type="email" placeholder="Your Email (optional)" name="client_email" id="pj-client-email">
+            <% } %>
+
+            <div class="form-group">
+              <label>Job Title *</label>
+              <input name="title" type="text" placeholder="e.g. Steel Fixer Needed for Residential Slab Construction" required>
+            </div>
+
+            <div class="two-col">
+              <div class="form-group">
+                <label>Trade Required *</label>
+                <select name="trade_required" required>
+                  <option value="">Select trade</option>
+                  <option value="Mason">Mason / Bricklayer</option>
+                  <option value="Steel fixer">Steel fixer</option>
+                  <option value="Electrician">Electrician</option>
+                  <option value="Plumber">Plumber</option>
+                  <option value="Welder">Welder</option>
+                  <option value="Carpenter">Carpenter</option>
+                  <option value="Scaffolder">Scaffolder</option>
+                  <option value="Equipment operator">Equipment operator</option>
+                  <option value="Painter">Painter</option>
+                  <option value="Foreman / supervisor">Foreman / supervisor</option>
+                  <option value="Other">Other Trade</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Duration *</label>
+                <input name="duration" type="text" placeholder="e.g. 2 weeks, 1 year" value="2 weeks" required>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="form-group">
+                <label>County or Country *</label>
+                <input name="location_county" type="text" placeholder="e.g. Nairobi or Saudi Arabia" required>
+              </div>
+              <div class="form-group">
+                <label>Town or City *</label>
+                <input name="location_town" type="text" placeholder="e.g. Westlands or Riyadh" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Budget Estimate (KSh) *</label>
+              <input name="budget_estimate" type="number" step="100" placeholder="e.g. 50000" required>
+            </div>
+
+            <div class="form-group">
+              <label>Job Description *</label>
+              <textarea name="description" rows="3" placeholder="Provide details on project scope, tools required, material provisions, and site location..." required></textarea>
+            </div>
+
+            <button class="btn navy" type="submit" id="btn-post-job" style="width:100%;font-size:16px;padding:14px;margin-top:6px">
+              <i class="fas fa-paper-plane"></i> Publish Job to TopLine
+            </button>
+            <div class="toast" id="postjob-toast"></div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. FAQ SECTION -->
+  <section id="faq">
+    <div class="w">
+      <h2 style="text-align:center">Frequently Asked Questions</h2>
+      <p class="sub" style="text-align:center">Clear answers regarding verified construction placements, payments, and platform policies.</p>
+      
+      <details>
+        <summary>What does the KSh 1,000 one-time fee cover?</summary>
+        <p>The KSh 1,000 fee activates your verified worker profile on TopLine. It grants you unlimited direct job applications, direct access to employer contacts, verification credential badges, and priority matching with verified contractors in Kenya and the Gulf.</p>
+      </details>
+      <details>
+        <summary>Do you guarantee a Gulf construction job?</summary>
+        <p>No agency can legitimately guarantee an automatic visa without an interview. TopLine eliminates middlemen fraud by directly connecting you to authenticated, licenced contractors and agencies who review your qualifications and conduct standard trade testing.</p>
+      </details>
+      <details>
+        <summary>How do you verify contractors and recruitment agencies?</summary>
+        <p>Before any job post is approved, our compliance team cross-checks trade licences, commercial registrations (CR in the Gulf / Registrar in Kenya), previous artisan track records, and valid project work orders.</p>
+      </details>
+      <details>
+        <summary>How does the realtime location filter work?</summary>
+        <p>You can search in realtime across domestic Kenyan counties (Nairobi, Mombasa, Kiambu, Machakos, etc.) as well as GCC locations (Saudi Arabia - Riyadh/Jeddah/NEOM, UAE - Dubai/Abu Dhabi, Qatar - Doha). The listings filter dynamically without page reloading.</p>
+      </details>
+      <details>
+        <summary>Can employers post construction jobs for free?</summary>
+        <p>Yes. Employers and individual builders can post their construction tenders and requirements for free to receive direct quotes from vetted, licensed artisans and subcontractors.</p>
+      </details>
+    </div>
+  </section>
+
 </div>
 
-<section>
-    <div class="w">
-        <div class="page-layout">
-            <!-- LEFT: How It Works -->
-            <div class="page-info-card">
-                <h2>How It Works</h2>
-                <p class="info-subtitle">Get your project done in 3 simple steps</p>
-
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-edit"></i></div>
-                    <div class="info-text">
-                        <h3>1. Describe Your Job</h3>
-                        <p>Tell us what you need — cleaning, construction, plumbing, electrical, painting or repairs.</p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-users"></i></div>
-                    <div class="info-text">
-                        <h3>2. Get Matched</h3>
-                        <p>Vetted providers in your area see your job and send competitive quotes directly to you.</p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-handshake"></i></div>
-                    <div class="info-text">
-                        <h3>3. Pick & Pay Safely</h3>
-                        <p>Choose the best quote, and pay securely via M-PESA escrow — released when the job is done.</p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-shield-halved"></i></div>
-                    <div class="info-text">
-                        <h3>100% Protected</h3>
-                        <p>All providers are verified. Your money is held safely until you confirm the work is complete.</p>
-                    </div>
-                </div>
-
-                <div class="details-box">
-                    <h3><i class="fas fa-list-check"></i> Job Categories</h3>
-                    <ul>
-                        <li>Cleaning — homes, offices, post-construction</li>
-                        <li>Construction — building, renovations, extensions</li>
-                        <li>Plumbing & Electrical — installations & repairs</li>
-                        <li>Painting, Repairs & General maintenance</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- RIGHT: Post a Job Form -->
-            <div class="page-form-card">
-                <h2><i class="fas fa-briefcase" style="color:var(--gold);margin-right:8px"></i> Post Your Job</h2>
-                <p class="form-subtitle">Providers in your area will see it and send you quotes.</p>
-
-                <form id="jobPostForm" onsubmit="return submitJobPost(event)">
-                    <label>Job Title *</label>
-                    <input name="title" type="text" placeholder="e.g. Office Cleaning Required" required>
-
-                    <label>Job Category (Trade Required) *</label>
-                    <select name="trade_required" required>
-                        <option value="">Select a category</option>
-                        <option value="Cleaning">Cleaning</option>
-                        <option value="Construction">Construction</option>
-                        <option value="Plumbing">Plumbing</option>
-                        <option value="Electrical">Electrical</option>
-                        <option value="Painting">Painting</option>
-                        <option value="Repairs">Repairs</option>
-                        <option value="Other">Other</option>
-                    </select>
-
-                    <div class="two">
-                        <div>
-                            <label>County *</label>
-                            <input name="location_county" type="text" placeholder="e.g. Nairobi" required>
-                        </div>
-                        <div>
-                            <label>Town / Area *</label>
-                            <input name="location_town" type="text" placeholder="e.g. Westlands" required>
-                        </div>
-                    </div>
-
-                    <label>Job Description *</label>
-                    <textarea name="description" rows="4" placeholder="Describe the work that needs doing in detail" required></textarea>
-
-                    <div class="two">
-                        <div>
-                            <label>Budget Estimate (KSh) *</label>
-                            <input name="budget_estimate" type="number" step="0.01" placeholder="e.g. 10000" required>
-                        </div>
-                        <div>
-                            <label>Duration</label>
-                            <input name="duration" type="text" placeholder="e.g. 2 weeks" value="2 weeks">
-                        </div>
-                    </div>
-
-                    <button class="submit-btn" type="submit" id="submitBtn">
-                        <i class="fas fa-paper-plane"></i> Post Job
-                    </button>
-                </form>
-            </div>
-        </div>
+<!-- REALTIME M-PESA / PAYSTACK PAYMENT MODAL (NO EMOJIS) -->
+<div class="pay-modal-overlay" id="payModal">
+  <div class="pay-modal">
+    <div style="width:52px;height:52px;border-radius:50%;background:#e6f7ec;display:grid;place-items:center;margin:0 auto 16px;color:#14703a;font-size:22px">
+      <i class="fas fa-credit-card"></i>
     </div>
-</section>
+    <h3 style="margin:0 0 8px;font-size:20px;color:var(--navy)">Complete Platform Activation</h3>
+    <p style="color:var(--mut);font-size:14px;margin:0 0 20px" id="payModalSubtext">
+      Please approve the <strong>M-Pesa STK push</strong> prompt sent to your phone, or complete via the secure Paystack checkout.
+    </p>
 
-<% /* Open Job Postings Section - Hidden for now
-if (jobs && jobs.length > 0) { %>
-<section class="alt">
-    <div class="w">
-        <h2 style="text-align:center">Open Job Postings</h2>
-        <p class="sub" style="text-align:center">Available jobs from clients</p>
-        <div class="grid">
-            <% jobs.forEach(job => { %>
-            <div class="c">
-                <div class="ic">📋</div>
-                <b><%= job.title %></b>
-                <p class="sub" style="margin:4px 0 0">
-                    <%= job.description ? (job.description.length > 120 ? job.description.substring(0, 120) + '...' : job.description) : 'Job details available' %>
-                </p>
-                <% if (job.budget) { %>
-                <p style="margin-top:8px;font-weight:700;color:var(--gold)">
-                    Budget: KSh <%= job.budget.toLocaleString() %>
-                </p>
-                <% } %>
-                <% if (job.location) { %>
-                <p class="sub" style="margin:2px 0 0;font-size:12px">📍 <%= job.location %></p>
-                <% } %>
-                <% if (job.category) { %>
-                <p class="sub" style="margin:2px 0 0;font-size:12px">Category: <%= job.category %></p>
-                <% } %>
-                <p class="sub" style="margin:6px 0 0;font-size:12px">Posted <%= new Date(job.created_at).toLocaleDateString() %></p>
-            </div>
-            <% }) %>
-        </div>
+    <div style="background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px">
+        <span style="color:var(--mut)">Amount:</span>
+        <strong style="color:var(--navy)">KSh 1,000.00</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px">
+        <span style="color:var(--mut)">Reference:</span>
+        <code id="payModalRef" style="font-size:12px;background:#e2e8f0;padding:2px 6px;border-radius:4px">TL_...</code>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px">
+        <span style="color:var(--mut)">Status:</span>
+        <span id="payModalStatus" style="color:#d97706;font-weight:700">Awaiting Approval...</span>
+      </div>
     </div>
-</section>
-<% }
-*/ %>
 
-<style>
-    /* Toast notification styles */
-    .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--navy);
-        color: white;
-        padding: 16px 24px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: none;
-        z-index: 10000;
-        max-width: 400px;
-        animation: slideIn 0.3s ease-out;
-    }
-    .toast.success {
-        background: #10b981;
-    }
-    .toast.error {
-        background: #ef4444;
-    }
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-</style>
+    <!-- Live Spinner -->
+    <div id="payModalSpinner" style="margin-bottom:20px">
+      <i class="fas fa-spinner fa-spin" style="font-size:28px;color:var(--navy)"></i>
+      <div style="font-size:13px;color:var(--mut);margin-top:8px">Listening for realtime payment confirmation...</div>
+    </div>
 
-<div id="toast" class="toast"></div>
+    <div style="display:flex;gap:10px">
+      <a id="payModalExternalBtn" href="javascript:void(0)" target="_blank" class="btn navy" style="flex:1;font-size:14px;padding:10px">
+        Open Checkout
+      </a>
+      <button type="button" class="btn o" onclick="closePayModal()" style="font-size:14px;padding:10px">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
 
+<!-- PAYSTACK INLINE POPUP & CLIENT JAVASCRIPT: REALTIME FILTERING, AUTH, AND REALTIME PAYMENTS -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-    /**
-     * Show toast notification
-     */
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = 'toast ' + type;
-        toast.style.display = 'block';
-        
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 5000);
-    }
+// State variables
+let currentTradeFilter = 'all';
+let currentLocationFilter = '';
+let paymentPollInterval = null;
 
-    /**
-     * Submit job post to backend
-     */
-    async function submitJobPost(event) {
-        event.preventDefault();
-        
-        const form = event.target;
-        const submitBtn = document.getElementById('submitBtn');
-        const originalBtnText = submitBtn.innerHTML;
-        
-        // Disable button and show loading
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
-        
-        try {
-            // Collect form data
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-            
-            // Submit to backend
-            const response = await fetch('/jobs/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                showToast(result.message, 'success');
-                form.reset();
-                
-                // Redirect to client dashboard after 2 seconds
-                setTimeout(() => {
-                    window.location.href = '/dashboard/client';
-                }, 2000);
-            } else {
-                // Handle errors
-                if (result.redirect) {
-                    showToast(result.message, 'error');
-                    setTimeout(() => {
-                        window.location.href = result.redirect;
-                    }, 2000);
-                } else {
-                    showToast(result.message, 'error');
-                }
-            }
-        } catch (error) {
-            console.error('Error submitting job:', error);
-            showToast('Network error. Please check your connection and try again.', 'error');
-        } finally {
-            // Re-enable button
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-        }
-        
-        return false;
+// Tab switcher
+window.showAuthTab = function(tabName) {
+  const tabs = ['signin', 'signup', 'postjob'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('tab-btn-' + t);
+    const panel = document.getElementById('auth-panel-' + t);
+    if (btn && panel) {
+      if (t === tabName) {
+        btn.classList.add('active');
+        panel.style.display = 'block';
+      } else {
+        btn.classList.remove('active');
+        panel.style.display = 'none';
+      }
     }
+  });
+};
+
+// Password toggle helper (Zero emojis)
+window.togglePasswordVisibility = function(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+  } else {
+    input.type = 'password';
+    btn.innerHTML = '<i class="fas fa-eye"></i>';
+  }
+};
+
+// Quick Fill Demo User
+window.fillDemoUser = function(phone, pass) {
+  const phoneEl = document.getElementById('signin-phone');
+  const passEl = document.getElementById('signin-pass');
+  if (phoneEl) phoneEl.value = phone;
+  if (passEl) passEl.value = pass;
+  showToast('signin-toast', 'Demo credentials loaded! Click Sign In.', 'success');
+};
+
+// Toast helper
+function showToast(elId, msg, type = 'success') {
+  const t = document.getElementById(elId);
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.style.display = 'block';
+  setTimeout(() => {
+    t.style.display = 'none';
+  }, 5000);
+}
+
+// 1. REALTIME FILTERING: TRADE & LOCATION
+function filterByTrade(trade) {
+  currentTradeFilter = trade;
+  
+  // Update chip active classes
+  const chips = document.querySelectorAll('#chips .chip');
+  chips.forEach(c => {
+    const text = c.textContent.toLowerCase();
+    if (trade === 'all' && text.includes('all')) {
+      c.classList.add('on');
+    } else if (trade !== 'all' && text.includes(trade.toLowerCase())) {
+      c.classList.add('on');
+    } else {
+      c.classList.remove('on');
+    }
+  });
+
+  applyFilters();
+}
+
+function filterByLocation(loc) {
+  const input = document.getElementById('locSearchInput');
+  if (loc === 'All Locations') {
+    currentLocationFilter = '';
+    if (input) input.value = '';
+  } else {
+    currentLocationFilter = loc;
+    if (input) input.value = loc;
+  }
+
+  // Update pill active state
+  const pills = document.querySelectorAll('.loc-pill');
+  pills.forEach(p => {
+    if ((loc === 'All Locations' && p.textContent.includes('All')) || p.textContent.includes(loc)) {
+      p.classList.add('active');
+    } else {
+      p.classList.remove('active');
+    }
+  });
+
+  applyFilters();
+}
+
+function onRealtimeLocationInput(val) {
+  currentLocationFilter = val.trim();
+  
+  // Clear active state of quick pills if typing custom location
+  const pills = document.querySelectorAll('.loc-pill');
+  pills.forEach(p => p.classList.remove('active'));
+
+  applyFilters();
+}
+
+function resetFilters() {
+  currentTradeFilter = 'all';
+  currentLocationFilter = '';
+  const input = document.getElementById('locSearchInput');
+  if (input) input.value = '';
+  filterByTrade('all');
+  filterByLocation('All Locations');
+}
+
+// Client-side instant filter on existing cards + API sync
+function applyFilters() {
+  const cards = document.querySelectorAll('#list .job-card-col');
+  let visibleCount = 0;
+
+  const tTerm = currentTradeFilter.toLowerCase();
+  const lTerm = currentLocationFilter.toLowerCase();
+
+  cards.forEach(card => {
+    const cardTrade = (card.getAttribute('data-trade') || '').toLowerCase();
+    const cardLoc = (card.getAttribute('data-location') || '').toLowerCase();
+    const cardTitle = (card.getAttribute('data-title') || '').toLowerCase();
+
+    const tradeMatch = (currentTradeFilter === 'all') || cardTrade.includes(tTerm) || cardTitle.includes(tTerm);
+    const locMatch = (!currentLocationFilter) || cardLoc.includes(lTerm) || cardTitle.includes(lTerm);
+
+    if (tradeMatch && locMatch) {
+      card.style.display = 'flex';
+      visibleCount++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  // Update status count
+  const countBadge = document.getElementById('jobCountBadge');
+  const countLabel = document.getElementById('jobCountLabel');
+  if (countBadge) countBadge.textContent = visibleCount;
+  if (countLabel) {
+    if (currentLocationFilter) {
+      countLabel.textContent = `Verified opportunities in "${currentLocationFilter}"`;
+    } else if (currentTradeFilter !== 'all') {
+      countLabel.textContent = `Verified opportunities for "${currentTradeFilter}"`;
+    } else {
+      countLabel.textContent = `Verified opportunities available`;
+    }
+  }
+}
+
+// 2. QUICK WORKER SIGN IN VIA API
+async function handleWorkerSignIn(e) {
+  e.preventDefault();
+  const phone = document.getElementById('signin-phone').value;
+  const pass = document.getElementById('signin-pass').value;
+  const btn = document.getElementById('btn-signin');
+  const original = btn.innerHTML;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+  try {
+    const res = await fetch('/api/jobs/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneOrEmail: phone, password: pass })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('signin-toast', data.message || 'Signed in successfully!', 'success');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } else {
+      showToast('signin-toast', data.message || 'Invalid credentials.', 'error');
+    }
+  } catch (err) {
+    showToast('signin-toast', 'Connection error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+// 3. WORKER ACTIVATION: REALTIME PAYMENT
+async function handleWorkerActivationPayment(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('btn-worker-pay');
+  const original = btn.innerHTML;
+
+  const payload = {
+    name: document.getElementById('reg-name').value,
+    phone: document.getElementById('reg-phone').value,
+    email: document.getElementById('reg-email').value,
+    password: document.getElementById('reg-pass').value,
+    trade: document.getElementById('reg-trade').value,
+    preferred_country: document.getElementById('reg-country').value
+  };
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing M-Pesa Payment...';
+
+  try {
+    const res = await fetch('/api/jobs/payment/initialize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      openPayModal(data.reference, data.authorization_url, data.isSimulated);
+      
+      const paystackKey = '<%= paystackPublicKey %>';
+      if (window.PaystackPop && paystackKey && paystackKey.length > 10 && !data.isSimulated) {
+        try {
+          const handler = PaystackPop.setup({
+            key: paystackKey,
+            email: payload.email || `worker_${payload.phone.replace(/\D/g, '')}@toplinehub.co.ke`,
+            amount: 1000 * 100,
+            currency: 'KES',
+            ref: data.reference,
+            metadata: {
+              custom_fields: [
+                { display_name: "Mobile Number", variable_name: "mobile_number", value: payload.phone },
+                { display_name: "Worker Name", variable_name: "worker_name", value: payload.name },
+                { display_name: "Trade", variable_name: "trade", value: payload.trade }
+              ]
+            },
+            callback: function(response) {
+              checkRealtimePaymentStatus(data.reference);
+            },
+            onClose: function() {
+              // Modal remains open listening for M-Pesa STK push
+            }
+          });
+          handler.openIframe();
+        } catch (popupErr) {
+          console.warn('Paystack popup fallback to redirect:', popupErr);
+          if (data.authorization_url) window.open(data.authorization_url, '_blank');
+        }
+      } else if (data.authorization_url && !data.isSimulated) {
+        window.open(data.authorization_url, '_blank');
+      }
+    } else {
+      showToast('signup-toast', data.message || 'Payment initialization failed.', 'error');
+    }
+  } catch (err) {
+    showToast('signup-toast', 'Network error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+function openPayModal(ref, authUrl, isSimulated) {
+  const modal = document.getElementById('payModal');
+  const refEl = document.getElementById('payModalRef');
+  const extBtn = document.getElementById('payModalExternalBtn');
+  const subtext = document.getElementById('payModalSubtext');
+
+  if (refEl) refEl.textContent = ref;
+  if (extBtn) extBtn.href = authUrl || 'javascript:void(0)';
+  if (modal) modal.style.display = 'flex';
+
+  if (isSimulated && subtext) {
+    subtext.innerHTML = '<em>Simulation Mode:</em> Verifying demo payment automatically in a few seconds...';
+  } else if (subtext) {
+    subtext.innerHTML = 'Secure Paystack checkout initiated. Complete payment via <strong>M-Pesa</strong> or Card to activate immediately.';
+  }
+
+  // Start polling backend verification every 2 seconds
+  if (paymentPollInterval) clearInterval(paymentPollInterval);
+  paymentPollInterval = setInterval(() => {
+    checkRealtimePaymentStatus(ref);
+  }, 2000);
+}
+
+function closePayModal() {
+  const modal = document.getElementById('payModal');
+  if (modal) modal.style.display = 'none';
+  if (paymentPollInterval) {
+    clearInterval(paymentPollInterval);
+    paymentPollInterval = null;
+  }
+}
+
+async function checkRealtimePaymentStatus(ref) {
+  try {
+    const res = await fetch(`/api/jobs/payment/verify?reference=${encodeURIComponent(ref)}`);
+    const data = await res.json();
+
+    if (data.success && data.completed) {
+      if (paymentPollInterval) clearInterval(paymentPollInterval);
+      
+      const statusEl = document.getElementById('payModalStatus');
+      const spinnerEl = document.getElementById('payModalSpinner');
+      if (statusEl) {
+        statusEl.textContent = 'Payment Confirmed!';
+        statusEl.style.color = '#10b981';
+      }
+      if (spinnerEl) {
+        spinnerEl.innerHTML = '<div style="color:#10b981;font-weight:800;font-size:16px"><i class="fas fa-check-circle" style="font-size:36px"></i><br>Profile Activated! Unlocking Jobs...</div>';
+      }
+
+      setTimeout(() => {
+        closePayModal();
+        window.location.reload();
+      }, 1500);
+    }
+  } catch (e) {
+    console.warn('Polling check error:', e);
+  }
+}
+
+function promptWorkerUnlock(jobTitle) {
+  showAuthTab('signup');
+  const joinSec = document.getElementById('join');
+  if (joinSec) joinSec.scrollIntoView({ behavior: 'smooth' });
+  showToast('signup-toast', `Activate your profile (KSh 1,000) to apply for "${jobTitle}"`, 'success');
+}
+
+// 4. POST A JOB SUBMISSION
+async function handleClientJobPost(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('btn-post-job');
+  const original = btn.innerHTML;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing to Platform...';
+
+  const formData = new FormData(form);
+  const payload = {};
+  formData.forEach((val, key) => { payload[key] = val; });
+
+  try {
+    const res = await fetch('/jobs/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      showToast('postjob-toast', data.message || 'Job posted successfully!', 'success');
+      form.reset();
+
+      // Prepend new job to 4-column grid in realtime
+      if (data.job) {
+        prependJobToList(data.job);
+        document.getElementById('jobs').scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      showToast('postjob-toast', data.message || 'Failed to post job.', 'error');
+    }
+  } catch (err) {
+    showToast('postjob-toast', 'Connection error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+function prependJobToList(j) {
+  const list = document.getElementById('list');
+  if (!list) return;
+
+  const card = document.createElement('div');
+  card.className = 'job-card-col';
+  card.setAttribute('data-trade', j.trade_required || '');
+  card.setAttribute('data-location', `${j.location_town}, ${j.location_county}`);
+  card.setAttribute('data-title', j.title || '');
+  card.style.border = '2px solid var(--gold)';
+
+  card.innerHTML = `
+    <div>
+      <div class="job-card-top">
+        <span class="trade-tag"><i class="fas fa-tag"></i> ${escapeHtml(j.trade_required)}</span>
+        <span class="ok-badge"><i class="fas fa-check-circle"></i> Verified</span>
+      </div>
+      <h3 class="job-card-title">${escapeHtml(j.title)}</h3>
+      <p class="job-card-desc">${escapeHtml(j.description)}</p>
+      <div class="job-meta-stack">
+        <div class="job-meta-row">
+          <span><i class="fas fa-map-marker-alt" style="color:var(--navy);margin-right:4px"></i> ${escapeHtml(j.location_town)}, ${escapeHtml(j.location_county)}</span>
+        </div>
+        <div class="job-meta-row">
+          <span class="salary-tag">KSh ${Number(j.budget_estimate || 0).toLocaleString()}</span>
+          <span><i class="far fa-clock"></i> ${escapeHtml(j.duration || '2 weeks')}</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <a class="btn s navy" href="/jobs/${j.id}" style="width:100%">
+        <i class="fas fa-check-circle"></i> View / Apply
+      </a>
+    </div>
+  `;
+
+  list.insertBefore(card, list.firstChild);
+  applyFilters();
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Check URL query parameters for payment return
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('reference');
+  if (ref && urlParams.get('payment_status') === 'check') {
+    openPayModal(ref, null, false);
+  }
+});
 </script>
 
 <%- include('partials/footer') %>

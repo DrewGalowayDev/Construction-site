@@ -278,10 +278,14 @@
 </div>
 
 <!-- Mobile Menu Toggle -->
-<button class="mobile-menu-toggle" onclick="document.querySelector('.dashboard-sidebar').classList.toggle('open')">
+<button class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
 </button>
 
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay"></div>
+
+<script src="/js/dashboard-mobile.js"></script>
 <script>
     // Toggle availability
     async function toggleAvailability() {
@@ -306,19 +310,6 @@
             alert('Network error. Please try again.');
         }
     }
-
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const sidebar = document.querySelector('.dashboard-sidebar');
-        const toggle = document.querySelector('.mobile-menu-toggle');
-        
-        if (window.innerWidth <= 768 && 
-            !sidebar.contains(event.target) && 
-            !toggle.contains(event.target) && 
-            sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-        }
-    });
 </script>
 
 </body>

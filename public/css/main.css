@@ -389,7 +389,365 @@ footer .w {
     gap: 10px;
 }
 
-/* Responsive Design */
+/* Responsive Design - Enhanced for Mobile */
+@media (max-width: 1024px) {
+    .w {
+        max-width: 100%;
+        padding: 0 24px;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Container - Reduced padding */
+    .w {
+        padding: 0 16px;
+    }
+    
+    /* Navigation - Mobile friendly */
+    nav .w {
+        height: 64px;
+    }
+    
+    nav img {
+        height: 45px;
+    }
+    
+    nav .l {
+        gap: 12px;
+        font-size: 13px;
+    }
+    
+    nav .l a.h {
+        display: none;
+    }
+    
+    /* Hero section - Compact */
+    .hero {
+        min-height: auto;
+        padding: 40px 0;
+    }
+    
+    .hero h1 {
+        font-size: clamp(28px, 8vw, 48px);
+        margin: 12px auto 16px;
+    }
+    
+    .hero p {
+        font-size: clamp(15px, 3vw, 18px);
+        margin: 0 auto 24px;
+    }
+    
+    .hero .tag {
+        font-size: clamp(12px, 2vw, 14px);
+    }
+    
+    .hero.s {
+        padding: 32px 0;
+    }
+    
+    .hero-btns {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+    
+    .hero .btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+        padding: 14px 24px;
+    }
+    
+    /* Sections - Reduced padding */
+    section {
+        padding: 40px 0;
+    }
+    
+    h2 {
+        font-size: clamp(20px, 5vw, 28px);
+    }
+    
+    /* Grid - Single column on mobile */
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    /* Cards - Edge to edge feel */
+    .c {
+        padding: 20px 16px;
+        border-radius: 10px;
+    }
+    
+    /* Icons - Slightly smaller */
+    .ic {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    
+    /* Forms - Full width */
+    .fm {
+        padding: 20px 16px;
+        border-radius: 12px;
+    }
+    
+    .fm .two {
+        grid-template-columns: 1fr;
+    }
+    
+    .fm input,
+    .fm select,
+    .fm textarea {
+        padding: 10px 12px;
+        font-size: 15px;
+    }
+    
+    .fm label {
+        font-size: 13px;
+        margin: 10px 0 4px;
+    }
+    
+    /* Buttons - Full width on forms */
+    .fm .btn {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+    
+    .btn {
+        padding: 11px 18px;
+        font-size: 14px;
+        border-radius: 8px;
+    }
+    
+    /* Training section */
+    .train {
+        padding: 32px 20px;
+        border-radius: 16px;
+    }
+    
+    .train h2 {
+        font-size: clamp(20px, 5vw, 28px);
+    }
+    
+    .train .price {
+        font-size: 36px;
+    }
+    
+    .train .btn {
+        width: 100%;
+        padding: 14px 24px;
+    }
+    
+    /* Footer */
+    footer {
+        padding: 24px 0;
+        font-size: 13px;
+    }
+    
+    footer .w {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    /* Toast - Mobile friendly */
+    .toast {
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+        max-width: calc(100% - 32px);
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens - Minimal padding */
+    .w {
+        padding: 0 12px;
+    }
+    
+    /* Navigation - Compact */
+    nav .w {
+        height: 56px;
+        padding: 0 12px;
+    }
+    
+    nav img {
+        height: 38px;
+    }
+    
+    nav .l {
+        gap: 8px;
+        font-size: 12px;
+    }
+    
+    nav .l .btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+    
+    /* Hero - Very compact */
+    .hero {
+        padding: 32px 0;
+    }
+    
+    .hero h1 {
+        font-size: clamp(24px, 10vw, 36px);
+        margin: 8px auto 12px;
+    }
+    
+    .hero p {
+        font-size: clamp(14px, 4vw, 16px);
+        margin: 0 auto 20px;
+    }
+    
+    .hero .tag {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+    }
+    
+    .hero .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    /* Sections - Minimal padding */
+    section {
+        padding: 32px 0;
+    }
+    
+    h2 {
+        font-size: clamp(18px, 6vw, 24px);
+        margin-bottom: 4px;
+    }
+    
+    .sub {
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+    
+    /* Cards - Compact */
+    .c {
+        padding: 16px 12px;
+        border-radius: 8px;
+    }
+    
+    .ic {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    /* Forms - Compact */
+    .fm {
+        padding: 16px 12px;
+    }
+    
+    .fm input,
+    .fm select,
+    .fm textarea {
+        padding: 9px 10px;
+        font-size: 14px;
+    }
+    
+    .fm label {
+        font-size: 12px;
+        margin: 8px 0 3px;
+    }
+    
+    .fm .btn {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+    
+    /* Buttons - Compact */
+    .btn {
+        padding: 9px 16px;
+        font-size: 13px;
+        border-radius: 7px;
+    }
+    
+    /* Training section - Compact */
+    .train {
+        padding: 24px 16px;
+        border-radius: 12px;
+    }
+    
+    .train h2 {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+    
+    .train p {
+        font-size: 14px;
+    }
+    
+    .train .price {
+        font-size: 32px;
+        margin: 10px 0 12px;
+    }
+    
+    .train .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    .train li {
+        font-size: 13px;
+        margin: 5px 0 5px 14px;
+    }
+    
+    /* Footer - Compact */
+    footer {
+        padding: 20px 0;
+        font-size: 12px;
+    }
+    
+    /* Toast - Compact */
+    .toast {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        max-width: calc(100% - 24px);
+        padding: 10px 14px;
+        font-size: 13px;
+        border-radius: 8px;
+    }
+}
+
+/* Landscape mode on small screens */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        min-height: auto;
+        padding: 24px 0;
+    }
+    
+    .hero h1 {
+        font-size: clamp(24px, 5vw, 36px);
+        margin: 8px auto 12px;
+    }
+    
+    .hero p {
+        font-size: 14px;
+        margin: 0 auto 16px;
+    }
+    
+    .hero-btns {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .hero .btn {
+        width: auto;
+        min-width: 140px;
+    }
+}
+
+/* Old mobile code kept for backwards compatibility */
 @media (max-width: 700px) {
     nav .l a.h {
         display: none;
