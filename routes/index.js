@@ -23,8 +23,11 @@ const bcrypt = require('bcryptjs');
  * Home page route - with featured products and jobs
  */
 router.get('/', async (req, res) => {
+    const t0 = Date.now();
+    console.log('[ROUTE] GET / started');
     try {
         // Get featured products (latest 6)
+        console.log('[ROUTE] GET / querying products...');
         const featuredProducts = await Product.findAll({
             limit: 6,
             order: [['created_at', 'DESC']],
@@ -33,8 +36,10 @@ router.get('/', async (req, res) => {
                 { model: Category, as: 'category', attributes: ['id', 'name'] }
             ]
         });
+        console.log(`[ROUTE] GET / products done (${Date.now() - t0}ms, ${featuredProducts.length} results)`);
 
         // Get recent job posts (latest 6)
+        console.log('[ROUTE] GET / querying jobs...');
         const recentJobs = await JobPost.findAll({
             where: { status: 'open' },
             limit: 6,
@@ -43,15 +48,18 @@ router.get('/', async (req, res) => {
                 { model: User, as: 'client', attributes: ['id', 'name'] }
             ]
         });
+        console.log(`[ROUTE] GET / jobs done (${Date.now() - t0}ms, ${recentJobs.length} results)`);
 
+        console.log(`[ROUTE] GET / rendering template (${Date.now() - t0}ms)`);
         res.render('index', {
             title: 'Home',
             page: 'home',
             featuredProducts: featuredProducts || [],
             recentJobs: recentJobs || []
         });
+        console.log(`[ROUTE] GET / COMPLETE (${Date.now() - t0}ms)`);
     } catch (error) {
-        console.error('Error loading home page:', error);
+        console.error(`[ROUTE] GET / ERROR after ${Date.now() - t0}ms:`, error.message);
         res.render('index', {
             title: 'Home',
             page: 'home',
@@ -65,6 +73,8 @@ router.get('/', async (req, res) => {
  * Providers page route - with artisan listings
  */
 router.get('/providers', async (req, res) => {
+    const t0 = Date.now();
+    console.log('[ROUTE] GET /providers started');
     try {
         // Get all providers/artisans (filter by is_available instead of verification_status)
         const providers = await ArtisanProfile.findAll({
@@ -75,14 +85,16 @@ router.get('/providers', async (req, res) => {
                 { model: User, as: 'user', attributes: ['id', 'name', 'email'] }
             ]
         });
+        console.log(`[ROUTE] GET /providers query done (${Date.now() - t0}ms, ${providers.length} results)`);
 
         res.render('providers', {
             title: 'Providers',
             page: 'providers',
             providers: providers || []
         });
+        console.log(`[ROUTE] GET /providers COMPLETE (${Date.now() - t0}ms)`);
     } catch (error) {
-        console.error('Error loading providers:', error);
+        console.error(`[ROUTE] GET /providers ERROR after ${Date.now() - t0}ms:`, error.message);
         res.render('providers', {
             title: 'Providers',
             page: 'providers',
@@ -95,8 +107,11 @@ router.get('/providers', async (req, res) => {
  * Jobs page route - with job listings & verified portal
  */
 router.get('/jobs', async (req, res) => {
+    const t0 = Date.now();
+    console.log('[ROUTE] GET /jobs started');
     try {
         // Get all open jobs from backend
+        console.log('[ROUTE] GET /jobs querying job_posts...');
         const jobs = await JobPost.findAll({
             where: { status: 'open' },
             order: [['created_at', 'DESC']],
@@ -104,10 +119,12 @@ router.get('/jobs', async (req, res) => {
                 { model: User, as: 'client', attributes: ['id', 'name'] }
             ]
         });
+        console.log(`[ROUTE] GET /jobs job_posts done (${Date.now() - t0}ms, ${jobs.length} results)`);
 
         let hasPaid = false;
         let userPayment = null;
         if (req.session.user) {
+            console.log(`[ROUTE] GET /jobs checking payment for user ${req.session.user.id}...`);
             userPayment = await Transaction.findOne({
                 where: {
                     user_id: req.session.user.id,
@@ -115,11 +132,13 @@ router.get('/jobs', async (req, res) => {
                     status: 'completed'
                 }
             });
+            console.log(`[ROUTE] GET /jobs payment check done (${Date.now() - t0}ms)`);
             if (userPayment || req.session.user.role === 'admin' || req.session.user.is_verified) {
                 hasPaid = true;
             }
         }
 
+        console.log(`[ROUTE] GET /jobs rendering template (${Date.now() - t0}ms)`);
         res.render('jobs', {
             title: 'TopLine – Verified Gulf Construction Jobs',
             page: 'jobs',
@@ -129,8 +148,9 @@ router.get('/jobs', async (req, res) => {
             user: req.session.user || null,
             paystackPublicKey: paystackHelper.getPublicKey()
         });
+        console.log(`[ROUTE] GET /jobs COMPLETE (${Date.now() - t0}ms)`);
     } catch (error) {
-        console.error('Error loading jobs:', error);
+        console.error(`[ROUTE] GET /jobs ERROR after ${Date.now() - t0}ms:`, error.message);
         res.render('jobs', {
             title: 'TopLine – Verified Gulf Construction Jobs',
             page: 'jobs',

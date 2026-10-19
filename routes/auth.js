@@ -11,6 +11,7 @@ const { Op } = require('sequelize');
  * GET Login Page
  */
 router.get('/login', (req, res) => {
+    console.log(`[AUTH] GET /login (redirect=${req.query.redirect || 'none'})`);
     res.render('auth/login', {
         title: 'Sign In',
         page: 'login',
@@ -22,9 +23,12 @@ router.get('/login', (req, res) => {
  * POST Login
  */
 router.post('/login', async (req, res) => {
+    const t0 = Date.now();
+    console.log('[AUTH] POST /login started');
     try {
         const { email, password, redirect } = req.body;
         const input = (email || '').trim();
+        console.log(`[AUTH] POST /login input: "${input}" (redirect=${redirect || 'none'})`);
         
         // Support email, username, and phone number login
         const cleanPhone = input.replace(/\D/g, '').slice(-9);
@@ -43,8 +47,10 @@ router.post('/login', async (req, res) => {
         }
 
         const user = await User.findOne({ where: { [Op.or]: orConditions } });
+        console.log(`[AUTH] POST /login user lookup done (${Date.now() - t0}ms, found=${!!user})`);
 
         if (!user || !(await user.validPassword(password))) {
+            console.log(`[AUTH] POST /login invalid credentials (${Date.now() - t0}ms)`);
             return res.render('auth/login', {
                 title: 'Sign In',
                 page: 'login',
@@ -67,10 +73,12 @@ router.post('/login', async (req, res) => {
 
         // If redirect URL specified, follow it
         if (redirect && redirect.startsWith('/')) {
+            console.log(`[AUTH] POST /login SUCCESS -> redirect to ${redirect} (${Date.now() - t0}ms)`);
             return res.redirect(redirect);
         }
 
         // Otherwise redirect based on role
+        console.log(`[AUTH] POST /login SUCCESS -> role redirect for ${user.role} (${Date.now() - t0}ms)`);
         if (user.role === 'admin') {
             res.redirect('/dashboard/admin');
         } else if (user.role === 'artisan') {
@@ -81,7 +89,7 @@ router.post('/login', async (req, res) => {
             res.redirect('/dashboard/client');
         }
     } catch (err) {
-        console.error('Login error:', err);
+        console.error(`[AUTH] POST /login ERROR after ${Date.now() - t0}ms:`, err.message);
         res.render('auth/login', {
             title: 'Sign In',
             page: 'login',
