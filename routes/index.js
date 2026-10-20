@@ -316,7 +316,7 @@ router.post('/api/jobs/auth/signin', async (req, res) => {
 });
 
 /**
- * POST API: Initialize Worker Platform Activation Payment (KSh 1,000)
+ * POST API: Initialize Worker Platform Activation Payment (KSh 519.34)
  */
 router.post('/api/jobs/payment/initialize', async (req, res) => {
     try {
@@ -383,7 +383,7 @@ router.post('/api/jobs/payment/initialize', async (req, res) => {
             is_verified: userObj.is_verified
         };
 
-        const ACTIVATION_FEE = 1000.00;
+        const ACTIVATION_FEE = 519.34;
         const reference = `TL_JOB_ACT_${userId}_${Date.now()}`;
         const host = req.get('host');
         const protocol = req.protocol;
@@ -414,7 +414,7 @@ router.post('/api/jobs/payment/initialize', async (req, res) => {
             status: 'pending',
             payment_method: 'paystack',
             mpesa_receipt: reference,
-            description: `Worker Platform Activation (KSh 1,000) - ${trimmedName} | Trade: ${trade} | Phone: ${trimmedPhone}`
+            description: `Worker Platform Activation (KSh 519.34) - ${trimmedName} | Trade: ${trade} | Phone: ${trimmedPhone}`
         });
 
         res.json({

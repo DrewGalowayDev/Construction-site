@@ -648,7 +648,7 @@
         <div class="card">
           <div class="n">2</div>
           <h3>Pay a small fee</h3>
-          <p>A one-time KSh 1,000 unlocks your full dashboard and direct applications. Employers and agencies never charge you through us.</p>
+          <p>A one-time KSh 519.34 unlocks your full dashboard and direct applications. Employers and agencies never charge you through us.</p>
         </div>
         <div class="card">
           <div class="n">3</div>
@@ -803,7 +803,7 @@
         <!-- Tab Header Switcher -->
         <div class="tab-switcher">
           <button type="button" id="tab-btn-signup" class="tab-btn active" onclick="showAuthTab('signup')">
-            <i class="fas fa-user-check"></i> Worker Activation (KSh 1,000)
+            <i class="fas fa-user-check"></i> Worker Activation (KSh 519.34)
           </button>
           <button type="button" id="tab-btn-postjob" class="tab-btn" onclick="showAuthTab('postjob')">
             <i class="fas fa-file-signature"></i> Post a Job (Free)
@@ -817,7 +817,7 @@
         <div id="auth-panel-signup" class="tab-panel" style="display:none">
           <div style="text-align:center;margin-bottom:16px">
             <h2 style="margin:0 0 4px;font-size:24px">Worker Profile &amp; Verification</h2>
-            <div style="font-size:36px;font-weight:900;color:var(--navy);margin:4px 0">KSh 1,000</div>
+            <div style="font-size:36px;font-weight:900;color:var(--navy);margin:4px 0">KSh 519.34</div>
             <div class="meta">One-time verified platform fee &bull; Instant M-Pesa unlock</div>
           </div>
 
@@ -867,7 +867,7 @@
             </div>
 
             <button class="btn" type="submit" id="btn-worker-pay" style="width:100%;font-size:16px;padding:15px;margin-top:6px">
-              <i class="fas fa-lock"></i> Activate &amp; Pay KSh 1,000 (M-Pesa)
+              <i class="fas fa-lock"></i> Activate &amp; Pay KSh 519.34 (M-Pesa)
             </button>
             <div class="toast" id="signup-toast"></div>
           </form>
@@ -962,8 +962,8 @@
       <p class="sub" style="text-align:center">Clear answers regarding verified construction placements, payments, and platform policies.</p>
       
       <details>
-        <summary>What does the KSh 1,000 one-time fee cover?</summary>
-        <p>The KSh 1,000 fee activates your verified worker profile on TopLine. It grants you unlimited direct job applications, direct access to employer contacts, verification credential badges, and priority matching with verified contractors in Saudi Arabia and Qatar.</p>
+        <summary>What does the KSh 519.34 one-time fee cover?</summary>
+        <p>The KSh 519.34 fee activates your verified worker profile on TopLine. It grants you unlimited direct job applications, direct access to employer contacts, verification credential badges, and priority matching with verified contractors in Saudi Arabia and Qatar.</p>
       </details>
       <details>
         <summary>Do you guarantee a Gulf construction job?</summary>
@@ -1265,7 +1265,7 @@ async function handleWorkerActivationPayment(e) {
           const handler = PaystackPop.setup({
             key: paystackKey,
             email: payload.email || `worker_${payload.phone.replace(/\D/g, '')}@toplinehub.co.ke`,
-            amount: 1000 * 100,
+            amount: 51934,
             currency: 'KES',
             ref: data.reference,
             metadata: {
