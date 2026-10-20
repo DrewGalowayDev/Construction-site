@@ -562,6 +562,7 @@
   text-align: center;
   box-shadow: 0 20px 45px rgba(0,0,0,0.25);
   animation: modalScale 0.25s ease-out;
+  position: relative;
 }
 @keyframes modalScale {
   from { transform: scale(0.92); opacity: 0; }
@@ -988,6 +989,11 @@
 <!-- REALTIME M-PESA / PAYSTACK PAYMENT MODAL (NO EMOJIS) -->
 <div class="pay-modal-overlay" id="payModal">
   <div class="pay-modal">
+    <!-- Close button -->
+    <button type="button" onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--mut);font-size:24px;cursor:pointer;padding:0;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;transition:all 0.2s" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+      <i class="fas fa-times"></i>
+    </button>
+    
     <div style="width:52px;height:52px;border-radius:50%;background:#e6f7ec;display:grid;place-items:center;margin:0 auto 16px;color:#14703a;font-size:22px">
       <i class="fas fa-credit-card"></i>
     </div>
