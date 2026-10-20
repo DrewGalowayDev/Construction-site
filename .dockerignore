@@ -1,0 +1,52 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# IDE
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Old files
+old/
+
+# Temporary files
+tmp/
+temp/
+
+# Test files
+test/
+*.test.js
+
+# Build files
+dist/
+build/
+
+# Database backups
+*.sql
+backup-db.bat
+
+# Development tools
+nodemon.json

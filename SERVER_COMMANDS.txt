@@ -1,0 +1,57 @@
+# ========================================
+# Server Commands for Database Import
+# Copy and paste these on your Contabo server
+# ========================================
+
+# STEP 1: Get MySQL Root Password from Coolify
+# Go to Coolify UI > Databases > Your MySQL Database > Configuration
+# Copy the root password
+
+# STEP 2: Create the 'topline' database
+docker exec -it zzmh8mpx0ldojmzuefvj2ips mysql -uroot -p -e "CREATE DATABASE IF NOT EXISTS topline CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# STEP 3: Verify database was created
+docker exec -it zzmh8mpx0ldojmzuefvj2ips mysql -uroot -p -e "SHOW DATABASES;"
+
+# STEP 4: Import the SQL file (make sure topline_export.sql is uploaded to /root/)
+docker exec -i zzmh8mpx0ldojmzuefvj2ips mysql -uroot -p topline < /root/topline_export.sql
+
+# STEP 5: Verify import was successful
+docker exec -it zzmh8mpx0ldojmzuefvj2ips mysql -uroot -p -e "USE topline; SHOW TABLES;"
+
+# STEP 6: Check data
+docker exec -it zzmh8mpx0ldojmzuefvj2ips mysql -uroot -p -e "USE topline; SELECT COUNT(*) FROM users; SELECT COUNT(*) FROM job_posts;"
+
+# STEP 7: Grant privileges (if needed)
+docker exec -it zzmh8mpx0ldojmzuefvj2ips mysql -uroot -p -e "GRANT ALL PRIVILEGES ON topline.* TO 'root'@'%'; FLUSH PRIVILEGES;"
+
+# ========================================
+# Alternative: If you need to copy file into container first
+# ========================================
+
+# Copy SQL file into container
+docker cp /root/topline_export.sql zzmh8mpx0ldojmzuefvj2ips:/tmp/topline_export.sql
+
+# Import from inside container
+docker exec -i zzmh8mpx0ldojmzuefvj2ips mysql -uroot -p topline < /tmp/topline_export.sql
+
+# ========================================
+# Cleanup after import
+# ========================================
+
+# Remove SQL file from server
+rm /root/topline_export.sql
+
+# Remove SQL file from container
+docker exec -it zzmh8mpx0ldojmzuefvj2ips rm /tmp/topline_export.sql
+
+# ========================================
+# Update Application in Coolify
+# ========================================
+
+# After successful import:
+# 1. Go to Coolify UI
+# 2. Open your application
+# 3. Go to Environment Variables
+# 4. Update DB_NAME=topline
+# 5. Click "Redeploy"

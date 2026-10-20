@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Node.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: topline-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-construction}
+      - DB_USER=${DB_USER:-root}
+      - DB_PASS=${DB_PASS}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - PAYSTACK_PUBLIC_KEY=${PAYSTACK_PUBLIC_KEY}
+      - PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY}
+      - PAYSTACK_CURRENCY=${PAYSTACK_CURRENCY:-KES}
+      - APP_URL=${APP_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - topline-network
+    volumes:
+      - ./uploads:/app/uploads
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: topline-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      - MYSQL_DATABASE=${DB_NAME:-construction}
+      - MYSQL_USER=${DB_USER:-topline}
+      - MYSQL_PASSWORD=${DB_PASS}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - topline-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASS}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  topline-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

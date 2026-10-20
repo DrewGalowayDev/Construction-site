@@ -1,275 +1,350 @@
-# TopLineHub - Kenyan Construction Materials & Artisan Marketplace
+# TopLine Marketplace
 
-![TopLineHub Logo](public/img/favicon.svg)
+A comprehensive construction and service providers marketplace platform for Kenya, connecting clients with verified artisans, suppliers, and service providers.
 
-A comprehensive construction marketplace platform connecting buyers, suppliers, artisans, and project clients in the Kenyan construction industry.
+## 🌟 Features
 
-## 🚀 Features
+### For Clients
+- **Post Jobs** - Describe your project and get competitive quotes
+- **Browse Providers** - Find verified service providers in your area
+- **Order Materials** - Purchase construction materials online
+- **Secure Payments** - Pay safely via M-PESA integration
+- **Track Applications** - View and manage provider applications
 
-### For Buyers/Clients
-- Browse and request quotes for building materials
-- Post construction jobs and projects
-- Hire verified artisans (fundis) with NCA credentials
-- Construction material cost calculator with BOQ generation
-- Track orders and job applications
+### For Providers/Artisans
+- **Create Profile** - Showcase your skills and experience
+- **Browse Jobs** - Find jobs matching your expertise
+- **Submit Bids** - Send competitive quotes to clients
+- **Build Reputation** - Earn ratings and reviews
+- **Training Portal** - Access professional development resources
 
-### For Suppliers/Sellers
-- List building materials and equipment for sale or rent
-- Manage inventory and pricing
-- Process incoming quote requests
-- Multi-image product galleries
+### For Suppliers
+- **List Products** - Showcase construction materials
+- **Manage Inventory** - Track stock and pricing
+- **Receive Orders** - Get notified of new orders
+- **Delivery Management** - Coordinate deliveries
 
-### For Artisans/Fundis
-- Create professional profiles with NCA registration
-- Browse available construction jobs
-- Submit competitive bids and proposals
-- Showcase trade skills and experience
+### Admin Features
+- **User Management** - Manage all platform users
+- **Provider Verification** - Verify and approve providers
+- **Job Monitoring** - Oversee all job postings
+- **Payment Tracking** - Monitor transactions
+- **Analytics Dashboard** - View platform statistics
 
-### For Administrators
-- User verification and moderation
-- Platform analytics dashboard
-- Listing management
-- Role-based access control
+## 🚀 Quick Start
 
-## 🛠️ Tech Stack
+### Prerequisites
+- Node.js 18+ 
+- MySQL 8.0+
+- npm or yarn
 
-- **Backend**: Node.js, Express.js v5
-- **Frontend**: EJS Templates, Bootstrap 5
-- **Database**: MySQL + Sequelize ORM
-- **Authentication**: bcryptjs + express-session
-- **File Uploads**: Multer
-- **Styling**: Custom Bootstrap theme
+### Local Development
 
-## 📋 Prerequisites
-
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- MySQL >= 5.7 or 8.0
-
-## ⚙️ Installation
-
-### 1. Clone the repository
-
+1. **Clone the repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/toplinehub-construction.git
-cd toplinehub-construction
+git clone https://github.com/yourusername/construction.git
+cd construction
 ```
 
-### 2. Install dependencies
-
+2. **Install dependencies**
 ```bash
 npm install
 ```
 
-### 3. Configure environment variables
-
+3. **Setup environment variables**
 ```bash
 cp .env.example .env
+# Edit .env with your database credentials
 ```
 
-Edit `.env` with your database credentials:
-
-```env
-PORT=3000
-NODE_ENV=development
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=construction
-DB_USER=root
-DB_PASS=your_password_here
-SESSION_SECRET=your_session_secret_here
-```
-
-### 4. Create database
-
-```bash
-mysql -u root -p
-CREATE DATABASE construction;
-EXIT;
-```
-
-### 5. Seed the database
-
-```bash
-npm run reset
-```
-
-This will:
-- Create all tables
-- Populate with demo data
-- Create test accounts
-
-### 6. Start the server
-
-```bash
-npm start
-```
-
-Visit: http://localhost:3000
-
-## 🔐 Test Accounts
-
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | `admin` | `admin2026` |
-| Client | `client` | `client2026` |
-| Supplier | `supplier` | `supplier2026` |
-| Artisan | `artisan` | `artisan2026` |
-
-## 📁 Project Structure
-
-```
-construction/
-├── config/              # Database & seed configuration
-├── controllers/         # Route controllers
-├── middleware/          # Auth & upload middleware
-├── models/             # Sequelize models
-├── public/             # Static assets (CSS, JS, images)
-├── routes/             # Express routes
-├── views/              # EJS templates
-│   ├── layouts/        # Layout templates
-│   ├── pages/          # Page views
-│   └── partials/       # Reusable components
-├── app.js              # Express app entry point
-├── .env.example        # Environment template
-└── package.json        # Dependencies
-```
-
-## 🌍 Deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions on deploying to:
-- Hostinger (Node.js hosting)
-- Heroku
-- DigitalOcean
-- AWS
-
-## 📚 API Routes
-
-### Public Routes
-- `GET /` - Homepage
-- `GET /materials` - Materials catalog
-- `GET /rentals` - Equipment hire
-- `GET /fundis` - Artisan directory
-- `GET /jobs` - Job board
-- `GET /calculator` - Material cost calculator
-
-### Authentication
-- `GET /auth/login` - Login page
-- `POST /auth/login` - Login handler
-- `GET /auth/register` - Registration page
-- `POST /auth/register` - Registration handler
-- `GET /auth/logout` - Logout
-
-### Protected Routes (Require Login)
-- `GET /dashboard` - User dashboard
-- `POST /materials/post` - Post material listing
-- `POST /jobs/post` - Post job
-- `POST /jobs/:id/apply` - Submit bid
-- `POST /orders/request/:id` - Request quote
-
-## 🔧 Development
-
-### Run in development mode
-
+4. **Start the application**
 ```bash
 npm run dev
 ```
 
-Uses nodemon for auto-restart on file changes.
+5. **Access the application**
+- Frontend: http://localhost:3000
+- Admin: http://localhost:3000/dashboard/admin
 
-### Reset database
+## 🐳 Docker Deployment
 
+### Local Docker Setup
+
+#### Windows
 ```bash
-npm run reset
+docker-start.bat
 ```
 
-Drops all tables and re-seeds with fresh data.
-
-## 🎨 Customization
-
-### Update WhatsApp Number
-
-Edit `config/constants.js`:
-
-```javascript
-module.exports = {
-  WHATSAPP_NUMBER: '254711000000', // Update here
-  KENYA_COUNTIES: [...]
-};
+#### Linux/Mac
+```bash
+chmod +x docker-start.sh
+./docker-start.sh
 ```
 
-### Customize Branding
+### Manual Docker Commands
+```bash
+# Build and start
+docker-compose up -d
 
-- Logo: `public/img/favicon.svg`
-- Colors: `public/css/style.css`
-- Footer: `views/partials/footer.ejs`
+# View logs
+docker-compose logs -f
 
-### Add Material Categories
+# Stop containers
+docker-compose down
 
-Edit `config/seed.js` categories array or add via admin dashboard.
+# Restart
+docker-compose restart
+```
 
-## 🔒 Security
+## ☁️ Deploy to Coolify (Contabo)
 
-- Passwords hashed with bcryptjs (10 salt rounds)
+Complete deployment guide: See [DEPLOYMENT_COOLIFY.md](./DEPLOYMENT_COOLIFY.md)
+
+### Quick Deploy Steps:
+1. Push code to Git repository
+2. Create application in Coolify
+3. Set environment variables
+4. Deploy!
+
+### Environment Variables Required:
+```env
+NODE_ENV=production
+PORT=3000
+DB_HOST=your-db-host
+DB_NAME=construction
+DB_USER=your-db-user
+DB_PASS=your-db-password
+SESSION_SECRET=your-secure-secret
+PAYSTACK_PUBLIC_KEY=your-key
+PAYSTACK_SECRET_KEY=your-key
+APP_URL=https://yourdomain.com
+```
+
+## 📱 Mobile Responsive
+
+The application is fully responsive with:
+- ✅ Edge-to-edge cards on mobile
+- ✅ Hamburger menu for dashboards
+- ✅ Touch-friendly buttons (48px minimum)
+- ✅ Optimized layouts for all screen sizes
+- ✅ Tested on iOS and Android
+
+## 🔒 Security Features
+
+- Bcrypt password hashing
 - Session-based authentication
-- SQL injection protection via Sequelize
-- XSS protection via EJS auto-escaping
-- CSRF protection via flash messages
-- Role-based access control
+- SQL injection protection (Sequelize ORM)
+- CSRF protection
+- Environment variable security
+- Secure payment processing (Paystack)
 
-## 📱 Features by Module
+## 🗄️ Database Schema
 
-### Materials Catalog
-- Multi-category filtering
-- County-based search
-- Quote request system
-- WhatsApp instant contact
-- Multi-image galleries
+Main tables:
+- `users` - All platform users
+- `job_posts` - Client job postings
+- `job_applications` - Provider applications
+- `artisan_profiles` - Provider profiles
+- `products` - Material listings
+- `order_requests` - Material orders
+- `transactions` - Payment records
+- `wallets` - User wallets
 
-### Job Board
-- Trade-specific filtering
-- Budget range search
-- Artisan bidding system
-- Proposal management
+## 🛠️ Tech Stack
 
-### Calculator
-- Concrete estimation
-- Walling calculations
-- Roofing material estimates
-- BOQ generation
-- WhatsApp export
+**Backend:**
+- Node.js
+- Express.js
+- MySQL
+- Sequelize ORM
+- Express Session
+
+**Frontend:**
+- EJS Templates
+- Vanilla JavaScript
+- Font Awesome Icons
+- Responsive CSS
+
+**Payment:**
+- Paystack API (M-PESA)
+
+**Deployment:**
+- Docker
+- Docker Compose
+- Coolify
+
+## 📂 Project Structure
+
+```
+construction/
+├── config/           # Database and app configuration
+├── controllers/      # Route controllers
+├── models/          # Database models (Sequelize)
+├── routes/          # Express routes
+├── views/           # EJS templates
+│   ├── dashboard/   # Dashboard pages
+│   ├── partials/    # Reusable components
+│   └── *.ejs        # Public pages
+├── public/          # Static assets
+│   ├── css/         # Stylesheets
+│   ├── js/          # Client-side JavaScript
+│   └── img/         # Images
+├── middleware/      # Express middleware
+├── helpers/         # Utility functions
+├── uploads/         # User uploads
+├── Dockerfile       # Docker configuration
+├── docker-compose.yml
+└── index.js         # Application entry point
+```
+
+## 🧪 Testing
+
+### Test User Accounts
+```
+# Client
+Email: client@test.com
+Password: password123
+
+# Provider
+Email: provider@test.com
+Password: password123
+
+# Admin
+Email: admin@test.com
+Password: admin123
+```
+
+### API Testing
+```bash
+# Health check
+curl http://localhost:3000
+
+# Test database connection
+curl http://localhost:3000/dashboard/client
+```
+
+## 📊 API Endpoints
+
+### Jobs
+- `GET /jobs` - View jobs page
+- `POST /jobs/create` - Create job post
+- `POST /jobs/:id/apply` - Apply to job
+- `GET /jobs/:id` - View job details
+
+### Providers
+- `GET /providers` - Providers page
+- `POST /providers/request` - Request a provider
+- `POST /providers/signup` - Provider signup
+
+### Materials
+- `GET /materials` - Materials page
+- `POST /materials/supplier-signup` - Supplier signup
 
 ### Dashboard
-- Role-specific tabs
-- Full CRUD operations
-- Order management
-- Bid tracking
-- Profile updates
+- `GET /dashboard/client` - Client dashboard
+- `GET /dashboard/provider` - Provider dashboard
+- `GET /dashboard/admin` - Admin dashboard
 
-## 🤝 Contributing
+## 🔧 Configuration
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Commit changes: `git commit -m "Add new feature"`
-4. Push to branch: `git push origin feature/new-feature`
-5. Open a Pull Request
+### Database Configuration
+Edit `config/database.js` for database settings.
+
+### Session Configuration
+Edit `index.js` for session settings.
+
+### Payment Configuration
+Set Paystack keys in `.env` file.
+
+## 🐛 Troubleshooting
+
+### Database Connection Issues
+```bash
+# Check MySQL is running
+mysql -u root -p
+
+# Verify credentials in .env
+DB_HOST=127.0.0.1
+DB_USER=root
+DB_PASS=your_password
+```
+
+### Port Already in Use
+```bash
+# Change port in .env
+PORT=3001
+
+# Or kill process on port 3000
+# Windows
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+
+# Linux/Mac
+lsof -ti:3000 | xargs kill -9
+```
+
+### Docker Issues
+```bash
+# Reset Docker environment
+docker-compose down -v
+docker-compose up --build
+
+# View logs
+docker-compose logs -f app
+```
+
+## 📝 Development
+
+### Adding New Features
+1. Create model in `models/`
+2. Create routes in `routes/`
+3. Create controller in `controllers/`
+4. Create views in `views/`
+5. Update navigation in partials
+
+### Code Style
+- Use ES6+ features
+- Follow existing naming conventions
+- Comment complex logic
+- Keep functions small and focused
+
+## 🚢 Production Deployment
+
+See [DEPLOYMENT_COOLIFY.md](./DEPLOYMENT_COOLIFY.md) for complete guide.
+
+### Pre-deployment Checklist
+- [ ] Environment variables set
+- [ ] Database migrated
+- [ ] SSL certificate configured
+- [ ] Domain DNS configured
+- [ ] Backups enabled
+- [ ] Monitoring configured
 
 ## 📄 License
 
-This project is licensed under the ISC License - see the [LICENSE.txt](LICENSE.txt) file for details.
+ISC
+
+## 👥 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
 
 ## 📞 Support
 
-For support, email support@toplinehub.co.ke or open an issue on GitHub.
+For issues and questions:
+- Create an issue on GitHub
+- Email: support@toplinemarketplace.co.ke
 
 ## 🙏 Acknowledgments
 
-- Bootstrap Team for the UI framework
-- Sequelize Team for the ORM
-- All contributors and testers
+- Font Awesome for icons
+- Paystack for payment processing
+- Coolify for deployment platform
+- Node.js community
 
 ---
 
-**Built with ❤️ for the Kenyan Construction Industry**
-
-🏗️ TopLineHub - Building Kenya Together
+**Built with ❤️ for the Kenyan construction industry**

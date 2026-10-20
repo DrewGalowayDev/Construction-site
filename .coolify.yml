@@ -1,0 +1,40 @@
+# Coolify Configuration File
+# This file configures deployment settings for Coolify
+
+# Application name
+name: topline-marketplace
+
+# Build settings
+build:
+  dockerfile: Dockerfile
+  context: .
+  
+# Health check
+healthcheck:
+  enabled: true
+  path: /
+  interval: 30s
+  timeout: 10s
+  retries: 3
+
+# Environment variables (set these in Coolify UI)
+# - PORT=3000
+# - NODE_ENV=production
+# - DB_HOST=your-db-host
+# - DB_PORT=3306
+# - DB_NAME=construction
+# - DB_USER=your-db-user
+# - DB_PASS=your-db-password
+# - SESSION_SECRET=your-secure-session-secret
+# - PAYSTACK_PUBLIC_KEY=your-paystack-public-key
+# - PAYSTACK_SECRET_KEY=your-paystack-secret-key
+# - PAYSTACK_CURRENCY=KES
+# - APP_URL=https://yourdomain.com
+
+# Persistent volumes
+volumes:
+  - uploads:/app/uploads
+
+# Port mapping
+ports:
+  - 3000:3000
