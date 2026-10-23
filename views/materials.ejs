@@ -582,66 +582,172 @@
 .materials-portal .toast.success { background: #e6f7ec; color: #14703a; border: 1px solid #b7ebc6; }
 .materials-portal .toast.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
-/* Modal Overlays */
+/* Modal Overlays & Dedicated Form Styling */
 .mat-modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(8, 27, 48, 0.78);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   z-index: 10000;
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
 .mat-modal {
-  background: #fff;
-  border-radius: 18px;
-  max-width: 540px;
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 550px;
   width: 100%;
-  padding: 28px;
-  box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+  padding: 24px 26px;
+  box-shadow: 0 25px 60px rgba(8, 36, 73, 0.35);
   animation: matModalScale 0.22s ease-out;
   position: relative;
-  max-height: 90vh;
+  max-height: 94vh;
   overflow-y: auto;
+  border: 1px solid rgba(221, 229, 239, 0.8);
+  box-sizing: border-box;
 }
 @keyframes matModalScale {
   from { transform: scale(0.93); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
 
-/* Quantity Control Widget */
-.qty-control-box {
+/* Explicit Modal Form Controls */
+.mat-modal form {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.mat-modal .two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.mat-modal .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.mat-modal .form-group label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--navy);
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 10px 0 16px;
+  gap: 6px;
+  margin: 0;
 }
-.qty-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  border: 1.5px solid var(--bd);
-  background: #f8fafc;
-  font-size: 18px;
+.mat-modal input,
+.mat-modal select,
+.mat-modal textarea {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 10px 14px !important;
+  border-radius: 9px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #f8fafc !important;
+  color: var(--tx) !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  line-height: 1.4 !important;
+}
+.mat-modal input:focus,
+.mat-modal select:focus,
+.mat-modal textarea:focus {
+  border-color: var(--navy) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(8, 58, 117, 0.12) !important;
+}
+.mat-modal input::placeholder,
+.mat-modal textarea::placeholder {
+  color: #94a3b8 !important;
+  font-size: 13px !important;
+}
+.mat-modal select {
+  cursor: pointer;
+}
+.mat-modal textarea {
+  resize: vertical;
+  min-height: 56px;
+}
+
+/* Quantity Control Widget */
+.mat-modal .qty-control-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 8px;
+}
+.mat-modal .qty-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 15px;
   font-weight: 800;
   cursor: pointer;
+  color: var(--navy);
   display: grid;
   place-items: center;
   transition: all 0.15s;
 }
-.qty-btn:hover {
+.mat-modal .qty-btn:hover {
   background: var(--navy);
-  color: #fff;
+  color: #ffffff;
   border-color: var(--navy);
 }
-.qty-input {
-  width: 80px !important;
-  text-align: center;
+.mat-modal .qty-input {
+  width: 70px !important;
+  text-align: center !important;
+  font-weight: 800 !important;
+  font-size: 17px !important;
+  padding: 6px !important;
+  background: #ffffff !important;
+}
+.mat-modal .checkout-total-box {
+  margin-left: auto;
+  text-align: right;
+}
+.mat-modal .checkout-total-amount {
+  font-size: 20px;
+  font-weight: 900;
+  color: #047857;
+}
+
+/* Modal Submit Button */
+.mat-modal .btn-checkout-submit {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 15.5px;
   font-weight: 800;
-  font-size: 18px;
-  padding: 8px !important;
+  border-radius: 11px;
+  background: var(--gold);
+  color: #1a1200;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(253, 181, 21, 0.35);
+  margin-top: 4px;
+}
+.mat-modal .btn-checkout-submit:hover {
+  background: var(--gold-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(253, 181, 21, 0.45);
 }
 
 /* Responsive Breakpoints */
@@ -1083,23 +1189,21 @@
     </div>
   </section>
 
-</div>
-
 <!-- 8. ORDER & PAYSTACK CHECKOUT MODAL -->
 <div class="mat-modal-overlay" id="orderModal">
   <div class="mat-modal">
     <!-- Close button -->
-    <button type="button" onclick="closeOrderModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--mut);font-size:22px;cursor:pointer;padding:0;width:32px;height:32px;display:grid;place-items:center;border-radius:50%">
+    <button type="button" onclick="closeOrderModal()" style="position:absolute;top:16px;right:16px;background:#f1f5f9;border:none;color:var(--tx);font-size:18px;cursor:pointer;padding:0;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;transition:all 0.2s">
       <i class="fas fa-times"></i>
     </button>
     
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--bd)">
-      <img id="orderModalImg" src="/img/service-1.jpg" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:1px solid var(--bd)">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--bd)">
+      <img id="orderModalImg" src="/img/service-1.jpg" alt="" style="width:68px;height:68px;object-fit:cover;border-radius:12px;border:1px solid var(--bd)">
       <div>
-        <span id="orderModalCategory" style="font-size:11px;font-weight:700;color:var(--navy);background:#eef4fb;padding:2px 8px;border-radius:4px">Category</span>
-        <h3 id="orderModalTitle" style="margin:4px 0 0;font-size:17px;color:var(--navy);font-weight:800;line-height:1.3">Material Title</h3>
-        <div style="font-size:13px;color:var(--mut)">
-          Unit Price: <strong id="orderModalUnitPrice" style="color:#047857">KSh 0</strong> / <span id="orderModalUnit">unit</span>
+        <span id="orderModalCategory" style="font-size:11px;font-weight:700;color:var(--navy);background:#eef4fb;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:0.3px">Category</span>
+        <h3 id="orderModalTitle" style="margin:5px 0 2px;font-size:17px;color:var(--navy);font-weight:800;line-height:1.35">Material Title</h3>
+        <div style="font-size:13.5px;color:var(--mut)">
+          Unit Price: <strong id="orderModalUnitPrice" style="color:#047857;font-weight:800">KSh 0</strong> / <span id="orderModalUnit">unit</span>
         </div>
       </div>
     </div>
@@ -1108,8 +1212,8 @@
       <input type="hidden" id="checkoutProductId" name="product_id">
       
       <!-- Quantity Selector with Live Calculation -->
-      <div style="background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:16px">
-        <label style="font-size:13px;font-weight:700;color:var(--navy);display:block;margin-bottom:4px">Select Quantity to Order</label>
+      <div style="background:#f8fafc;border:1.5px solid var(--bd);border-radius:14px;padding:14px 18px;margin-bottom:6px">
+        <label style="font-size:13px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">Select Quantity to Order</label>
         <div class="qty-control-box">
           <button type="button" class="qty-btn" onclick="adjustOrderQty(-1)"><i class="fas fa-minus"></i></button>
           <input 
@@ -1123,12 +1227,12 @@
             oninput="updateOrderModalTotal()"
           >
           <button type="button" class="qty-btn" onclick="adjustOrderQty(1)"><i class="fas fa-plus"></i></button>
-          <div style="margin-left:auto;text-align:right">
-            <div style="font-size:12px;color:var(--mut)">Order Total:</div>
-            <div id="checkoutTotalPrice" style="font-size:22px;font-weight:900;color:#047857">KSh 0</div>
+          <div class="checkout-total-box">
+            <div style="font-size:12px;color:var(--mut);font-weight:600">Order Total:</div>
+            <div id="checkoutTotalPrice" class="checkout-total-amount">KSh 0</div>
           </div>
         </div>
-        <div id="checkoutStockNotice" style="font-size:12px;color:var(--mut)">
+        <div id="checkoutStockNotice" style="font-size:12px;color:#047857;font-weight:600">
           <i class="fas fa-check-circle" style="color:var(--success)"></i> In stock and ready for immediate site dispatch
         </div>
       </div>
@@ -1136,22 +1240,22 @@
       <!-- Customer Site Details -->
       <div class="two-col">
         <div class="form-group">
-          <label>Your Full Name *</label>
+          <label><i class="fas fa-user" style="color:var(--navy);font-size:12px"></i> Your Full Name *</label>
           <input required name="customer_name" id="cust-name" placeholder="e.g. John Kamau" value="<%= user ? user.name : '' %>">
         </div>
         <div class="form-group">
-          <label>Phone (M-Pesa registered) *</label>
+          <label><i class="fas fa-phone-alt" style="color:var(--navy);font-size:12px"></i> Phone (M-Pesa registered) *</label>
           <input required type="tel" name="customer_phone" id="cust-phone" placeholder="0712345678" value="<%= user ? user.phone : '' %>">
         </div>
       </div>
 
       <div class="two-col">
         <div class="form-group">
-          <label>Email (for digital receipt)</label>
+          <label><i class="fas fa-envelope" style="color:var(--navy);font-size:12px"></i> Email (for digital receipt)</label>
           <input type="email" name="customer_email" id="cust-email" placeholder="john@example.com" value="<%= user ? user.email : '' %>">
         </div>
         <div class="form-group">
-          <label>Delivery County *</label>
+          <label><i class="fas fa-map-marked-alt" style="color:var(--navy);font-size:12px"></i> Delivery County *</label>
           <select name="delivery_county" id="cust-county" required>
             <option value="Nairobi">Nairobi</option>
             <option value="Kiambu">Kiambu</option>
@@ -1167,16 +1271,16 @@
       </div>
 
       <div class="form-group">
-        <label>Detailed Site Location / Delivery Address *</label>
+        <label><i class="fas fa-truck-loading" style="color:var(--navy);font-size:12px"></i> Detailed Site Location / Delivery Address *</label>
         <input required name="delivery_address" id="cust-address" placeholder="e.g. Ruaka, off Limuru Road, near Quickmart, Gate 4" value="<%= (user && user.town) || '' %>">
       </div>
 
       <div class="form-group">
-        <label>Site Instructions / Delivery Notes (optional)</label>
+        <label><i class="fas fa-clipboard-list" style="color:var(--navy);font-size:12px"></i> Site Instructions / Delivery Notes (optional)</label>
         <textarea name="delivery_notes" id="cust-notes" rows="2" placeholder="e.g. Call before dispatch, site gate open from 7am, offloading crew on site..."></textarea>
       </div>
 
-      <button class="btn" type="submit" id="btn-submit-order" style="width:100%;font-size:16px;padding:15px;margin-top:4px">
+      <button class="btn-checkout-submit" type="submit" id="btn-submit-order">
         <i class="fas fa-lock"></i> Pay via Paystack (M-Pesa / Card)
       </button>
       <div class="toast" id="order-toast"></div>
@@ -1268,6 +1372,8 @@
       </button>
     </div>
   </div>
+</div>
+
 </div>
 
 <!-- PAYSTACK INLINE POPUP SCRIPT -->
