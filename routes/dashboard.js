@@ -284,6 +284,7 @@ router.get('/admin', isAuthenticated, (req, res, next) => {
     if (page === 'providers') return adminController.getProviders(req, res, next);
     if (page === 'training') return adminController.getTraining(req, res, next);
     if (page === 'products') return adminController.getProducts(req, res, next);
+    if (page === 'orders') return adminController.getOrders(req, res, next);
     if (page === 'jobs') return adminController.getJobs(req, res, next);
     return adminController.getOverview(req, res, next);
 });
@@ -292,6 +293,7 @@ router.get('/admin/users', isAuthenticated, adminController.getUsers);
 router.get('/admin/providers', isAuthenticated, adminController.getProviders);
 router.get('/admin/training', isAuthenticated, adminController.getTraining);
 router.get('/admin/products', isAuthenticated, adminController.getProducts);
+router.get('/admin/orders', isAuthenticated, adminController.getOrders);
 router.get('/admin/jobs', isAuthenticated, adminController.getJobs);
 
 /**
@@ -344,5 +346,12 @@ router.post('/admin/jobs/:id/update', isAuthenticated, adminController.updateJob
 router.put('/admin/jobs/:id', isAuthenticated, adminController.updateJob);
 router.post('/admin/jobs/:id/delete', isAuthenticated, adminController.deleteJob);
 router.delete('/admin/jobs/:id', isAuthenticated, adminController.deleteJob);
+
+/**
+ * Admin Material Orders CRUD Endpoints
+ */
+router.post('/admin/orders/:id/update-status', isAuthenticated, adminController.updateOrderStatus);
+router.post('/admin/orders/:id/delete', isAuthenticated, adminController.deleteOrder);
+router.delete('/admin/orders/:id', isAuthenticated, adminController.deleteOrder);
 
 module.exports = router;

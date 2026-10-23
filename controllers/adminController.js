@@ -46,9 +46,11 @@ exports.getOverview = async (req, res) => {
             totalJobs,
             totalProducts,
             totalTrainingPayments,
+            totalOrders,
             recentUsers,
             recentTransactions,
             recentJobs,
+            recentOrders,
             categories
         ] = await Promise.all([
             User.count(),
@@ -56,6 +58,7 @@ exports.getOverview = async (req, res) => {
             JobPost.count({ where: { status: 'open' } }),
             Product.count({ where: { is_active: true } }),
             Transaction.count({ where: { type: 'training_fee' } }),
+            OrderRequest.count(),
             User.findAll({ order: [['created_at', 'DESC']], limit: 5 }),
             Transaction.findAll({
                 include: [{ model: User, as: 'user', attributes: ['id', 'name', 'email', 'phone'] }],
@@ -67,6 +70,14 @@ exports.getOverview = async (req, res) => {
                 order: [['created_at', 'DESC']],
                 limit: 5
             }),
+            OrderRequest.findAll({
+                include: [
+                    { model: Product, as: 'product', attributes: ['id', 'title', 'price', 'unit', 'image_url'] },
+                    { model: User, as: 'buyer', attributes: ['id', 'name', 'phone'] }
+                ],
+                order: [['created_at', 'DESC']],
+                limit: 6
+            }),
             Category.findAll({ order: [['name', 'ASC']] })
         ]);
 
@@ -75,6 +86,12 @@ exports.getOverview = async (req, res) => {
             where: { type: 'training_fee', status: 'completed' }
         });
         const trainingRevenue = trainingRevenueResult || 0;
+
+        // Calculate material orders revenue
+        const ordersRevenueResult = await OrderRequest.sum('total_price', {
+            where: { payment_status: 'paid' }
+        });
+        const ordersRevenue = ordersRevenueResult || 0;
 
         res.render('dashboard/admin', {
             title: 'Admin Overview - Topline Construction',
@@ -85,12 +102,15 @@ exports.getOverview = async (req, res) => {
                 providers: totalProviders,
                 jobs: totalJobs,
                 products: totalProducts,
+                orders: totalOrders,
                 trainingPayments: totalTrainingPayments,
-                trainingRevenue: trainingRevenue
+                trainingRevenue: trainingRevenue,
+                ordersRevenue: ordersRevenue
             },
             recentUsers: recentUsers || [],
             recentTransactions: recentTransactions || [],
             recentJobs: recentJobs || [],
+            recentOrders: recentOrders || [],
             categories: categories || []
         });
     } catch (error) {
@@ -394,6 +414,88 @@ exports.getJobs = async (req, res) => {
     } catch (error) {
         console.error('Error loading jobs page:', error);
         res.status(500).send('Error loading jobs page: ' + error.message);
+    }
+};
+
+/**
+ * 7. Material Orders Management Page
+ */
+exports.getOrders = async (req, res) => {
+    try {
+        const { search, status, payment_status } = req.query;
+        const whereClause = {};
+
+        if (status && status !== 'all') {
+            whereClause.status = status;
+        }
+
+        if (payment_status && payment_status !== 'all') {
+            whereClause.payment_status = payment_status;
+        }
+
+        if (search && search.trim()) {
+            const q = search.trim();
+            whereClause[Op.or] = [
+                { contact_phone: { [Op.like]: `%${q}%` } },
+                { delivery_address: { [Op.like]: `%${q}%` } },
+                { paystack_reference: { [Op.like]: `%${q}%` } },
+                { mpesa_receipt: { [Op.like]: `%${q}%` } }
+            ];
+        }
+
+        const [
+            orders,
+            totalCount,
+            paidCount,
+            pendingCount,
+            deliveredCount,
+            totalRevenueResult
+        ] = await Promise.all([
+            OrderRequest.findAll({
+                where: whereClause,
+                include: [
+                    {
+                        model: Product,
+                        as: 'product',
+                        include: [{ model: Category, as: 'category', attributes: ['id', 'name'] }]
+                    },
+                    {
+                        model: User,
+                        as: 'buyer',
+                        attributes: ['id', 'name', 'email', 'phone']
+                    }
+                ],
+                order: [['created_at', 'DESC']],
+                limit: 100
+            }),
+            OrderRequest.count(),
+            OrderRequest.count({ where: { payment_status: 'paid' } }),
+            OrderRequest.count({ where: { payment_status: 'pending' } }),
+            OrderRequest.count({ where: { status: 'delivered' } }),
+            OrderRequest.sum('total_price', { where: { payment_status: 'paid' } })
+        ]);
+
+        res.render('dashboard/admin', {
+            title: 'Material Orders & Purchase Records - Admin',
+            activePage: 'orders',
+            user: req.session.user || { name: 'Admin', role: 'admin' },
+            orders: orders || [],
+            stats: {
+                total: totalCount,
+                paid: paidCount,
+                pending: pendingCount,
+                delivered: deliveredCount,
+                revenue: totalRevenueResult || 0
+            },
+            filter: {
+                search: search || '',
+                status: status || 'all',
+                payment_status: payment_status || 'all'
+            }
+        });
+    } catch (error) {
+        console.error('Error loading material orders page:', error);
+        res.status(500).send('Error loading material orders page: ' + error.message);
     }
 };
 
@@ -961,7 +1063,7 @@ exports.getProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, price, stock_quantity, category_id, unit, location_county, is_active } = req.body;
+        const { title, description, price, stock_quantity, category_id, unit, location_county, image_url, is_active } = req.body;
 
         const product = await Product.findByPk(id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -977,6 +1079,7 @@ exports.updateProduct = async (req, res) => {
         if (category_id !== undefined) updates.category_id = parseInt(category_id, 10);
         if (unit !== undefined) updates.unit = unit.trim();
         if (location_county !== undefined) updates.location_county = location_county.trim();
+        if (image_url !== undefined && image_url.trim()) updates.image_url = image_url.trim();
         if (is_active !== undefined) {
             updates.is_active = is_active === 'true' || is_active === true || is_active === '1' || is_active === 1;
         }
@@ -1017,6 +1120,70 @@ exports.deleteProduct = async (req, res) => {
             return res.status(500).json({ success: false, message: error.message });
         }
         res.redirect('/dashboard/admin/products?error=' + encodeURIComponent(error.message));
+    }
+};
+
+/**
+ * ==========================================
+ * MATERIAL ORDERS CRUD OPERATIONS
+ * ==========================================
+ */
+
+// UPDATE Order Status
+exports.updateOrderStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, payment_status, notes } = req.body;
+
+        const order = await OrderRequest.findByPk(id, {
+            include: [{ model: Product, as: 'product' }]
+        });
+        if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+        const updates = {};
+        if (status) updates.status = status;
+        if (payment_status) updates.payment_status = payment_status;
+        if (notes !== undefined) updates.notes = notes;
+
+        if (status === 'delivered' && order.status !== 'delivered') {
+            updates.buyer_confirmed_at = new Date();
+        }
+
+        await order.update(updates);
+
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            return res.json({ success: true, message: 'Order updated successfully', order });
+        }
+        res.redirect('/dashboard/admin/orders?success=Order+status+updated+successfully');
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        res.redirect('/dashboard/admin/orders?error=' + encodeURIComponent(error.message));
+    }
+};
+
+// DELETE Order
+exports.deleteOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await OrderRequest.findByPk(id);
+        if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+        await Transaction.destroy({ where: { reference_id: id, reference_type: 'OrderRequest' } }).catch(() => {});
+        await order.destroy();
+
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            return res.json({ success: true, message: 'Order record deleted successfully' });
+        }
+        res.redirect('/dashboard/admin/orders?success=Order+deleted+successfully');
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        res.redirect('/dashboard/admin/orders?error=' + encodeURIComponent(error.message));
     }
 };
 

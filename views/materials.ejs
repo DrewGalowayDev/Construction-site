@@ -1,401 +1,1797 @@
 <%- include('partials/header') %>
 <%- include('partials/nav') %>
 
+<!-- TopLine Materials Marketplace Styling (Clean, Zero-Emoji, 4-Column Card Grid, Edge-to-Edge Hero) -->
 <style>
-    .page-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-        align-items: start;
-        padding: 48px 0;
-    }
+:root {
+  --navy: #083a75;
+  --navy-dark: #052449;
+  --gold: #fdb515;
+  --gold-hover: #e5a312;
+  --bg: #ffffff;
+  --bg2: #f4f7fb;
+  --tx: #0c1b30;
+  --mut: #5a6b82;
+  --bd: #dde5ef;
+  --card: #ffffff;
+  --success: #10b981;
+  --danger: #ef4444;
+}
 
-    .page-hero-compact {
-        background: var(--navy);
-        color: #fff;
-        padding: 28px 0;
-        text-align: center;
-    }
+.materials-portal {
+  color: var(--tx);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  background: var(--bg);
+  overflow-x: hidden;
+  width: 100%;
+}
 
-    .page-hero-compact .tag { margin-bottom: 6px; }
+.materials-portal * { box-sizing: border-box; }
 
-    .page-hero-compact h1 {
-        font-size: clamp(22px, 3vw, 34px);
-        font-weight: 800;
-        margin: 0;
-        line-height: 1.2;
-    }
+/* Wide edge-to-edge container */
+.materials-portal .w-full {
+  width: 100%;
+  max-width: 1480px;
+  margin: auto;
+  padding: 0 28px;
+}
 
-    .page-hero-compact h1 span { color: var(--gold); }
+/* Standard centered content container */
+.materials-portal .w {
+  width: 100%;
+  max-width: 1280px;
+  margin: auto;
+  padding: 0 24px;
+}
 
-    .page-hero-compact p {
-        color: #cfdcee;
-        margin: 8px 0 0;
-        font-size: 15px;
-    }
+/* Buttons */
+.materials-portal .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--gold);
+  color: #1a1200;
+  font-weight: 700;
+  border: 0;
+  border-radius: 10px;
+  padding: 13px 24px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+.materials-portal .btn:hover { background: var(--gold-hover); transform: translateY(-1px); }
+.materials-portal .btn.s { padding: 9px 16px; font-size: 13px; border-radius: 8px; }
+.materials-portal .btn.o { background: #fff; border: 2px solid var(--bd); color: var(--tx); }
+.materials-portal .btn.o:hover { border-color: var(--navy); color: var(--navy); }
+.materials-portal .btn.navy { background: var(--navy); color: #fff; }
+.materials-portal .btn.navy:hover { background: var(--navy-dark); }
+.materials-portal .btn.success { background: var(--success); color: #fff; }
 
-    .page-info-card {
-        background: var(--navy);
-        color: #fff;
-        border-radius: 18px;
-        padding: 36px;
-    }
+/* FULL-WIDTH CENTERED HERO SECTION */
+.materials-portal .hero-fullwidth {
+  width: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  padding: 72px 24px 64px;
+  border-bottom: 1px solid var(--bd);
+  text-align: center;
+}
+.materials-portal .hero-fullwidth .hero-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: center;
+}
+.materials-portal .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg2);
+  color: var(--navy);
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 8px 18px;
+  font-size: 13px;
+  margin-bottom: 22px;
+  border: 1px solid var(--bd);
+  box-shadow: 0 2px 6px rgba(8, 58, 117, 0.04);
+}
+.materials-portal h1 {
+  font-size: clamp(32px, 4.8vw, 54px);
+  line-height: 1.15;
+  margin: 0 0 20px;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--tx);
+  text-align: center;
+}
+.materials-portal h1 em {
+  color: var(--navy);
+  font-style: normal;
+  box-shadow: inset 0 -0.32em 0 var(--gold);
+}
+.materials-portal .hero-fullwidth p {
+  font-size: 18px;
+  color: var(--mut);
+  max-width: 780px;
+  margin: 0 auto 32px;
+  line-height: 1.65;
+  text-align: center;
+}
+.materials-portal .hero-actions-center {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-    .page-info-card h2 {
-        color: #fff;
-        font-size: 24px;
-        margin-bottom: 6px;
-    }
+/* Category Ticker Strip */
+.materials-portal .tr-strip {
+  padding: 24px 0 10px;
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+}
+.materials-portal .tr {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.materials-portal .tr span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  color: var(--tx);
+}
+.materials-portal .tr span i { color: var(--navy); }
+.materials-portal .tr span:hover {
+  background: var(--bg2);
+  border-color: var(--navy);
+  color: var(--navy);
+}
 
-    .page-info-card .info-subtitle {
-        color: #b6c7dc;
-        margin-bottom: 28px;
-        font-size: 15px;
-    }
+/* Sections */
+.materials-portal section { padding: 60px 0; }
+.materials-portal section.a { background: var(--bg2); }
+.materials-portal h2 {
+  font-size: 28px;
+  margin: 0 0 8px;
+  font-style: italic;
+  font-weight: 900;
+  color: var(--tx);
+}
+.materials-portal .sub { color: var(--mut); margin: 0 0 28px; font-size: 15px; }
 
-    .page-info-card .info-item {
-        display: flex;
-        gap: 16px;
-        margin-bottom: 24px;
-        align-items: flex-start;
-    }
+/* 3-Column How It Works Cards */
+.materials-portal .g3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.materials-portal .card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  padding: 26px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.materials-portal .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+.materials-portal .n {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--navy);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+.materials-portal .card h3 { margin: 0 0 8px; font-size: 18px; color: var(--tx); font-weight: 700; }
+.materials-portal .card p { margin: 0; color: var(--mut); font-size: 14px; line-height: 1.55; }
 
-    .page-info-card .info-icon {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        border-radius: 12px;
-        background: rgba(245, 166, 35, 0.15);
-        color: var(--gold);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-    }
+/* Filter Controls: Chips, Search & Quick Locations */
+.materials-portal .filters-container {
+  background: #fff;
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 18px rgba(8, 58, 117, 0.03);
+}
+.materials-portal .chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.materials-portal .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--bd);
+  background: var(--card);
+  color: var(--tx);
+  border-radius: 99px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.materials-portal .chip i { color: var(--mut); }
+.materials-portal .chip:hover { border-color: var(--navy); }
+.materials-portal .chip.on {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.materials-portal .chip.on i { color: #fff; }
 
-    .page-info-card .info-text h3 {
-        font-size: 16px;
-        font-weight: 700;
-        margin: 0 0 4px;
-        color: #fff;
-    }
+/* Realtime Search Bar */
+.materials-portal .loc-bar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+}
+.materials-portal .loc-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.materials-portal .loc-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 16px;
+  color: var(--navy);
+}
+.materials-portal .loc-input {
+  width: 100%;
+  padding: 13px 16px 13px 44px;
+  border-radius: 10px;
+  border: 1.5px solid var(--bd);
+  background: #fff;
+  color: var(--tx);
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.materials-portal .loc-input:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+.materials-portal .sort-select {
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--bd);
+  background: #fff;
+  color: var(--tx);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.materials-portal .quick-locs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  align-items: center;
+}
+.materials-portal .loc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 99px;
+  padding: 5px 14px;
+  cursor: pointer;
+  color: var(--mut);
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.materials-portal .loc-pill:hover,
+.materials-portal .loc-pill.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1a1200;
+}
 
-    .page-info-card .info-text p {
-        font-size: 14px;
-        color: #b6c7dc;
-        margin: 0;
-        line-height: 1.5;
-    }
+/* 4-COLUMN RESPONSIVE MATERIAL CARDS GRID */
+.materials-portal .materials-grid-4col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
 
-    .page-info-card .details-box {
-        background: rgba(255,255,255,0.06);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 24px;
-        border: 1px solid rgba(255,255,255,0.08);
-    }
+.materials-portal .material-card-col {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 380px;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  position: relative;
+  overflow: hidden;
+}
+.materials-portal .material-card-col:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 24px rgba(8, 58, 117, 0.08);
+}
 
-    .page-info-card .details-box h3 {
-        font-size: 15px;
-        font-weight: 700;
-        margin: 0 0 10px;
-        color: var(--gold);
-    }
+/* Material Image Wrapper */
+.materials-portal .material-card-img-wrap {
+  width: 100%;
+  height: 170px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f1f5f9;
+  position: relative;
+  margin-bottom: 14px;
+}
+.materials-portal .material-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.materials-portal .material-card-col:hover .material-card-img {
+  transform: scale(1.05);
+}
+.materials-portal .material-badge-overlay {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(8, 58, 117, 0.88);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.materials-portal .material-stock-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(16, 185, 129, 0.92);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.materials-portal .material-stock-badge.low {
+  background: rgba(239, 68, 68, 0.92);
+}
 
-    .page-info-card .details-box li {
-        color: #cfdcee;
-        margin: 8px 0 8px 16px;
-        font-size: 14px;
-        line-height: 1.5;
-    }
+.materials-portal .material-card-title {
+  font-size: 16px;
+  color: var(--navy);
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 0 0 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 44px;
+}
+.materials-portal .material-card-desc {
+  color: var(--mut);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+.materials-portal .material-meta-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+  font-size: 12.5px;
+  color: var(--mut);
+}
+.materials-portal .material-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.materials-portal .price-tag {
+  font-weight: 900;
+  color: #047857;
+  background: #ecfdf5;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.materials-portal .unit-label {
+  font-size: 12px;
+  color: var(--mut);
+  font-weight: 500;
+}
 
-    .page-form-card {
-        background: #fff;
-        border: 2px solid var(--ln);
-        border-radius: 18px;
-        padding: 36px;
-        box-shadow: 0 8px 32px rgba(11, 58, 110, 0.08);
-    }
+/* Safe Guarantee Banner */
+.materials-portal .safe {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 16px;
+  padding: 40px 36px;
+  box-shadow: 0 12px 35px rgba(8, 58, 117, 0.15);
+}
+.materials-portal .safe h2 { color: #fff; margin-bottom: 12px; }
+.materials-portal .safe ul { margin: 18px 0 0; padding-left: 20px; }
+.materials-portal .safe li {
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #e2e8f0;
+}
 
-    .page-form-card h2 {
-        font-size: 24px;
-        margin-bottom: 4px;
-        color: var(--navy);
-    }
+/* Action Hub Card (Orders / Supplier Signup) */
+.materials-portal .action-card {
+  max-width: 840px;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--bd);
+  box-shadow: 0 14px 35px -5px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  border-radius: 16px;
+}
+.materials-portal .tab-switcher {
+  display: flex;
+  background: #f1f5f9;
+  border-bottom: 1px solid var(--bd);
+}
+.materials-portal .tab-btn {
+  flex: 1;
+  padding: 16px 14px;
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  font-size: 14.5px;
+  cursor: pointer;
+  color: var(--mut);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.materials-portal .tab-btn.active {
+  background: #fff;
+  color: var(--navy);
+  border-bottom: 3px solid var(--navy);
+}
+.materials-portal .tab-panel {
+  padding: 32px 28px;
+}
 
-    .page-form-card .form-subtitle {
-        color: var(--mu);
-        margin-bottom: 20px;
-        font-size: 15px;
-    }
+/* Forms */
+.materials-portal form { display: grid; gap: 15px; }
+.materials-portal .form-group { display: grid; gap: 6px; }
+.materials-portal .form-group label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.materials-portal input,
+.materials-portal select,
+.materials-portal textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--bd);
+  background: var(--card);
+  color: var(--tx);
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.materials-portal input:focus,
+.materials-portal select:focus,
+.materials-portal textarea:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+.materials-portal .two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
-    .page-form-card label {
-        display: block;
-        font-weight: 600;
-        font-size: 14px;
-        margin: 14px 0 4px;
-        color: var(--tx);
-    }
+/* FAQ Details */
+.materials-portal details {
+  border-bottom: 1px solid var(--bd);
+  padding: 18px 0;
+}
+.materials-portal summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--navy);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.materials-portal summary::-webkit-details-marker { display: none; }
+.materials-portal summary:after {
+  content: "+";
+  font-size: 20px;
+  color: var(--mut);
+  font-weight: 400;
+}
+.materials-portal details[open] summary:after { content: "–"; }
+.materials-portal details p {
+  color: var(--mut);
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
 
-    .page-form-card input,
-    .page-form-card select,
-    .page-form-card textarea {
-        width: 100%;
-        padding: 13px 16px;
-        border: 1px solid var(--ln);
-        border-radius: 10px;
-        font: inherit;
-        background: var(--card);
-        color: var(--tx);
-        transition: border-color 0.2s;
-    }
+/* Toast Notification */
+.materials-portal .toast {
+  display: none;
+  padding: 14px 18px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 10px;
+}
+.materials-portal .toast.success { background: #e6f7ec; color: #14703a; border: 1px solid #b7ebc6; }
+.materials-portal .toast.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
-    .page-form-card input:focus,
-    .page-form-card select:focus,
-    .page-form-card textarea:focus {
-        outline: none;
-        border-color: var(--gold);
-    }
+/* Modal Overlays */
+.mat-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 27, 48, 0.78);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.mat-modal {
+  background: #fff;
+  border-radius: 18px;
+  max-width: 540px;
+  width: 100%;
+  padding: 28px;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+  animation: matModalScale 0.22s ease-out;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+@keyframes matModalScale {
+  from { transform: scale(0.93); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
 
-    .page-form-card .two {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px;
-    }
+/* Quantity Control Widget */
+.qty-control-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 16px;
+}
+.qty-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1.5px solid var(--bd);
+  background: #f8fafc;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s;
+}
+.qty-btn:hover {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.qty-input {
+  width: 80px !important;
+  text-align: center;
+  font-weight: 800;
+  font-size: 18px;
+  padding: 8px !important;
+}
 
-    .page-form-card .submit-btn {
-        width: 100%;
-        margin-top: 20px;
-        padding: 16px;
-        font-size: 16px;
-        font-weight: 700;
-        background: var(--navy);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: background 0.2s, transform 0.1s;
-    }
-
-    .page-form-card .submit-btn:hover {
-        background: var(--navy2);
-        transform: translateY(-1px);
-    }
-
-    @media (max-width: 800px) {
-        .page-layout {
-            grid-template-columns: 1fr;
-            gap: 24px;
-            padding: 28px 0;
-        }
-    }
+/* Responsive Breakpoints */
+@media (max-width: 1260px) {
+  .materials-portal .materials-grid-4col { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .materials-portal .materials-grid-4col { grid-template-columns: repeat(2, 1fr); }
+  .materials-portal .g3 { grid-template-columns: 1fr; }
+  .materials-portal .loc-bar { grid-template-columns: 1fr; }
+}
+@media (max-width: 580px) {
+  .materials-portal .materials-grid-4col { grid-template-columns: 1fr; }
+  .materials-portal .two-col { grid-template-columns: 1fr; }
+  .materials-portal .hero-fullwidth { padding: 48px 16px; }
+  .materials-portal h1 { font-size: 28px; }
+  .materials-portal .tab-btn { font-size: 12px; padding: 12px 6px; }
+  .materials-portal .hero-actions-center { flex-direction: column; width: 100%; }
+  .materials-portal .hero-actions-center .btn { width: 100%; }
+}
 </style>
 
-<!-- Compact Hero Strip -->
-<div class="page-hero-compact">
-    <div class="w">
-        <div class="tag">MATERIALS MARKETPLACE</div>
-        <h1>Construction materials. <span>Online.</span></h1>
-        <p>Suppliers: list your products. Buyers: browse and order, payment via M-PESA.</p>
+<div class="materials-portal">
+
+  <!-- 1. FULL-WIDTH CENTERED HERO SECTION -->
+  <header class="hero-fullwidth">
+    <div class="hero-inner">
+      <span class="pill">
+        <i class="fas fa-boxes" style="color:var(--navy)"></i>
+        Verified Construction Materials &bull; Direct Factory &amp; Wholesale Pricing
+      </span>
+      <h1>Quality Construction Materials <em>Direct to Your Site</em></h1>
+      <p>
+        Cement, high-yield steel rebars, mabati roofing, machine-cut stones, timber, plumbing, electricals &amp; heavy equipment. Order online with secure Paystack &amp; M-Pesa escrow protection and prompt site delivery across Kenya.
+      </p>
+      <div class="hero-actions-center">
+        <a class="btn" href="#catalog">
+          <i class="fas fa-cubes"></i> Browse Materials (<%= (products && products.length) || 0 %> Items)
+        </a>
+        <button type="button" class="btn navy" onclick="showHubTab('orders');document.getElementById('hub').scrollIntoView({behavior:'smooth'})">
+          <i class="fas fa-receipt"></i> Track My Orders
+        </button>
+        <button type="button" class="btn o" onclick="showHubTab('supplier');document.getElementById('hub').scrollIntoView({behavior:'smooth'})">
+          <i class="fas fa-store"></i> List as Supplier
+        </button>
+      </div>
     </div>
+  </header>
+
+  <!-- 2. MATERIALS CATEGORY TICKER STRIP -->
+  <div class="tr-strip">
+    <div class="w-full">
+      <div class="tr">
+        <span onclick="filterByCategory('all')"><i class="fas fa-th-large"></i> All Categories</span>
+        <span onclick="filterByCategory('Cement')"><i class="fas fa-layer-group"></i> Cement &amp; Binding</span>
+        <span onclick="filterByCategory('Steel')"><i class="fas fa-cubes"></i> Steel &amp; Metal</span>
+        <span onclick="filterByCategory('Roofing')"><i class="fas fa-home"></i> Roofing &amp; Mabati</span>
+        <span onclick="filterByCategory('Sand')"><i class="fas fa-mountain"></i> Sand, Stones &amp; Ballast</span>
+        <span onclick="filterByCategory('Timber')"><i class="fas fa-tree"></i> Timber &amp; Formwork</span>
+        <span onclick="filterByCategory('Plumbing')"><i class="fas fa-faucet"></i> Plumbing &amp; Pipes</span>
+        <span onclick="filterByCategory('Electrical')"><i class="fas fa-bolt"></i> Electrical &amp; Solar</span>
+        <span onclick="filterByCategory('Equipment')"><i class="fas fa-truck-pickup"></i> Equipment Hire</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. HOW IT WORKS -->
+  <section id="how">
+    <div class="w-full">
+      <h2 style="text-align:center">How Material Ordering Works</h2>
+      <p class="sub" style="text-align:center">Three straightforward steps to genuine materials delivered directly to your project site.</p>
+      <div class="g3">
+        <div class="card">
+          <div class="n">1</div>
+          <h3>Select Materials &amp; Quantity</h3>
+          <p>Explore catalog items uploaded and verified by TopLine administrators &amp; certified factories. Calculate exact quantities needed for your construction phase.</p>
+        </div>
+        <div class="card">
+          <div class="n">2</div>
+          <h3>Pay Safely via Paystack</h3>
+          <p>Instant checkout via M-Pesa STK push or Card. Your funds are held securely in platform escrow and only released upon certified delivery to your site.</p>
+        </div>
+        <div class="card">
+          <div class="n">3</div>
+          <h3>Guaranteed Site Delivery</h3>
+          <p>Verified suppliers dispatch directly to your site in Nairobi, Kiambu, Machakos or countrywide with realtime dispatch confirmation and formal digital receipts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. VERIFIED MATERIALS SECTION (4 COLUMNS RESPONSIVE GRID) -->
+  <section class="a" id="catalog">
+    <div class="w-full">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:14px">
+        <div>
+          <h2>Verified Construction Materials Catalog</h2>
+          <p class="sub" style="margin:0">Live materials inventory managed by TopLine Admin. Filter by category, location, and search in realtime.</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn s o" onclick="showHubTab('orders');document.getElementById('hub').scrollIntoView({behavior:'smooth'})">
+            <i class="fas fa-receipt"></i> View My Orders
+          </button>
+          <button class="btn s navy" onclick="showHubTab('supplier');document.getElementById('hub').scrollIntoView({behavior:'smooth'})">
+            <i class="fas fa-plus"></i> List Your Materials
+          </button>
+        </div>
+      </div>
+
+      <!-- Realtime Filter Controls -->
+      <div class="filters-container">
+        <!-- Category Filter Chips -->
+        <div class="chips" id="categoryChips">
+          <button type="button" class="chip on" onclick="filterByCategory('all')"><i class="fas fa-th-large"></i> All Materials</button>
+          <button type="button" class="chip" onclick="filterByCategory('Cement')"><i class="fas fa-layer-group"></i> Cement &amp; Binding</button>
+          <button type="button" class="chip" onclick="filterByCategory('Steel')"><i class="fas fa-cubes"></i> Steel &amp; Metal</button>
+          <button type="button" class="chip" onclick="filterByCategory('Roofing')"><i class="fas fa-home"></i> Roofing &amp; Mabati</button>
+          <button type="button" class="chip" onclick="filterByCategory('Sand')"><i class="fas fa-mountain"></i> Sand &amp; Stones</button>
+          <button type="button" class="chip" onclick="filterByCategory('Timber')"><i class="fas fa-tree"></i> Timber &amp; Formwork</button>
+          <button type="button" class="chip" onclick="filterByCategory('Plumbing')"><i class="fas fa-faucet"></i> Plumbing &amp; Drainage</button>
+          <button type="button" class="chip" onclick="filterByCategory('Electrical')"><i class="fas fa-bolt"></i> Electrical &amp; Solar</button>
+          <button type="button" class="chip" onclick="filterByCategory('Equipment')"><i class="fas fa-truck-pickup"></i> Equipment Hire</button>
+        </div>
+
+        <!-- Realtime Search Bar & Sort Dropdown -->
+        <div class="loc-bar">
+          <div class="loc-input-wrap">
+            <i class="fas fa-search loc-icon"></i>
+            <input 
+              id="matSearchInput" 
+              class="loc-input" 
+              type="text" 
+              placeholder="Search materials in realtime (e.g. Bamburi cement, D12 rebar, mabati, sand, timber, Nairobi, Kiambu)..."
+              oninput="onRealtimeMaterialInput(this.value)"
+            >
+          </div>
+          <select id="matSortSelect" class="sort-select" onchange="sortMaterials(this.value)">
+            <option value="latest">Sort: Latest Items</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="title">Name: A to Z</option>
+          </select>
+          <button type="button" class="btn s o" onclick="resetMaterialFilters()">
+            <i class="fas fa-undo"></i> Reset
+          </button>
+        </div>
+
+        <!-- Quick Location Pills -->
+        <div class="quick-locs">
+          <span style="font-size:12px;font-weight:700;color:var(--mut);margin-right:6px">Quick Counties:</span>
+          <span class="loc-pill active" onclick="filterByCounty('All Counties')"><i class="fas fa-map-marker-alt"></i> All Counties</span>
+          <span class="loc-pill" onclick="filterByCounty('Nairobi')"><i class="fas fa-map-pin"></i> Nairobi</span>
+          <span class="loc-pill" onclick="filterByCounty('Kiambu')"><i class="fas fa-map-pin"></i> Kiambu</span>
+          <span class="loc-pill" onclick="filterByCounty('Machakos')"><i class="fas fa-map-pin"></i> Machakos</span>
+          <span class="loc-pill" onclick="filterByCounty('Mombasa')"><i class="fas fa-map-pin"></i> Mombasa</span>
+          <span class="loc-pill" onclick="filterByCounty('Nakuru')"><i class="fas fa-map-pin"></i> Nakuru</span>
+          <span class="loc-pill" onclick="filterByCounty('Eldoret')"><i class="fas fa-map-pin"></i> Eldoret</span>
+        </div>
+      </div>
+
+      <!-- Live Material Counter -->
+      <div id="materialStatusText" style="font-size:14px;color:var(--mut);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+        <span id="materialCountBadge" style="background:var(--navy);color:#fff;padding:3px 10px;border-radius:99px;font-size:12px"><%= (products && products.length) || 0 %></span>
+        <span id="materialCountLabel">Verified materials available for immediate order &amp; delivery</span>
+      </div>
+
+      <!-- 4-COLUMN CARDS CONTAINER -->
+      <div id="materialsGrid" class="materials-grid-4col">
+        <% if (products && products.length > 0) { %>
+          <% products.forEach(function(product) { %>
+            <% 
+              const catName = product.category ? product.category.name : 'General';
+              const sellerName = product.seller ? product.seller.name : 'TopLine Verified Supplier';
+              const county = product.location_county || 'Nairobi';
+              const priceNum = Number(product.price) || 0;
+              const stockNum = product.stock_quantity !== null ? Number(product.stock_quantity) : 100;
+              const isRental = product.is_rental;
+              const imgUrl = product.image_url || '/img/service-1.jpg';
+            %>
+            <div 
+              class="material-card-col" 
+              data-id="<%= product.id %>"
+              data-title="<%= product.title %>"
+              data-category="<%= catName %>"
+              data-location="<%= county %>"
+              data-price="<%= priceNum %>"
+              data-stock="<%= stockNum %>"
+              data-unit="<%= product.unit || 'unit' %>"
+              data-image="<%= imgUrl %>"
+              data-desc="<%= product.description || '' %>"
+            >
+              <div>
+                <!-- Thumbnail with category & stock overlays -->
+                <div class="material-card-img-wrap">
+                  <img src="<%= imgUrl %>" alt="<%= product.title %>" class="material-card-img" onerror="this.src='/img/service-1.jpg'">
+                  <div class="material-badge-overlay">
+                    <i class="fas fa-tag"></i> <%= catName %>
+                  </div>
+                  <% if (isRental) { %>
+                    <div class="material-stock-badge">
+                      <i class="fas fa-tools"></i> For Hire
+                    </div>
+                  <% } else if (stockNum > 10) { %>
+                    <div class="material-stock-badge">
+                      <i class="fas fa-check-circle"></i> In Stock (<%= stockNum %>)
+                    </div>
+                  <% } else if (stockNum > 0) { %>
+                    <div class="material-stock-badge low">
+                      <i class="fas fa-exclamation-circle"></i> Only <%= stockNum %> Left
+                    </div>
+                  <% } else { %>
+                    <div class="material-stock-badge low">
+                      <i class="fas fa-times-circle"></i> Out of Stock
+                    </div>
+                  <% } %>
+                </div>
+
+                <h3 class="material-card-title"><%= product.title %></h3>
+                <p class="material-card-desc"><%= product.description || 'Certified quality construction material with direct site dispatch.' %></p>
+                
+                <div class="material-meta-stack">
+                  <div class="material-meta-row">
+                    <span><i class="fas fa-map-marker-alt" style="color:var(--navy);margin-right:4px"></i> <%= county %>, Kenya</span>
+                    <span style="font-size:11.5px;color:var(--mut)"><i class="fas fa-shield-alt" style="color:var(--gold);margin-right:2px"></i> Verified</span>
+                  </div>
+                  <div class="material-meta-row" style="margin-top:4px">
+                    <span class="price-tag">KSh <%= priceNum.toLocaleString() %></span>
+                    <span class="unit-label">per <%= product.unit || 'unit' %></span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px">
+                <button 
+                  type="button" 
+                  class="btn s navy" 
+                  onclick="openOrderModal('<%= product.id %>')"
+                  style="width:100%"
+                >
+                  <i class="fas fa-shopping-cart"></i> Order Now
+                </button>
+                <button 
+                  type="button" 
+                  class="btn s o" 
+                  onclick="openSpecsModal('<%= product.id %>')"
+                  title="View Specifications"
+                >
+                  <i class="fas fa-info-circle"></i>
+                </button>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div style="grid-column: 1 / -1; text-align:center;padding:50px 20px;background:#fff;border-radius:14px;border:1px dashed var(--bd)">
+            <p style="color:var(--mut);font-size:16px;margin:0">No construction materials currently uploaded. Please check back shortly or reset your filters.</p>
+            <button class="btn s o" onclick="resetMaterialFilters()" style="margin-top:14px">View All Materials</button>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. SAFE ESCROW BANNER -->
+  <section>
+    <div class="w-full">
+      <div class="safe">
+        <h2><i class="fas fa-shield-alt" style="color:var(--gold);margin-right:10px"></i> Built to protect your material purchases</h2>
+        <p style="margin:0;font-size:16px">Construction material fraud, substandard adulteration, and payment diversion are frequent hazards in the construction sector. TopLine protects your investment:</p>
+        <ul>
+          <li><strong>Factory-Certified Authenticity:</strong> Direct sourcing of high-grade cements (Bamburi, Simba), standard BS4449 steel rebars, certified gauge roofing, and vetted quarries.</li>
+          <li><strong>Paystack &amp; M-Pesa Escrow Protection:</strong> Payments are processed via secure Paystack checkout. Monies remain protected in platform escrow until goods are delivered and inspected at your site.</li>
+          <li><strong>Realtime Admin &amp; Supplier Tracking:</strong> Every material order generates formal digital invoices stored directly in the admin management database with Paystack tracking references.</li>
+          <li><strong>Prompt Site Dispatch:</strong> Experienced tipper lorry, crane truck, and light transport drivers dispatch materials directly to your site gates across Nairobi, Kiambu, Machakos, Mombasa, and regional hubs.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. ACTION HUB: TRACK ORDERS / SUPPLIER REGISTRATION -->
+  <section class="a" id="hub">
+    <div class="w-full">
+      <div class="action-card">
+        
+        <!-- Tab Header Switcher -->
+        <div class="tab-switcher">
+          <button type="button" id="tab-btn-orders" class="tab-btn active" onclick="showHubTab('orders')">
+            <i class="fas fa-receipt"></i> Track My Orders
+          </button>
+          <button type="button" id="tab-btn-supplier" class="tab-btn" onclick="showHubTab('supplier')">
+            <i class="fas fa-store"></i> List Materials (Supplier Signup)
+          </button>
+        </div>
+
+        <!-- 1. TRACK MY ORDERS PANEL -->
+        <div id="hub-panel-orders" class="tab-panel">
+          <div style="text-align:center;margin-bottom:20px">
+            <h2 style="margin:0 0 4px;font-size:22px"><i class="fas fa-boxes-packing" style="color:var(--navy);margin-right:8px"></i> Material Orders &amp; Delivery Tracking</h2>
+            <p style="margin:0;color:var(--mut);font-size:14px">Lookup orders placed via Paystack. Records are updated in realtime upon payment confirmation.</p>
+          </div>
+
+          <!-- Phone lookup bar for non-authenticated buyers -->
+          <div style="display:flex;gap:10px;margin-bottom:22px">
+            <input 
+              id="orderLookupPhone" 
+              type="tel" 
+              placeholder="Enter your M-Pesa phone number (e.g. 0712345678) to find your orders..." 
+              value="<%= user ? user.phone : '' %>"
+              style="flex:1"
+            >
+            <button type="button" class="btn navy s" onclick="searchMyOrders()">
+              <i class="fas fa-search"></i> Search Orders
+            </button>
+          </div>
+
+          <!-- Orders List Container -->
+          <div id="ordersListContainer">
+            <% if (myOrders && myOrders.length > 0) { %>
+              <div style="display:grid;gap:12px">
+                <% myOrders.forEach(ord => { %>
+                  <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+                    <div>
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                        <strong style="color:var(--navy);font-size:15px">Order #<%= ord.id %></strong>
+                        <span style="font-size:12px;background:#eef4fb;color:var(--navy);padding:2px 8px;border-radius:4px;font-weight:700"><%= ord.paystack_reference || 'Paystack' %></span>
+                        <span style="font-size:12px;padding:2px 8px;border-radius:99px;font-weight:700;background:<%= ord.payment_status === 'paid' ? '#d1fae5;color:#065f46' : '#fef3c7;color:#92400e' %>">
+                          <%= ord.payment_status === 'paid' ? 'Paid & Confirmed' : 'Payment Pending' %>
+                        </span>
+                      </div>
+                      <div style="font-size:13.5px;color:var(--tx);font-weight:600">
+                        <%= ord.product ? ord.product.title : 'Material Item' %> &bull; Qty: <%= ord.quantity %> <%= ord.product ? ord.product.unit : '' %>
+                      </div>
+                      <div style="font-size:12px;color:var(--mut);margin-top:3px">
+                        <i class="fas fa-map-marker-alt"></i> <%= ord.delivery_address %> &bull; Placed: <%= new Date(ord.createdAt || Date.now()).toLocaleDateString() %>
+                      </div>
+                    </div>
+                    <div style="text-align:right">
+                      <div style="font-size:17px;font-weight:900;color:#047857">KSh <%= Number(ord.total_price).toLocaleString() %></div>
+                      <div style="font-size:12px;color:var(--mut);margin-top:2px">Status: <strong style="color:var(--navy)"><%= ord.status %></strong></div>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div id="noOrdersMsg" style="text-align:center;padding:36px 20px;background:#f8fafc;border-radius:12px;border:1px dashed var(--bd)">
+                <i class="fas fa-shopping-bag" style="font-size:32px;color:var(--mut);margin-bottom:10px"></i>
+                <p style="margin:0;color:var(--mut);font-size:14.5px">No material orders found yet. Select an item above and click <strong>Order Now</strong> to buy via Paystack.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- 2. SUPPLIER SIGNUP PANEL -->
+        <div id="hub-panel-supplier" class="tab-panel" style="display:none">
+          <div style="text-align:center;margin-bottom:20px">
+            <h2 style="margin:0 0 4px;font-size:22px"><i class="fas fa-box-open" style="color:var(--navy);margin-right:8px"></i> List Your Construction Materials</h2>
+            <p style="margin:0;color:var(--mut);font-size:14px">Partner with TopLine as a certified manufacturer or hardware supplier to reach developers, contractors, and fundis countrywide.</p>
+          </div>
+
+          <form id="supplierSignupForm" onsubmit="submitSupplierSignup(event)">
+            <div class="two-col">
+              <div class="form-group">
+                <label>Business / Supplier Name *</label>
+                <input name="business_name" type="text" placeholder="e.g. Athi River Steel &amp; Hardware Ltd" required>
+              </div>
+              <div class="form-group">
+                <label>Contact Person Name</label>
+                <input name="contact_name" type="text" placeholder="Your full name">
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="form-group">
+                <label>Contact Phone (WhatsApp registered) *</label>
+                <input name="phone" type="tel" placeholder="0712345678" required>
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input name="email" type="email" placeholder="sales@yourcompany.co.ke">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Warehouse / Yard Location (County &amp; Town) *</label>
+              <input name="location" type="text" placeholder="e.g. Nairobi, Industrial Area Road A / Mombasa Rd" required>
+            </div>
+
+            <div class="form-group">
+              <label>What Materials Do You Supply? *</label>
+              <textarea name="products_supplied" rows="3" placeholder="List products, brands, and units (e.g. Bamburi cement 50kg, D12 rebars, 30G mabati, clean sand, ballast)..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Site Delivery Capabilities *</label>
+              <select name="delivery_available" required>
+                <option value="">Select delivery capability</option>
+                <option value="Yes - We have our own fleet (Tippers, Flatbeds, Pickups)">Yes - We deliver with our own fleet</option>
+                <option value="No - Customer or TopLine third-party pickup only">Customer or TopLine third-party pickup only</option>
+                <option value="Depends on location & volume">Depends on order location &amp; volume</option>
+              </select>
+            </div>
+
+            <button class="btn navy" type="submit" id="supplierSignupBtn" style="width:100%;font-size:16px;padding:15px;margin-top:6px">
+              <i class="fas fa-paper-plane"></i> Submit Supplier Application
+            </button>
+            <div class="toast" id="supplier-toast"></div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. FAQ SECTION -->
+  <section id="faq">
+    <div class="w">
+      <h2 style="text-align:center">Frequently Asked Questions</h2>
+      <p class="sub" style="text-align:center">Clear information on ordering construction materials, payments via Paystack, and site deliveries.</p>
+      
+      <details>
+        <summary>How does payment via Paystack &amp; M-Pesa work?</summary>
+        <p>When you place an order, you can pay instantly using your M-Pesa registered phone number via STK push prompt or with debit/credit cards. Funds are placed into TopLine's secure escrow and records are preserved directly in our admin database.</p>
+      </details>
+      <details>
+        <summary>How quickly are materials delivered to my construction site?</summary>
+        <p>Standard delivery in Nairobi, Kiambu, and Machakos is completed within 4 to 24 hours depending on the material type (e.g. ready-mix cement, timber, rebar, or quarry sand). For regional deliveries, delivery timeframes are confirmed upon order dispatch.</p>
+      </details>
+      <details>
+        <summary>Can I place large wholesale orders for commercial sites?</summary>
+        <p>Yes. TopLine serves both residential builders and large-scale developers. You can select higher quantities directly on the order form or contact our procurement team for bulk articulated tipper and trailer rates.</p>
+      </details>
+      <details>
+        <summary>How are construction materials vetted for quality?</summary>
+        <p>All materials uploaded by admin and certified suppliers must comply with Kenya Bureau of Standards (KEBS) specifications. We inspect manufacturing batch certificates for cement and tensile strength compliance for rebars.</p>
+      </details>
+      <details>
+        <summary>What if the materials delivered do not match the order?</summary>
+        <p>Our platform escrow protects you. If materials delivered do not match specifications, reject the offloading and report immediately to our compliance department. Funds are withheld and resolved before release.</p>
+      </details>
+    </div>
+  </section>
+
 </div>
 
-<section>
-    <div class="w">
-        <div class="page-layout">
-            <!-- LEFT: How It Works -->
-            <div class="page-info-card">
-                <h2>How It Works</h2>
-                <p class="info-subtitle">Start selling construction materials on TopLine</p>
-
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-store"></i></div>
-                    <div class="info-text">
-                        <h3>1. Sign Up as a Supplier</h3>
-                        <p>Register your business and tell us what materials you supply — cement, steel, roofing, tiles, paint and more.</p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-cubes"></i></div>
-                    <div class="info-text">
-                        <h3>2. List Your Products</h3>
-                        <p>Add your products with descriptions, prices and photos. Your listings go live on our marketplace instantly.</p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-cart-shopping"></i></div>
-                    <div class="info-text">
-                        <h3>3. Receive Orders</h3>
-                        <p>Contractors and homeowners browse and order from you. You get notified instantly when someone buys.</p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-mobile-screen-button"></i></div>
-                    <div class="info-text">
-                        <h3>4. Get Paid via M-PESA</h3>
-                        <p>Secure payments processed through M-PESA. Funds are sent directly to your account after delivery.</p>
-                    </div>
-                </div>
-
-                <div class="details-box">
-                    <h3><i class="fas fa-boxes-stacked"></i> Popular Categories</h3>
-                    <ul>
-                        <li>Cement — Bamburi, Simba, Savannah brands</li>
-                        <li>Steel — rebars, BRC, binding wire</li>
-                        <li>Roofing — mabati, timber, gutters</li>
-                        <li>Tiles, paint, plumbing & electrical fittings</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- RIGHT: Supplier Signup Form -->
-            <div class="page-form-card">
-                <h2><i class="fas fa-box-open" style="color:var(--gold);margin-right:8px"></i> List Your Materials</h2>
-                <p class="form-subtitle">Reach more customers. Cement, steel, roofing, paint, tiles.</p>
-
-                <form id="supplierSignupForm" onsubmit="return submitSupplierSignup(event)">
-                    <label>Business / supplier name *</label>
-                    <input name="business_name" type="text" placeholder="Enter your business name" required>
-
-                    <label>Contact person name</label>
-                    <input name="contact_name" type="text" placeholder="Your name">
-
-                    <div class="two">
-                        <div>
-                            <label>Contact phone *</label>
-                            <input name="phone" type="tel" placeholder="0712345678" required>
-                        </div>
-                        <div>
-                            <label>Email</label>
-                            <input name="email" type="email" placeholder="your@email.com">
-                        </div>
-                    </div>
-
-                    <label>Location *</label>
-                    <input name="location" type="text" placeholder="e.g. Nairobi, Industrial Area" required>
-
-                    <label>What do you supply? *</label>
-                    <textarea name="products_supplied" rows="3" placeholder="List your product categories (e.g., Cement, Steel bars, Roofing materials, Paint, Tiles)" required></textarea>
-
-                    <label>Delivery available? *</label>
-                    <select name="delivery_available" required>
-                        <option value="">Select option</option>
-                        <option value="Yes - we deliver">Yes - we deliver</option>
-                        <option value="No - pickup only">No - pickup only</option>
-                        <option value="Depends on location">Depends on location</option>
-                    </select>
-
-                    <button class="submit-btn" type="submit" id="supplierSignupBtn">
-                        <i class="fas fa-paper-plane"></i> Sign Up as Supplier
-                    </button>
-                </form>
-            </div>
+<!-- 8. ORDER & PAYSTACK CHECKOUT MODAL -->
+<div class="mat-modal-overlay" id="orderModal">
+  <div class="mat-modal">
+    <!-- Close button -->
+    <button type="button" onclick="closeOrderModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--mut);font-size:22px;cursor:pointer;padding:0;width:32px;height:32px;display:grid;place-items:center;border-radius:50%">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--bd)">
+      <img id="orderModalImg" src="/img/service-1.jpg" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:1px solid var(--bd)">
+      <div>
+        <span id="orderModalCategory" style="font-size:11px;font-weight:700;color:var(--navy);background:#eef4fb;padding:2px 8px;border-radius:4px">Category</span>
+        <h3 id="orderModalTitle" style="margin:4px 0 0;font-size:17px;color:var(--navy);font-weight:800;line-height:1.3">Material Title</h3>
+        <div style="font-size:13px;color:var(--mut)">
+          Unit Price: <strong id="orderModalUnitPrice" style="color:#047857">KSh 0</strong> / <span id="orderModalUnit">unit</span>
         </div>
+      </div>
     </div>
-</section>
 
-<% /* Available Construction Materials Section - Hidden for now
-if (products && products.length > 0) { %>
-<section class="alt">
-    <div class="w">
-        <h2 style="text-align:center">Available Construction Materials</h2>
-        <p class="sub" style="text-align:center">Browse products from verified suppliers</p>
-        <div class="grid">
-            <% products.forEach(product => { %>
-            <div class="c">
-                <div class="ic">🧱</div>
-                <b><%= product.name %></b>
-                <p class="sub" style="margin:4px 0 0"><%= product.description || 'Quality construction material' %></p>
-                <% if (product.category) { %>
-                <p class="sub" style="margin:4px 0 0;font-size:12px">Category: <%= product.category.name %></p>
-                <% } %>
-                <p style="margin-top:8px;font-weight:700;color:var(--gold)">
-                    KSh <%= product.price ? product.price.toLocaleString() : 'Contact for price' %>
-                </p>
-                <% if (product.seller) { %>
-                <p class="sub" style="margin:2px 0 0;font-size:12px">Supplier: <%= product.seller.name %></p>
-                <% } %>
-                <% if (product.location) { %>
-                <p class="sub" style="margin:2px 0 0;font-size:12px">📍 <%= product.location %></p>
-                <% } %>
-            </div>
-            <% }) %>
+    <form id="materialCheckoutForm" onsubmit="handleMaterialCheckout(event)">
+      <input type="hidden" id="checkoutProductId" name="product_id">
+      
+      <!-- Quantity Selector with Live Calculation -->
+      <div style="background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+        <label style="font-size:13px;font-weight:700;color:var(--navy);display:block;margin-bottom:4px">Select Quantity to Order</label>
+        <div class="qty-control-box">
+          <button type="button" class="qty-btn" onclick="adjustOrderQty(-1)"><i class="fas fa-minus"></i></button>
+          <input 
+            type="number" 
+            id="checkoutQty" 
+            name="quantity" 
+            class="qty-input" 
+            value="1" 
+            min="1" 
+            max="10000"
+            oninput="updateOrderModalTotal()"
+          >
+          <button type="button" class="qty-btn" onclick="adjustOrderQty(1)"><i class="fas fa-plus"></i></button>
+          <div style="margin-left:auto;text-align:right">
+            <div style="font-size:12px;color:var(--mut)">Order Total:</div>
+            <div id="checkoutTotalPrice" style="font-size:22px;font-weight:900;color:#047857">KSh 0</div>
+          </div>
         </div>
-    </div>
-</section>
-<% }
-*/ %>
+        <div id="checkoutStockNotice" style="font-size:12px;color:var(--mut)">
+          <i class="fas fa-check-circle" style="color:var(--success)"></i> In stock and ready for immediate site dispatch
+        </div>
+      </div>
 
-<!-- Toast Notification -->
-<div id="toast" style="display:none;position:fixed;top:20px;right:20px;background:var(--navy);color:white;padding:16px 24px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:10000;max-width:400px"></div>
+      <!-- Customer Site Details -->
+      <div class="two-col">
+        <div class="form-group">
+          <label>Your Full Name *</label>
+          <input required name="customer_name" id="cust-name" placeholder="e.g. John Kamau" value="<%= user ? user.name : '' %>">
+        </div>
+        <div class="form-group">
+          <label>Phone (M-Pesa registered) *</label>
+          <input required type="tel" name="customer_phone" id="cust-phone" placeholder="0712345678" value="<%= user ? user.phone : '' %>">
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="form-group">
+          <label>Email (for digital receipt)</label>
+          <input type="email" name="customer_email" id="cust-email" placeholder="john@example.com" value="<%= user ? user.email : '' %>">
+        </div>
+        <div class="form-group">
+          <label>Delivery County *</label>
+          <select name="delivery_county" id="cust-county" required>
+            <option value="Nairobi">Nairobi</option>
+            <option value="Kiambu">Kiambu</option>
+            <option value="Machakos">Machakos</option>
+            <option value="Kajiado">Kajiado</option>
+            <option value="Mombasa">Mombasa</option>
+            <option value="Nakuru">Nakuru</option>
+            <option value="Eldoret">Uasin Gishu (Eldoret)</option>
+            <option value="Kisumu">Kisumu</option>
+            <option value="Other">Other County</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Detailed Site Location / Delivery Address *</label>
+        <input required name="delivery_address" id="cust-address" placeholder="e.g. Ruaka, off Limuru Road, near Quickmart, Gate 4" value="<%= (user && user.town) || '' %>">
+      </div>
+
+      <div class="form-group">
+        <label>Site Instructions / Delivery Notes (optional)</label>
+        <textarea name="delivery_notes" id="cust-notes" rows="2" placeholder="e.g. Call before dispatch, site gate open from 7am, offloading crew on site..."></textarea>
+      </div>
+
+      <button class="btn" type="submit" id="btn-submit-order" style="width:100%;font-size:16px;padding:15px;margin-top:4px">
+        <i class="fas fa-lock"></i> Pay via Paystack (M-Pesa / Card)
+      </button>
+      <div class="toast" id="order-toast"></div>
+    </form>
+  </div>
+</div>
+
+<!-- 9. REALTIME PAYSTACK PAYMENT STATUS MODAL -->
+<div class="mat-modal-overlay" id="payModal">
+  <div class="mat-modal" style="max-width:440px;text-align:center">
+    <button type="button" onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--mut);font-size:22px;cursor:pointer;padding:0;width:32px;height:32px;display:grid;place-items:center;border-radius:50%">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div style="width:52px;height:52px;border-radius:50%;background:#e6f7ec;display:grid;place-items:center;margin:0 auto 16px;color:#14703a;font-size:22px">
+      <i class="fas fa-credit-card"></i>
+    </div>
+    <h3 style="margin:0 0 8px;font-size:20px;color:var(--navy)">Complete Material Payment</h3>
+    <p style="color:var(--mut);font-size:14px;margin:0 0 20px" id="payModalSubtext">
+      Please approve the <strong>M-Pesa STK push</strong> prompt sent to your phone, or complete via the secure Paystack checkout.
+    </p>
+
+    <div style="background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px">
+        <span style="color:var(--mut)">Total Amount:</span>
+        <strong id="payModalAmount" style="color:#047857;font-size:16px">KSh 0.00</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px">
+        <span style="color:var(--mut)">Paystack Reference:</span>
+        <code id="payModalRef" style="font-size:12px;background:#e2e8f0;padding:2px 6px;border-radius:4px">TL_MAT_...</code>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px">
+        <span style="color:var(--mut)">Payment Status:</span>
+        <span id="payModalStatus" style="color:#d97706;font-weight:700">Awaiting Approval...</span>
+      </div>
+    </div>
+
+    <!-- Live Spinner -->
+    <div id="payModalSpinner" style="margin-bottom:20px">
+      <i class="fas fa-spinner fa-spin" style="font-size:28px;color:var(--navy)"></i>
+      <div style="font-size:13px;color:var(--mut);margin-top:8px">Listening for realtime payment confirmation...</div>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <a id="payModalExternalBtn" href="javascript:void(0)" target="_blank" class="btn navy" style="flex:1;font-size:14px;padding:10px">
+        Open Checkout
+      </a>
+      <button type="button" class="btn o" onclick="closePayModal()" style="font-size:14px;padding:10px">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 10. MATERIAL QUICK SPECS MODAL -->
+<div class="mat-modal-overlay" id="specsModal">
+  <div class="mat-modal" style="max-width:560px">
+    <button type="button" onclick="closeSpecsModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--mut);font-size:22px;cursor:pointer;padding:0;width:32px;height:32px;display:grid;place-items:center;border-radius:50%">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div style="width:100%;height:220px;border-radius:12px;overflow:hidden;margin-bottom:16px;background:#f1f5f9">
+      <img id="specsModalImg" src="/img/service-1.jpg" alt="" style="width:100%;height:100%;object-fit:cover">
+    </div>
+
+    <span id="specsModalCat" style="font-size:11.5px;font-weight:700;background:#eef4fb;color:var(--navy);padding:3px 10px;border-radius:6px;display:inline-block;margin-bottom:8px">Category</span>
+    <h2 id="specsModalTitle" style="font-size:20px;margin:0 0 10px;color:var(--navy)">Material Specifications</h2>
+    
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;background:#f8fafc;padding:12px 16px;border-radius:10px;border:1px solid var(--bd)">
+      <div>
+        <div style="font-size:12px;color:var(--mut)">Price</div>
+        <div id="specsModalPrice" style="font-size:20px;font-weight:900;color:#047857">KSh 0</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:var(--mut)">Stock Availability</div>
+        <div id="specsModalStock" style="font-size:15px;font-weight:700;color:var(--navy)">In Stock</div>
+      </div>
+    </div>
+
+    <h4 style="margin:16px 0 6px;font-size:14px;color:var(--navy)">Full Material Description</h4>
+    <p id="specsModalDesc" style="color:var(--tx);font-size:14px;line-height:1.6;margin:0 0 16px;white-space:pre-line">Description</p>
+
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button type="button" id="specsOrderBtn" class="btn navy" style="flex:1" onclick="orderFromSpecs()">
+        <i class="fas fa-shopping-cart"></i> Order This Material
+      </button>
+      <button type="button" class="btn o" onclick="closeSpecsModal()">
+        Back to Catalog
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYSTACK INLINE POPUP SCRIPT -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
 
 <script>
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
-        toast.style.display = 'block';
-        
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 5000);
-    }
+// State Management
+let currentCategoryFilter = 'all';
+let currentLocationFilter = '';
+let currentSearchQuery = '';
+let currentSortOrder = 'latest';
+let paymentPollInterval = null;
+let activeModalProductId = null;
+const paystackPublicKey = '<%= paystackPublicKey %>';
 
-    // Submit supplier signup form
-    async function submitSupplierSignup(event) {
-        event.preventDefault();
-        
-        const form = event.target;
-        const submitBtn = document.getElementById('supplierSignupBtn');
-        const originalBtnText = submitBtn.innerHTML;
-        
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-        
-        try {
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-            
-            const response = await fetch('/materials/supplier-signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                showToast(result.message, 'success');
-                form.reset();
-                
-                // Optionally redirect to login after 3 seconds
-                setTimeout(() => {
-                    showToast('Redirecting to login...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/auth/login';
-                    }, 1000);
-                }, 3000);
-            } else {
-                showToast(result.message, 'error');
-            }
-        } catch (error) {
-            console.error('Error submitting signup:', error);
-            showToast('Network error. Please check your connection and try again.', 'error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-        }
-        
-        return false;
+// Hub Tabs (Orders vs Supplier)
+function showHubTab(tabName) {
+  const tabs = ['orders', 'supplier'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('tab-btn-' + t);
+    const panel = document.getElementById('hub-panel-' + t);
+    if (btn && panel) {
+      if (t === tabName) {
+        btn.classList.add('active');
+        panel.style.display = 'block';
+      } else {
+        btn.classList.remove('active');
+        panel.style.display = 'none';
+      }
     }
+  });
+}
+
+// Toast Notification
+function showToast(elId, msg, type = 'success') {
+  const t = document.getElementById(elId);
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.style.display = 'block';
+  setTimeout(() => {
+    t.style.display = 'none';
+  }, 5000);
+}
+
+// 1. REALTIME FILTERING LOGIC
+function filterByCategory(cat) {
+  currentCategoryFilter = cat;
+  
+  // Update chips UI
+  const chips = document.querySelectorAll('#categoryChips .chip');
+  chips.forEach(c => {
+    const text = c.textContent.toLowerCase();
+    if (cat === 'all' && text.includes('all')) {
+      c.classList.add('on');
+    } else if (cat !== 'all' && text.includes(cat.toLowerCase())) {
+      c.classList.add('on');
+    } else {
+      c.classList.remove('on');
+    }
+  });
+
+  applyMaterialFilters();
+}
+
+function filterByCounty(county) {
+  const input = document.getElementById('matSearchInput');
+  if (county === 'All Counties') {
+    currentLocationFilter = '';
+    if (input) input.value = '';
+  } else {
+    currentLocationFilter = county;
+    if (input) input.value = county;
+  }
+
+  // Update pill UI
+  const pills = document.querySelectorAll('.loc-pill');
+  pills.forEach(p => {
+    if ((county === 'All Counties' && p.textContent.includes('All')) || p.textContent.includes(county)) {
+      p.classList.add('active');
+    } else {
+      p.classList.remove('active');
+    }
+  });
+
+  applyMaterialFilters();
+}
+
+function onRealtimeMaterialInput(val) {
+  currentSearchQuery = val.trim();
+  
+  // Clear pills if custom typing
+  const pills = document.querySelectorAll('.loc-pill');
+  pills.forEach(p => p.classList.remove('active'));
+
+  applyMaterialFilters();
+}
+
+function sortMaterials(val) {
+  currentSortOrder = val;
+  const grid = document.getElementById('materialsGrid');
+  if (!grid) return;
+
+  const cards = Array.from(grid.querySelectorAll('.material-card-col'));
+  cards.sort((a, b) => {
+    const priceA = parseFloat(a.getAttribute('data-price') || 0);
+    const priceB = parseFloat(b.getAttribute('data-price') || 0);
+    const titleA = (a.getAttribute('data-title') || '').toLowerCase();
+    const titleB = (b.getAttribute('data-title') || '').toLowerCase();
+    const idA = parseInt(a.getAttribute('data-id') || 0, 10);
+    const idB = parseInt(b.getAttribute('data-id') || 0, 10);
+
+    if (val === 'price_asc') return priceA - priceB;
+    if (val === 'price_desc') return priceB - priceA;
+    if (val === 'title') return titleA.localeCompare(titleB);
+    return idB - idA; // default latest
+  });
+
+  cards.forEach(c => grid.appendChild(c));
+}
+
+function resetMaterialFilters() {
+  currentCategoryFilter = 'all';
+  currentLocationFilter = '';
+  currentSearchQuery = '';
+  const input = document.getElementById('matSearchInput');
+  if (input) input.value = '';
+  filterByCategory('all');
+  filterByCounty('All Counties');
+}
+
+function applyMaterialFilters() {
+  const cards = document.querySelectorAll('#materialsGrid .material-card-col');
+  let visibleCount = 0;
+
+  const catTerm = currentCategoryFilter.toLowerCase();
+  const qTerm = currentSearchQuery.toLowerCase();
+  const locTerm = currentLocationFilter.toLowerCase();
+
+  cards.forEach(card => {
+    const title = (card.getAttribute('data-title') || '').toLowerCase();
+    const cat = (card.getAttribute('data-category') || '').toLowerCase();
+    const loc = (card.getAttribute('data-location') || '').toLowerCase();
+    const desc = (card.getAttribute('data-desc') || '').toLowerCase();
+
+    const catMatch = (currentCategoryFilter === 'all') || cat.includes(catTerm) || title.includes(catTerm);
+    const locMatch = (!currentLocationFilter) || loc.includes(locTerm) || title.includes(locTerm);
+    const queryMatch = (!currentSearchQuery) || title.includes(qTerm) || cat.includes(qTerm) || loc.includes(qTerm) || desc.includes(qTerm);
+
+    if (catMatch && locMatch && queryMatch) {
+      card.style.display = 'flex';
+      visibleCount++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  // Update status badge
+  const countBadge = document.getElementById('materialCountBadge');
+  const countLabel = document.getElementById('materialCountLabel');
+  if (countBadge) countBadge.textContent = visibleCount;
+  if (countLabel) {
+    if (currentSearchQuery) {
+      countLabel.textContent = `Materials matching "${currentSearchQuery}"`;
+    } else if (currentCategoryFilter !== 'all') {
+      countLabel.textContent = `Materials in "${currentCategoryFilter}"`;
+    } else {
+      countLabel.textContent = `Verified materials available for immediate order & delivery`;
+    }
+  }
+}
+
+// 2. ORDER MODAL & PAYSTACK CHECKOUT
+function openOrderModal(productId) {
+  const card = document.querySelector(`.material-card-col[data-id="${productId}"]`);
+  if (!card) return;
+
+  activeModalProductId = productId;
+  const title = card.getAttribute('data-title');
+  const price = parseFloat(card.getAttribute('data-price') || 0);
+  const unit = card.getAttribute('data-unit') || 'unit';
+  const img = card.getAttribute('data-image') || '/img/service-1.jpg';
+  const cat = card.getAttribute('data-category') || 'General';
+  const stock = parseInt(card.getAttribute('data-stock') || 100, 10);
+
+  document.getElementById('checkoutProductId').value = productId;
+  document.getElementById('orderModalTitle').textContent = title;
+  document.getElementById('orderModalCategory').textContent = cat;
+  document.getElementById('orderModalUnitPrice').textContent = 'KSh ' + price.toLocaleString();
+  document.getElementById('orderModalUnit').textContent = unit;
+  document.getElementById('orderModalImg').src = img;
+  document.getElementById('checkoutQty').value = 1;
+  document.getElementById('checkoutQty').setAttribute('data-unit-price', price);
+  document.getElementById('checkoutQty').setAttribute('max', stock > 0 ? stock : 10000);
+
+  updateOrderModalTotal();
+
+  const modal = document.getElementById('orderModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeOrderModal() {
+  const modal = document.getElementById('orderModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function adjustOrderQty(delta) {
+  const qtyInput = document.getElementById('checkoutQty');
+  if (!qtyInput) return;
+  let val = parseInt(qtyInput.value, 10) || 1;
+  val = Math.max(1, val + delta);
+  const max = parseInt(qtyInput.getAttribute('max') || 10000, 10);
+  if (val > max) val = max;
+  qtyInput.value = val;
+  updateOrderModalTotal();
+}
+
+function updateOrderModalTotal() {
+  const qtyInput = document.getElementById('checkoutQty');
+  if (!qtyInput) return;
+  const qty = parseInt(qtyInput.value, 10) || 1;
+  const unitPrice = parseFloat(qtyInput.getAttribute('data-unit-price') || 0);
+  const total = Math.round(qty * unitPrice);
+
+  const totalEl = document.getElementById('checkoutTotalPrice');
+  if (totalEl) totalEl.textContent = 'KSh ' + total.toLocaleString();
+
+  const submitBtn = document.getElementById('btn-submit-order');
+  if (submitBtn) {
+    submitBtn.innerHTML = `<i class="fas fa-lock"></i> Pay KSh ${total.toLocaleString()} via Paystack`;
+  }
+}
+
+async function handleMaterialCheckout(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('btn-submit-order');
+  const original = btn.innerHTML;
+
+  const payload = {
+    product_id: document.getElementById('checkoutProductId').value,
+    quantity: document.getElementById('checkoutQty').value,
+    customer_name: document.getElementById('cust-name').value,
+    customer_phone: document.getElementById('cust-phone').value,
+    customer_email: document.getElementById('cust-email').value,
+    delivery_county: document.getElementById('cust-county').value,
+    delivery_address: document.getElementById('cust-address').value,
+    delivery_notes: document.getElementById('cust-notes').value
+  };
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing Paystack Payment...';
+
+  try {
+    const res = await fetch('/api/materials/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      closeOrderModal();
+      openPayModal(data.reference, data.authorization_url, data.isSimulated, data.total_price);
+
+      // Launch Paystack inline if key available and not simulated
+      if (window.PaystackPop && paystackPublicKey && paystackPublicKey.length > 10 && !data.isSimulated) {
+        try {
+          const handler = PaystackPop.setup({
+            key: paystackPublicKey,
+            email: payload.customer_email || `buyer_${payload.customer_phone.replace(/\D/g, '')}@toplinehub.co.ke`,
+            amount: Math.round(data.total_price * 100),
+            currency: 'KES',
+            ref: data.reference,
+            metadata: {
+              custom_fields: [
+                { display_name: "Customer Name", variable_name: "customer_name", value: payload.customer_name },
+                { display_name: "Customer Phone", variable_name: "customer_phone", value: payload.customer_phone },
+                { display_name: "Material", variable_name: "product_title", value: data.product?.title || '' },
+                { display_name: "Delivery Address", variable_name: "delivery_address", value: payload.delivery_address }
+              ]
+            },
+            callback: function(response) {
+              checkRealtimePaymentStatus(data.reference);
+            },
+            onClose: function() {
+              // Modal stays open polling backend
+            }
+          });
+          handler.openIframe();
+        } catch (popupErr) {
+          console.warn('Paystack popup fallback:', popupErr);
+          if (data.authorization_url) window.open(data.authorization_url, '_blank');
+        }
+      } else if (data.authorization_url && !data.isSimulated) {
+        window.open(data.authorization_url, '_blank');
+      }
+    } else {
+      showToast('order-toast', data.message || 'Checkout failed. Please verify details.', 'error');
+    }
+  } catch (err) {
+    showToast('order-toast', 'Connection error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+// 3. REALTIME PAYMENT STATUS MODAL & VERIFICATION
+function openPayModal(ref, authUrl, isSimulated, total) {
+  const modal = document.getElementById('payModal');
+  const refEl = document.getElementById('payModalRef');
+  const amtEl = document.getElementById('payModalAmount');
+  const extBtn = document.getElementById('payModalExternalBtn');
+  const subtext = document.getElementById('payModalSubtext');
+
+  if (refEl) refEl.textContent = ref;
+  if (amtEl && total) amtEl.textContent = 'KSh ' + Number(total).toLocaleString();
+  if (extBtn) extBtn.href = authUrl || 'javascript:void(0)';
+  if (modal) modal.style.display = 'flex';
+
+  if (isSimulated && subtext) {
+    subtext.innerHTML = '<em>Simulation Mode:</em> Verifying material payment automatically in a few seconds...';
+  } else if (subtext) {
+    subtext.innerHTML = 'Complete payment via <strong>M-Pesa STK push</strong> or Card to confirm your site dispatch.';
+  }
+
+  // Poll backend every 2s
+  if (paymentPollInterval) clearInterval(paymentPollInterval);
+  paymentPollInterval = setInterval(() => {
+    checkRealtimePaymentStatus(ref);
+  }, 2000);
+}
+
+function closePayModal() {
+  const modal = document.getElementById('payModal');
+  if (modal) modal.style.display = 'none';
+  if (paymentPollInterval) {
+    clearInterval(paymentPollInterval);
+    paymentPollInterval = null;
+  }
+}
+
+async function checkRealtimePaymentStatus(ref) {
+  try {
+    const res = await fetch(`/api/materials/payment/verify?reference=${encodeURIComponent(ref)}`);
+    const data = await res.json();
+
+    if (data.success && data.completed) {
+      if (paymentPollInterval) clearInterval(paymentPollInterval);
+
+      const statusEl = document.getElementById('payModalStatus');
+      const spinnerEl = document.getElementById('payModalSpinner');
+      if (statusEl) {
+        statusEl.textContent = 'Payment Confirmed!';
+        statusEl.style.color = '#10b981';
+      }
+      if (spinnerEl) {
+        spinnerEl.innerHTML = `
+          <div style="color:#10b981;font-weight:800;font-size:16px">
+            <i class="fas fa-check-circle" style="font-size:36px;margin-bottom:8px"></i><br>
+            Order #${data.order?.id || ''} Confirmed! Stored by Admin.<br>
+            <span style="font-size:13px;color:var(--mut);font-weight:normal">Queued for site dispatch.</span>
+          </div>
+        `;
+      }
+
+      setTimeout(() => {
+        closePayModal();
+        showHubTab('orders');
+        document.getElementById('hub').scrollIntoView({ behavior: 'smooth' });
+        searchMyOrders();
+      }, 1800);
+    }
+  } catch (e) {
+    console.warn('Payment check error:', e);
+  }
+}
+
+// 4. QUICK SPECS MODAL
+function openSpecsModal(productId) {
+  const card = document.querySelector(`.material-card-col[data-id="${productId}"]`);
+  if (!card) return;
+
+  activeModalProductId = productId;
+  document.getElementById('specsModalTitle').textContent = card.getAttribute('data-title');
+  document.getElementById('specsModalCat').textContent = card.getAttribute('data-category');
+  document.getElementById('specsModalPrice').textContent = 'KSh ' + Number(card.getAttribute('data-price')).toLocaleString() + ' / ' + card.getAttribute('data-unit');
+  document.getElementById('specsModalImg').src = card.getAttribute('data-image') || '/img/service-1.jpg';
+  document.getElementById('specsModalDesc').textContent = card.getAttribute('data-desc') || 'Quality verified construction material.';
+  
+  const stock = parseInt(card.getAttribute('data-stock') || 100, 10);
+  document.getElementById('specsModalStock').textContent = stock > 0 ? `${stock} units in stock` : 'Available on order';
+
+  const modal = document.getElementById('specsModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeSpecsModal() {
+  const modal = document.getElementById('specsModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function orderFromSpecs() {
+  closeSpecsModal();
+  if (activeModalProductId) {
+    openOrderModal(activeModalProductId);
+  }
+}
+
+// 5. SEARCH & TRACK MY ORDERS
+async function searchMyOrders() {
+  const phone = document.getElementById('orderLookupPhone').value.trim();
+  const container = document.getElementById('ordersListContainer');
+  if (!container) return;
+
+  container.innerHTML = '<div style="text-align:center;padding:24px"><i class="fas fa-spinner fa-spin" style="font-size:24px;color:var(--navy)"></i><p style="margin:8px 0 0;font-size:13px;color:var(--mut)">Loading order history...</p></div>';
+
+  try {
+    const res = await fetch(`/api/materials/my-orders?phone=${encodeURIComponent(phone)}`);
+    const data = await res.json();
+
+    if (data.success && data.orders && data.orders.length > 0) {
+      let html = '<div style="display:grid;gap:12px">';
+      data.orders.forEach(ord => {
+        const prodTitle = ord.product ? ord.product.title : 'Construction Material';
+        const unit = ord.product ? ord.product.unit : 'unit';
+        const isPaid = ord.payment_status === 'paid';
+        const dateStr = new Date(ord.createdAt || ord.created_at || Date.now()).toLocaleDateString('en-KE', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        html += `
+          <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <strong style="color:var(--navy);font-size:15px">Order #${ord.id}</strong>
+                <span style="font-size:12px;background:#eef4fb;color:var(--navy);padding:2px 8px;border-radius:4px;font-weight:700">${escapeHtml(ord.paystack_reference || 'Paystack')}</span>
+                <span style="font-size:12px;padding:2px 8px;border-radius:99px;font-weight:700;background:${isPaid ? '#d1fae5;color:#065f46' : '#fef3c7;color:#92400e'}">
+                  ${isPaid ? 'Paid & Confirmed' : 'Payment Pending'}
+                </span>
+              </div>
+              <div style="font-size:13.5px;color:var(--tx);font-weight:600">
+                ${escapeHtml(prodTitle)} &bull; Qty: ${ord.quantity} ${escapeHtml(unit)}
+              </div>
+              <div style="font-size:12px;color:var(--mut);margin-top:3px">
+                <i class="fas fa-map-marker-alt"></i> ${escapeHtml(ord.delivery_address)} &bull; Placed: ${dateStr}
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:17px;font-weight:900;color:#047857">KSh ${Number(ord.total_price).toLocaleString()}</div>
+              <div style="font-size:12px;color:var(--mut);margin-top:2px">Status: <strong style="color:var(--navy)">${escapeHtml(ord.status)}</strong></div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = `
+        <div style="text-align:center;padding:36px 20px;background:#f8fafc;border-radius:12px;border:1px dashed var(--bd)">
+          <i class="fas fa-shopping-bag" style="font-size:32px;color:var(--mut);margin-bottom:10px"></i>
+          <p style="margin:0;color:var(--mut);font-size:14.5px">No material orders found for this phone number. Try another phone or browse our catalog above to place an order.</p>
+        </div>
+      `;
+    }
+  } catch (err) {
+    container.innerHTML = '<p style="color:#ef4444;text-align:center">Failed to load orders. Please try again.</p>';
+  }
+}
+
+// 6. SUPPLIER SIGNUP SUBMISSION
+async function submitSupplierSignup(event) {
+  event.preventDefault();
+  const form = event.target;
+  const submitBtn = document.getElementById('supplierSignupBtn');
+  const original = submitBtn.innerHTML;
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting Application...';
+
+  try {
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => { data[key] = value; });
+
+    const response = await fetch('/materials/supplier-signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showToast('supplier-toast', result.message || 'Application submitted successfully! Our team will contact you.', 'success');
+      form.reset();
+    } else {
+      showToast('supplier-toast', result.message || 'Submission failed.', 'error');
+    }
+  } catch (error) {
+    showToast('supplier-toast', 'Connection error. Please try again.', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = original;
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Check URL query parameters for payment return
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('reference');
+  if (ref && urlParams.get('payment_status') === 'check') {
+    openPayModal(ref, null, false);
+  }
+});
 </script>
 
 <%- include('partials/footer') %>

@@ -51,6 +51,12 @@
                 </a>
             </li>
             <li class="admin-nav-item">
+                <a href="/dashboard/admin/orders" class="admin-nav-link <%= activePage === 'orders' ? 'active' : '' %>">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Material Orders</span>
+                </a>
+            </li>
+            <li class="admin-nav-item">
                 <a href="/dashboard/admin/jobs" class="admin-nav-link <%= activePage === 'jobs' ? 'active' : '' %>">
                     <i class="fas fa-briefcase"></i>
                     <span>Jobs</span>
@@ -93,6 +99,8 @@
                         <i class="fas fa-graduation-cap" style="color:var(--admin-accent);"></i> Training Payments & Transactions
                     <% } else if (activePage === 'products') { %>
                         <i class="fas fa-cubes" style="color:var(--admin-primary);"></i> Products Inventory
+                    <% } else if (activePage === 'orders') { %>
+                        <i class="fas fa-shopping-bag" style="color:var(--admin-accent);"></i> Material Orders & Purchases
                     <% } else if (activePage === 'jobs') { %>
                         <i class="fas fa-briefcase" style="color:var(--admin-primary);"></i> Construction Jobs
                     <% } %>
@@ -183,6 +191,17 @@
                         </div>
                         <div class="stat-icon-wrapper" style="background:#ede9fe;color:#7c3aed;">
                             <i class="fas fa-briefcase"></i>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card">
+                        <div>
+                            <div class="stat-info-title">Material Orders</div>
+                            <div class="stat-info-value" style="color:#059669;"><%= counts.orders || 0 %></div>
+                            <div class="stat-info-sub">KSh <%= Number(counts.ordersRevenue || 0).toLocaleString() %> paid sales</div>
+                        </div>
+                        <div class="stat-icon-wrapper" style="background:#dcfce7;color:#16a34a;">
+                            <i class="fas fa-shopping-bag"></i>
                         </div>
                     </div>
                 </div>
@@ -887,6 +906,200 @@
                 </div>
 
             <!-- ============================================================== -->
+            <!-- 5.5 MATERIAL ORDERS MANAGEMENT PAGE (Dedicated View with Full Tracking) -->
+            <!-- ============================================================== -->
+            <% } else if (activePage === 'orders') { %>
+                <div class="page-header-box">
+                    <div>
+                        <h1><i class="fas fa-shopping-bag" style="color:var(--admin-accent);"></i> Material Orders & Purchases</h1>
+                        <p>Track construction material purchases, Paystack payment records, customer delivery sites, and fulfillments.</p>
+                    </div>
+                </div>
+
+                <!-- Orders Stats Grid -->
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <div>
+                            <div class="stat-info-title">Total Orders</div>
+                            <div class="stat-info-value"><%= stats.total %></div>
+                        </div>
+                        <div class="stat-icon-wrapper" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-receipt"></i></div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div>
+                            <div class="stat-info-title">Paid / Confirmed</div>
+                            <div class="stat-info-value" style="color:#10b981;"><%= stats.paid %></div>
+                        </div>
+                        <div class="stat-icon-wrapper" style="background:#d1fae5;color:#059669;"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div>
+                            <div class="stat-info-title">Pending Payment</div>
+                            <div class="stat-info-value" style="color:#f59e0b;"><%= stats.pending %></div>
+                        </div>
+                        <div class="stat-icon-wrapper" style="background:#fef3e2;color:#d97706;"><i class="fas fa-clock"></i></div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div>
+                            <div class="stat-info-title">Delivered</div>
+                            <div class="stat-info-value" style="color:#0284c7;"><%= stats.delivered %></div>
+                        </div>
+                        <div class="stat-icon-wrapper" style="background:#e0f2fe;color:#0284c7;"><i class="fas fa-truck"></i></div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div>
+                            <div class="stat-info-title">Sales Revenue</div>
+                            <div class="stat-info-value" style="color:#f5a623;">KSh <%= Number(stats.revenue || 0).toLocaleString() %></div>
+                        </div>
+                        <div class="stat-icon-wrapper" style="background:#fef3e2;color:#f5a623;"><i class="fas fa-coins"></i></div>
+                    </div>
+                </div>
+
+                <!-- Orders Table Card -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div class="admin-toolbar">
+                            <input type="text" class="admin-search-input" placeholder="Live search orders by customer, phone, address, reference...">
+                            <select class="admin-select-filter" onchange="window.location.href='/dashboard/admin/orders?status=' + this.value + '&payment_status=<%= filter.payment_status %>'">
+                                <option value="all" <%= filter.status === 'all' ? 'selected' : '' %>>All Delivery Statuses</option>
+                                <option value="confirmed" <%= filter.status === 'confirmed' ? 'selected' : '' %>>Confirmed / Processing</option>
+                                <option value="delivered" <%= filter.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                <option value="inquiry" <%= filter.status === 'inquiry' ? 'selected' : '' %>>Inquiry</option>
+                                <option value="cancelled" <%= filter.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                            </select>
+                            <select class="admin-select-filter" onchange="window.location.href='/dashboard/admin/orders?payment_status=' + this.value + '&status=<%= filter.status %>'">
+                                <option value="all" <%= filter.payment_status === 'all' ? 'selected' : '' %>>All Payments</option>
+                                <option value="paid" <%= filter.payment_status === 'paid' ? 'selected' : '' %>>Paid (Paystack/M-Pesa)</option>
+                                <option value="pending" <%= filter.payment_status === 'pending' ? 'selected' : '' %>>Pending</option>
+                            </select>
+                        </div>
+                        <div style="font-size:13px;color:#6b7280;font-weight:600;">
+                            <%= orders.length %> orders recorded
+                        </div>
+                    </div>
+
+                    <div class="admin-table-responsive">
+                        <table class="admin-modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer / Phone</th>
+                                    <th>Material Ordered</th>
+                                    <th>Quantity</th>
+                                    <th>Total (KES)</th>
+                                    <th>Payment Ref</th>
+                                    <th>Payment</th>
+                                    <th>Fulfillment</th>
+                                    <th>Delivery Address</th>
+                                    <th style="text-align:right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (orders && orders.length > 0) { %>
+                                    <% orders.forEach(ord => { %>
+                                        <tr>
+                                            <td style="font-weight:700;color:#0b3a6e;">
+                                                #<%= ord.id %>
+                                                <div style="font-size:11px;color:#9ca3af;font-weight:normal;">
+                                                    <%= ord.created_at ? new Date(ord.created_at).toLocaleDateString('en-KE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '' %>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <%
+                                                  let buyerDisplayName = ord.buyer ? ord.buyer.name : '';
+                                                  if (!buyerDisplayName && ord.notes) {
+                                                    const m = ord.notes.match(/Customer:\s*([^|,\n]+)/i);
+                                                    if (m) buyerDisplayName = m[1].trim();
+                                                  }
+                                                  if (!buyerDisplayName) buyerDisplayName = 'Customer';
+                                                %>
+                                                <div style="font-weight:700;color:#111827;"><%= buyerDisplayName %></div>
+                                                <div style="font-size:12px;color:#059669;font-weight:600;">
+                                                    <i class="fas fa-phone-alt" style="font-size:10px;"></i> <%= ord.contact_phone %>
+                                                </div>
+                                                <% if (ord.buyer && ord.buyer.email) { %>
+                                                    <div style="font-size:11px;color:#6b7280;"><%= ord.buyer.email %></div>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <div style="display:flex;align-items:center;gap:8px;">
+                                                    <% if (ord.product && ord.product.image_url) { %>
+                                                        <img src="<%= ord.product.image_url %>" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid #e5e7eb;">
+                                                    <% } %>
+                                                    <div>
+                                                        <div style="font-weight:700;color:#111827;font-size:13px;">
+                                                            <%= ord.product ? ord.product.title : 'Material Item' %>
+                                                        </div>
+                                                        <div style="font-size:11px;color:#6b7280;">
+                                                            <%= ord.product && ord.product.category ? ord.product.category.name : 'General' %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span style="font-weight:700;font-size:14px;color:#111827;"><%= ord.quantity %></span>
+                                                <span style="font-size:12px;color:#6b7280;"><%= ord.product ? ord.product.unit : 'units' %></span>
+                                            </td>
+                                            <td style="font-weight:800;color:#f5a623;font-size:14px;">
+                                                KSh <%= Number(ord.total_price).toLocaleString() %>
+                                            </td>
+                                            <td>
+                                                <div style="font-size:11.5px;font-family:monospace;font-weight:600;color:#1e40af;background:#eff6ff;padding:2px 6px;border-radius:4px;display:inline-block;">
+                                                    <%= ord.paystack_reference || ord.mpesa_receipt || 'None' %>
+                                                </div>
+                                                <div style="font-size:10.5px;color:#9ca3af;text-transform:uppercase;">
+                                                    <%= ord.payment_method || 'paystack' %>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="status-pill <%= ord.payment_status === 'paid' ? 'status-completed' : (ord.payment_status === 'pending' ? 'status-pending' : 'status-failed') %>">
+                                                    <%= ord.payment_status %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="status-pill <%= ord.status === 'delivered' ? 'status-completed' : (ord.status === 'confirmed' ? 'status-available' : (ord.status === 'cancelled' ? 'status-unavailable' : 'status-pending')) %>">
+                                                    <%= ord.status %>
+                                                </span>
+                                            </td>
+                                            <td style="max-width:180px;">
+                                                <div style="font-size:12px;color:#374151;line-height:1.3;">
+                                                    <i class="fas fa-map-marker-alt" style="color:#ef4444;font-size:10px;"></i> <%= ord.delivery_address %>
+                                                </div>
+                                                <% if (ord.notes) { %>
+                                                    <div style="font-size:11px;color:#6b7280;font-style:italic;margin-top:2px;">
+                                                        Note: <%= ord.notes %>
+                                                    </div>
+                                                <% } %>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <div class="action-buttons-group" style="justify-content:flex-end;">
+                                                    <button class="btn-admin btn-admin-primary btn-admin-icon" title="Update Status" onclick="openOrderModal(<%= ord.id %>, '<%= ord.status %>', '<%= ord.payment_status %>', '<%= ord.buyer ? ord.buyer.name : 'Customer' %>', <%= ord.total_price %>)">
+                                                        <i class="fas fa-sync-alt"></i> Status
+                                                    </button>
+                                                    <button class="btn-admin btn-admin-danger btn-admin-icon" title="Delete Order" onclick="confirmDelete('Order', <%= ord.id %>, 'Order #<%= ord.id %> (<%= ord.product ? ord.product.title : 'Material' %>)', '/dashboard/admin/orders/<%= ord.id %>/delete', this.closest('tr'))">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="10">
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon"><i class="fas fa-shopping-bag"></i></div>
+                                                <h3 class="empty-state-title">No Material Orders Found</h3>
+                                                <p style="color:#6b7280;font-size:13px;">Customer orders placed via the /materials page with Paystack will appear here in real time.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            <!-- ============================================================== -->
             <!-- 6. JOBS MANAGEMENT PAGE (Dedicated View with Full CRUD) -->
             <!-- ============================================================== -->
             <% } else if (activePage === 'jobs') { %>
@@ -1467,8 +1680,18 @@
                         <input type="number" name="stock_quantity" class="form-control-admin" value="100">
                     </div>
                     <div class="form-group-admin">
-                        <label>Unit (e.g. bag, piece, ton)</label>
+                        <label>Unit (e.g. 50kg Bag, Ton, Meter, Day)</label>
                         <input type="text" name="unit" class="form-control-admin" value="item">
+                    </div>
+                </div>
+                <div class="form-row-admin">
+                    <div class="form-group-admin">
+                        <label>Location / County</label>
+                        <input type="text" name="location_county" class="form-control-admin" placeholder="e.g. Nairobi, Mombasa, Kiambu" value="Nairobi">
+                    </div>
+                    <div class="form-group-admin">
+                        <label>Image URL</label>
+                        <input type="text" name="image_url" class="form-control-admin" placeholder="e.g. /img/service-1.jpg" value="/img/service-1.jpg">
                     </div>
                 </div>
                 <div class="form-group-admin">
@@ -1499,26 +1722,46 @@
                 </div>
                 <div class="form-row-admin">
                     <div class="form-group-admin">
-                        <label>Price (KES)</label>
-                        <input type="number" step="0.01" name="price" id="editProductPrice" class="form-control-admin" required>
+                        <label>Category</label>
+                        <select name="category_id" id="editProductCategory" class="form-control-admin">
+                            <% if (typeof categories !== 'undefined') { %>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                                <% }) %>
+                            <% } %>
+                        </select>
                     </div>
                     <div class="form-group-admin">
-                        <label>Stock Quantity</label>
-                        <input type="number" name="stock_quantity" id="editProductStock" class="form-control-admin" required>
+                        <label>Price (KES)</label>
+                        <input type="number" step="0.01" name="price" id="editProductPrice" class="form-control-admin" required>
                     </div>
                 </div>
                 <div class="form-row-admin">
                     <div class="form-group-admin">
+                        <label>Stock Quantity</label>
+                        <input type="number" name="stock_quantity" id="editProductStock" class="form-control-admin" required>
+                    </div>
+                    <div class="form-group-admin">
                         <label>Unit</label>
                         <input type="text" name="unit" id="editProductUnit" class="form-control-admin">
                     </div>
+                </div>
+                <div class="form-row-admin">
                     <div class="form-group-admin">
-                        <label>Status</label>
-                        <select name="is_active" id="editProductStatus" class="form-control-admin">
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
-                        </select>
+                        <label>Location / County</label>
+                        <input type="text" name="location_county" id="editProductCounty" class="form-control-admin" value="Nairobi">
                     </div>
+                    <div class="form-group-admin">
+                        <label>Image URL</label>
+                        <input type="text" name="image_url" id="editProductImage" class="form-control-admin" value="/img/service-1.jpg">
+                    </div>
+                </div>
+                <div class="form-group-admin">
+                    <label>Status</label>
+                    <select name="is_active" id="editProductStatus" class="form-control-admin">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
                 </div>
                 <div class="form-group-admin">
                     <label>Description</label>
@@ -1625,6 +1868,63 @@
             <div class="admin-modal-footer">
                 <button type="button" class="btn-admin btn-admin-secondary" data-close-modal>Cancel</button>
                 <button type="submit" class="btn-admin btn-admin-primary"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 13. Update Material Order Status Modal -->
+<div class="admin-modal-backdrop" id="updateOrderStatusModal">
+    <div class="admin-modal">
+        <form id="updateOrderStatusForm" method="POST">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title"><i class="fas fa-sync-alt" style="color:var(--admin-accent);"></i> Update Material Order Status</h3>
+                <button type="button" class="admin-modal-close" data-close-modal><i class="fas fa-times"></i></button>
+            </div>
+            <div class="admin-modal-body">
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                        <span style="color:#64748b;font-size:13px;">Order Number:</span>
+                        <strong id="orderModalId" style="color:#0b3a6e;">#0</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                        <span style="color:#64748b;font-size:13px;">Customer:</span>
+                        <strong id="orderModalBuyer" style="color:#111827;">Customer</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span style="color:#64748b;font-size:13px;">Order Amount:</span>
+                        <strong id="orderModalTotal" style="color:#f5a623;font-size:16px;">KSh 0</strong>
+                    </div>
+                </div>
+
+                <div class="form-row-admin">
+                    <div class="form-group-admin">
+                        <label>Delivery / Fulfillment Status*</label>
+                        <select name="status" id="orderStatusSelect" class="form-control-admin" required>
+                            <option value="confirmed">Confirmed / In Preparation</option>
+                            <option value="delivered">Delivered / Dispatched</option>
+                            <option value="inquiry">Inquiry / Processing</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group-admin">
+                        <label>Payment Status*</label>
+                        <select name="payment_status" id="orderPaymentStatusSelect" class="form-control-admin" required>
+                            <option value="paid">Paid (Paystack / M-Pesa)</option>
+                            <option value="pending">Pending Payment</option>
+                            <option value="refunded">Refunded</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group-admin">
+                    <label>Admin Delivery Notes & Dispatch Details</label>
+                    <textarea name="notes" id="orderModalNotes" class="form-control-admin" rows="3" placeholder="e.g. Lorry driver John (0722000000) dispatched with consignment receipt."></textarea>
+                </div>
+            </div>
+            <div class="admin-modal-footer">
+                <button type="button" class="btn-admin btn-admin-secondary" data-close-modal>Cancel</button>
+                <button type="submit" class="btn-admin btn-admin-primary"><i class="fas fa-save"></i> Save Order Changes</button>
             </div>
         </form>
     </div>

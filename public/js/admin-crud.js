@@ -469,9 +469,9 @@ function editProduct(id) {
             document.getElementById('editProductTitle').value = product.title || '';
             document.getElementById('editProductPrice').value = product.price || 0;
             document.getElementById('editProductStock').value = product.stock_quantity || 0;
-            document.getElementById('editProductUnit').value = product.unit || 'item';
-            document.getElementById('editProductCounty').value = product.location_county || 'Nairobi';
-            document.getElementById('editProductCategory').value = product.category_id || 1;
+            if (document.getElementById('editProductCounty')) document.getElementById('editProductCounty').value = product.location_county || 'Nairobi';
+            if (document.getElementById('editProductCategory')) document.getElementById('editProductCategory').value = product.category_id || 1;
+            if (document.getElementById('editProductImage')) document.getElementById('editProductImage').value = product.image_url || '/img/service-1.jpg';
             document.getElementById('editProductStatus').value = product.is_active ? 'true' : 'false';
             document.getElementById('editProductDescription').value = product.description || '';
 
@@ -507,3 +507,19 @@ function editJob(id) {
         })
         .catch(err => showToast('Failed to load job: ' + err.message, 'error'));
 }
+
+/**
+ * Edit / Update Material Order Status
+ */
+function openOrderModal(id, status, paymentStatus, buyerName, total) {
+    const form = document.getElementById('updateOrderStatusForm');
+    if (!form) return;
+    form.action = `/dashboard/admin/orders/${id}/update-status`;
+    if (document.getElementById('orderModalId')) document.getElementById('orderModalId').textContent = '#' + id;
+    if (document.getElementById('orderModalBuyer')) document.getElementById('orderModalBuyer').textContent = buyerName || 'Customer';
+    if (document.getElementById('orderModalTotal')) document.getElementById('orderModalTotal').textContent = 'KSh ' + Number(total).toLocaleString();
+    if (document.getElementById('orderStatusSelect')) document.getElementById('orderStatusSelect').value = status || 'confirmed';
+    if (document.getElementById('orderPaymentStatusSelect')) document.getElementById('orderPaymentStatusSelect').value = paymentStatus || 'paid';
+    openModal('updateOrderStatusModal');
+}
+

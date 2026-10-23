@@ -13,6 +13,7 @@ const {
     Transaction,
     Wallet,
     JobApplication,
+    OrderRequest,
     sequelize
 } = require(modelsPath);
 const { Op } = require('sequelize');
@@ -164,39 +165,463 @@ router.get('/jobs', async (req, res) => {
 });
 
 /**
- * Materials page route - with product listings
+ * Materials page route - with full catalog, category filters, and user session
  */
 router.get('/materials', async (req, res) => {
+    const t0 = Date.now();
     try {
-        // Get all products
+        console.log('[ROUTE] GET /materials started');
+        // Get all active products with price > 0
         const products = await Product.findAll({
-            limit: 20,
+            where: {
+                is_active: true,
+                price: { [Op.gt]: 0 }
+            },
             order: [['created_at', 'DESC']],
             include: [
-                { model: User, as: 'seller', attributes: ['id', 'name'] },
-                { model: Category, as: 'category', attributes: ['id', 'name'] }
+                { model: User, as: 'seller', attributes: ['id', 'name', 'phone', 'role'] },
+                { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'icon'] }
             ]
         });
 
-        // Get categories for filter
+        // Get all categories
         const categories = await Category.findAll({
-            attributes: ['id', 'name']
+            order: [['name', 'ASC']]
         });
 
+        // If user is logged in, fetch their recent orders
+        let myOrders = [];
+        if (req.session.user) {
+            myOrders = await OrderRequest.findAll({
+                where: { buyer_id: req.session.user.id },
+                include: [
+                    { model: Product, as: 'product', attributes: ['id', 'title', 'image_url', 'unit', 'price'] }
+                ],
+                order: [['created_at', 'DESC']],
+                limit: 15
+            }).catch(() => []);
+        }
+
+        console.log(`[ROUTE] GET /materials completed in ${Date.now() - t0}ms (${products.length} products)`);
         res.render('materials', {
-            title: 'Materials',
+            title: 'TopLine – Construction Materials & Supplies Marketplace | Kenya',
             page: 'materials',
             products: products || [],
-            categories: categories || []
+            categories: categories || [],
+            myOrders: myOrders || [],
+            user: req.session.user || null,
+            paystackPublicKey: paystackHelper.getPublicKey()
         });
     } catch (error) {
-        console.error('Error loading materials:', error);
+        console.error('Error loading materials page:', error);
         res.render('materials', {
-            title: 'Materials',
+            title: 'TopLine – Construction Materials & Supplies Marketplace | Kenya',
             page: 'materials',
             products: [],
-            categories: []
+            categories: [],
+            myOrders: [],
+            user: req.session.user || null,
+            paystackPublicKey: paystackHelper.getPublicKey()
         });
+    }
+});
+
+/**
+ * GET API: Realtime Materials with search, category, location, and price filtering
+ */
+router.get('/api/materials', async (req, res) => {
+    try {
+        const { category, search, location, price_max, sort, in_stock } = req.query;
+        const whereClause = {
+            is_active: true,
+            price: { [Op.gt]: 0 }
+        };
+        const conditions = [];
+
+        // Category filter
+        if (category && category !== 'all' && category !== 'All' && category !== 'All Categories') {
+            if (!isNaN(category)) {
+                conditions.push({ category_id: parseInt(category, 10) });
+            } else {
+                // If slug or name passed
+                const catObj = await Category.findOne({
+                    where: {
+                        [Op.or]: [
+                            { name: { [Op.like]: `%${category}%` } },
+                            { slug: category.toLowerCase() }
+                        ]
+                    }
+                });
+                if (catObj) {
+                    conditions.push({ category_id: catObj.id });
+                }
+            }
+        }
+
+        // Location / County filter
+        if (location && location.trim() && location !== 'all' && location !== 'All Counties') {
+            conditions.push({ location_county: { [Op.like]: `%${location.trim()}%` } });
+        }
+
+        // Search text (title, description, unit, location_county)
+        if (search && search.trim()) {
+            const q = search.trim();
+            conditions.push({
+                [Op.or]: [
+                    { title: { [Op.like]: `%${q}%` } },
+                    { description: { [Op.like]: `%${q}%` } },
+                    { unit: { [Op.like]: `%${q}%` } },
+                    { location_county: { [Op.like]: `%${q}%` } }
+                ]
+            });
+        }
+
+        // Price max filter
+        if (price_max && !isNaN(price_max) && Number(price_max) > 0) {
+            conditions.push({ price: { [Op.lte]: parseFloat(price_max) } });
+        }
+
+        // In-stock only filter
+        if (in_stock === 'true' || in_stock === true || in_stock === '1') {
+            conditions.push({ stock_quantity: { [Op.gt]: 0 } });
+        }
+
+        if (conditions.length > 0) {
+            whereClause[Op.and] = conditions;
+        }
+
+        // Sort order
+        let orderClause = [['created_at', 'DESC']];
+        if (sort === 'price_asc') {
+            orderClause = [['price', 'ASC']];
+        } else if (sort === 'price_desc') {
+            orderClause = [['price', 'DESC']];
+        } else if (sort === 'title') {
+            orderClause = [['title', 'ASC']];
+        }
+
+        const products = await Product.findAll({
+            where: whereClause,
+            order: orderClause,
+            include: [
+                { model: User, as: 'seller', attributes: ['id', 'name', 'phone', 'role'] },
+                { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'icon'] }
+            ]
+        });
+
+        res.json({
+            success: true,
+            count: products.length,
+            products
+        });
+    } catch (error) {
+        console.error('API materials fetch error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch materials' });
+    }
+});
+
+/**
+ * POST API: Create Material Order & Initialize Paystack Checkout
+ */
+router.post('/api/materials/checkout', async (req, res) => {
+    try {
+        const {
+            product_id,
+            quantity,
+            customer_name,
+            customer_phone,
+            customer_email,
+            delivery_county,
+            delivery_address,
+            delivery_notes
+        } = req.body;
+
+        // Validation
+        if (!product_id) {
+            return res.status(400).json({ success: false, message: 'Product ID is required.' });
+        }
+        if (!customer_name || !customer_phone) {
+            return res.status(400).json({ success: false, message: 'Name and phone number are required.' });
+        }
+        if (!delivery_address) {
+            return res.status(400).json({ success: false, message: 'Delivery address is required.' });
+        }
+
+        const orderQty = parseInt(quantity, 10) || 1;
+        if (orderQty < 1) {
+            return res.status(400).json({ success: false, message: 'Quantity must be at least 1.' });
+        }
+
+        const product = await Product.findByPk(product_id, {
+            include: [{ model: Category, as: 'category' }]
+        });
+        if (!product || !product.is_active) {
+            return res.status(404).json({ success: false, message: 'Product is not available or out of stock.' });
+        }
+
+        if (product.stock_quantity !== null && product.stock_quantity < orderQty) {
+            return res.status(400).json({
+                success: false,
+                message: `Only ${product.stock_quantity} units available in stock. Please adjust your quantity.`
+            });
+        }
+
+        const unitPrice = parseFloat(product.price);
+        const totalPrice = Math.round(unitPrice * orderQty * 100) / 100;
+
+        const trimmedName = customer_name.trim();
+        const trimmedPhone = customer_phone.trim();
+        const userEmail = (customer_email && customer_email.trim())
+            ? customer_email.trim().toLowerCase()
+            : `buyer_${trimmedPhone.replace(/\D/g, '')}@toplinehub.co.ke`;
+
+        // Associate with buyer account
+        let buyerId = req.session.user ? req.session.user.id : null;
+        let buyerObj = null;
+
+        if (buyerId) {
+            buyerObj = await User.findByPk(buyerId);
+        } else {
+            const cleanPhone = trimmedPhone.replace(/\D/g, '').slice(-9);
+            const orConditions = [{ email: userEmail }];
+            if (cleanPhone.length >= 7) {
+                orConditions.push(
+                    sequelize.where(
+                        sequelize.fn('REPLACE', sequelize.col('phone'), ' ', ''),
+                        { [Op.like]: `%${cleanPhone}` }
+                    )
+                );
+            }
+            buyerObj = await User.findOne({ where: { [Op.or]: orConditions } });
+
+            if (!buyerObj) {
+                buyerObj = await User.create({
+                    name: trimmedName,
+                    email: userEmail,
+                    phone: trimmedPhone,
+                    password: 'BuyerPass2026!',
+                    role: 'buyer',
+                    county: delivery_county || 'Nairobi',
+                    town: delivery_address.slice(0, 50),
+                    is_verified: false
+                }).catch(() => null);
+            }
+            if (buyerObj) {
+                buyerId = buyerObj.id;
+                req.session.user = {
+                    id: buyerObj.id,
+                    name: buyerObj.name,
+                    email: buyerObj.email,
+                    phone: buyerObj.phone,
+                    role: buyerObj.role,
+                    county: buyerObj.county,
+                    town: buyerObj.town,
+                    is_verified: buyerObj.is_verified
+                };
+            }
+        }
+
+        const fullAddress = `${delivery_address.trim()}${delivery_county ? ', ' + delivery_county.trim() : ''}`;
+        const reference = `TL_MAT_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+
+        const orderNotes = [
+            `Customer: ${trimmedName}`,
+            delivery_notes && delivery_notes.trim() ? `Notes: ${delivery_notes.trim()}` : null
+        ].filter(Boolean).join(' | ');
+
+        // Create OrderRequest record
+        const order = await OrderRequest.create({
+            product_id: product.id,
+            buyer_id: buyerId,
+            quantity: orderQty,
+            total_price: totalPrice,
+            delivery_address: fullAddress,
+            contact_phone: trimmedPhone,
+            notes: orderNotes,
+            status: 'confirmed',
+            payment_status: 'pending',
+            payment_method: 'paystack',
+            paystack_reference: reference,
+            order_type: 'purchase'
+        });
+
+        // Create Transaction record for admin financial tracking
+        await Transaction.create({
+            user_id: buyerId,
+            type: 'material_purchase',
+            amount: totalPrice,
+            balance_before: 0,
+            balance_after: 0,
+            status: 'pending',
+            payment_method: 'paystack',
+            mpesa_receipt: reference,
+            reference_type: 'OrderRequest',
+            reference_id: order.id,
+            description: `Material Order #${order.id}: ${product.title} (Qty: ${orderQty} ${product.unit}) | Buyer: ${trimmedName} (${trimmedPhone})`
+        }).catch(err => console.error('Error creating order transaction:', err.message));
+
+        const host = req.get('host');
+        const protocol = req.protocol;
+        const callbackUrl = `${protocol}://${host}/materials?reference=${reference}&payment_status=check&order_id=${order.id}`;
+
+        // Initialize Paystack checkout
+        const paystackRes = await paystackHelper.initializeTransaction({
+            email: userEmail,
+            amount: totalPrice,
+            reference: reference,
+            callbackUrl: callbackUrl,
+            metadata: {
+                order_id: order.id,
+                product_id: product.id,
+                product_title: product.title,
+                quantity: orderQty,
+                unit: product.unit,
+                customer_name: trimmedName,
+                customer_phone: trimmedPhone,
+                delivery_address: fullAddress
+            },
+            channels: ['mobile_money', 'card', 'bank']
+        });
+
+        res.json({
+            success: true,
+            order_id: order.id,
+            reference: reference,
+            total_price: totalPrice,
+            authorization_url: paystackRes.data.authorization_url,
+            access_code: paystackRes.data.access_code,
+            isSimulated: !!paystackRes.isSimulated,
+            product: {
+                title: product.title,
+                price: product.price,
+                unit: product.unit,
+                image_url: product.image_url
+            }
+        });
+    } catch (err) {
+        console.error('Materials checkout error:', err);
+        res.status(500).json({ success: false, message: err.message || 'Payment initialization failed' });
+    }
+});
+
+/**
+ * GET API: Verify Paystack Material Order Payment
+ */
+router.get('/api/materials/payment/verify', async (req, res) => {
+    try {
+        const { reference } = req.query;
+        if (!reference) {
+            return res.status(400).json({ success: false, message: 'Missing transaction reference' });
+        }
+
+        const existingOrder = await OrderRequest.findOne({
+            where: { paystack_reference: reference },
+            include: [{ model: Product, as: 'product' }]
+        });
+
+        if (!existingOrder) {
+            return res.status(404).json({ success: false, message: 'Order with this reference not found' });
+        }
+
+        // If already confirmed as paid
+        if (existingOrder.payment_status === 'paid') {
+            return res.json({
+                success: true,
+                completed: true,
+                order: existingOrder,
+                message: 'Payment already verified! Order is confirmed and queued for delivery.'
+            });
+        }
+
+        // Verify with Paystack
+        const verifyRes = await paystackHelper.verifyTransaction(reference);
+
+        if ((verifyRes.data && verifyRes.data.status === 'success') || verifyRes.isSimulated) {
+            // Update order status to paid
+            await existingOrder.update({
+                payment_status: 'paid',
+                status: 'confirmed',
+                paid_at: new Date(),
+                mpesa_receipt: verifyRes.data?.reference || reference
+            });
+
+            // Decrement product stock
+            if (existingOrder.product && existingOrder.product.stock_quantity) {
+                const newStock = Math.max(0, existingOrder.product.stock_quantity - existingOrder.quantity);
+                await existingOrder.product.update({ stock_quantity: newStock });
+            }
+
+            // Update transaction record
+            await Transaction.update(
+                { status: 'completed', balance_after: existingOrder.total_price },
+                { where: { mpesa_receipt: reference } }
+            ).catch(() => {});
+
+            return res.json({
+                success: true,
+                completed: true,
+                order: existingOrder,
+                message: 'Payment confirmed successfully! Your material order has been placed with TopLine.'
+            });
+        } else {
+            return res.json({
+                success: false,
+                completed: false,
+                status: verifyRes.data?.status || 'pending',
+                message: 'Payment is still being processed or was not completed.'
+            });
+        }
+    } catch (err) {
+        console.error('Materials payment verification error:', err);
+        res.status(500).json({ success: false, message: err.message || 'Verification failed' });
+    }
+});
+
+/**
+ * GET API: User Material Orders History
+ */
+router.get('/api/materials/my-orders', async (req, res) => {
+    try {
+        const { phone, email } = req.query;
+        const whereClause = {};
+        const conditions = [];
+
+        if (req.session.user) {
+            conditions.push({ buyer_id: req.session.user.id });
+        }
+
+        if (phone && phone.trim()) {
+            const cleanPhone = phone.trim().replace(/\D/g, '').slice(-9);
+            conditions.push({ contact_phone: { [Op.like]: `%${cleanPhone}%` } });
+        }
+
+        if (conditions.length > 0) {
+            whereClause[Op.or] = conditions;
+        } else {
+            return res.json({ success: true, count: 0, orders: [] });
+        }
+
+        const orders = await OrderRequest.findAll({
+            where: whereClause,
+            include: [
+                {
+                    model: Product,
+                    as: 'product',
+                    include: [{ model: Category, as: 'category' }]
+                }
+            ],
+            order: [['created_at', 'DESC']],
+            limit: 20
+        });
+
+        res.json({
+            success: true,
+            count: orders.length,
+            orders
+        });
+    } catch (error) {
+        console.error('Fetch my-orders error:', error);
+        res.status(500).json({ success: false, message: 'Failed to load order history' });
     }
 });
 
@@ -882,11 +1307,12 @@ router.post('/materials/supplier-signup', async (req, res) => {
             seller_id: user.id,
             category_id: 1, // Default category, update as needed
             title: `${business_name} - Supplier Application`,
+            slug: `supplier-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
             description: `Supplier Application\n\nBusiness: ${business_name}\nContact: ${contact_name || business_name}\nPhone: ${phone}\nLocation: ${location || 'Not specified'}\n\nProducts Supplied:\n${products_supplied}\n\nDelivery Available: ${delivery_available || 'Not specified'}`,
             price: 0,
             unit: 'inquiry',
             stock_quantity: 0,
-            is_available: false // Set to false until admin approves
+            is_active: false
         });
 
         res.json({ 
